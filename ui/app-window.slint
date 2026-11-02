@@ -5,30 +5,28 @@ import {
     LineEdit
 } from "std-widgets.slint";
 
+// my own component
+export component Box inherits Rectangle {
+    in property <color> text-color: black;
+    in property <color> bg-color: white;
+    // width, height, x and y are there by default
+    
+    border-radius: 10px;
+    background: bg-color;
+}
+
+// by default everything in a slint file is private
+// export and import are used for public stuff
 export component MainWindow inherits Window {
     
     title: "playing around with Slint";
-    width: 800px;
-    height: 400px;
     
-    // ill just try and guess how it works
-    property <int> count: 0;
-
-    Rectangle {
-        width: parent.width / 2;
-        height: parent.height / 2;
-        background: grey;
-
-        Text {
-            text: count;
-            font-size: 34px;
-            color: #000000;
+    // roughly making the app layout
+        Box {
+            bg-color: green;
+            vertical-stretch: 1;
+            min-height: 20px;
+            max-height: 40px;
         }
-
-        TouchArea {
-            clicked => {
-                count += 1;
-            }
-        }
-    }
+       
 }
