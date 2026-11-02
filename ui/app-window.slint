@@ -1,51 +1,34 @@
 
-
-component rect inherits Rectangle {
-    callback clicked;
-    in property <bool> open_curtain;
-    in property <bool> solved;
-    in property <image> img;
-
-    width:      512px;
-    height:     512px;
-    // random color
-    background: solved ? #888888 : #ffffff;
-
-    Image {
-        source: @image-url("assets/turtle.png");
-        width:  parent.width;
-        height: parent.height;
-    }
-
-    Rectangle {
-        background:     #ffa822;
-        x:              0px;
-        width:          open_curtain ? 0px : (parent.width / 2);
-        height:         parent.height;
-        animate width { duration: 1000ms; easing: ease-in; }
-    }
-
-    Rectangle {
-        background:     #ffa822;
-        x:              open_curtain ? parent.width : (parent.width / 2);
-        width:          open_curtain ? 0px : (parent.width / 2);
-        height:         parent.height;
-        animate width { duration: 1000ms; easing: ease-in; }
-        animate x { duration: 1000ms; easing: ease-in; }
-    }
-
-    TouchArea {
-        clicked => {
-            root.clicked();
-        }
-    }
-}
+import {
+    Button,
+    CheckBox,
+    LineEdit
+} from "std-widgets.slint";
 
 export component MainWindow inherits Window {
-    rect {
-        img: @image-url("assets/turtle.png");
-        clicked => {
-            self.open_curtain = !self.open_curtain;
+    
+    title: "playing around with Slint";
+    width: 800px;
+    height: 400px;
+    
+    // ill just try and guess how it works
+    property <int> count: 0;
+
+    Rectangle {
+        width: parent.width / 2;
+        height: parent.height / 2;
+        background: grey;
+
+        Text {
+            text: count;
+            font-size: 34px;
+            color: #000000;
+        }
+
+        TouchArea {
+            clicked => {
+                count += 1;
+            }
         }
     }
 }
