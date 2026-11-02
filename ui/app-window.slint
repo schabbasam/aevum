@@ -22,11 +22,17 @@ export component MainWindow inherits Window {
     title: "playing around with Slint";
     
     // roughly making the app layout
+    VerticalLayout {
+        spacing: 10px;
+
         Box {
-            bg-color: green;
-            vertical-stretch: 1;
+            background: green;
             min-height: 20px;
-            max-height: 40px;
+            max-height: 100px;
         }
-       
+
+        Box {
+            vertical-stretch: 1;
+        }
+    } 
 }
