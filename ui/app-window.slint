@@ -9,10 +9,16 @@ import {
 export component Box inherits Rectangle {
     in property <color> text-color: black;
     in property <color> bg-color: white;
+    in property <string> text: "default";
     // width, height, x and y are there by default
     
-    border-radius: 10px;
     background: bg-color;
+
+    Text {
+        font-size: 16px;
+        color: parent.text-color;
+        text: parent.text;
+    }
 }
 
 // by default everything in a slint file is private
@@ -23,16 +29,39 @@ export component MainWindow inherits Window {
     
     // roughly making the app layout
     VerticalLayout {
-        spacing: 10px;
-
         Box {
-            background: green;
-            min-height: 20px;
-            max-height: 100px;
+            bg-color: red;
+            text: "navigation bar";
+            height: 50px;
         }
+        HorizontalLayout {
+            Box {
+                bg-color: green;
+                text: "task blocks";
+                max-width: 260px;
+                min-width: 140px;
+                horizontal-stretch: 0.5;
+            }
+            GridLayout {
+                spacing: 10px;
+                padding: 10px;
 
-        Box {
-            vertical-stretch: 1;
+                Row {
+                    for i in 7 : Box {
+                        height: 35px;
+                        bg-color: cyan;
+                        text: "day " + (i+1);
+                        min-width: 70px;
+                    }
+                }
+                Row {
+                    for i in 7 : Box {
+                        bg-color: blue;
+                        text: "grid " + (i+1);
+                    }
+                }
+            }
         }
-    } 
+    }
+
 }
