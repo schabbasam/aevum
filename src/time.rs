@@ -85,6 +85,21 @@ impl Recurrence {
         Ok(Self::Weekly {interval, days})
     }
 
+    pub fn interval(&self) -> u32 {
+        match &self {
+            Self::Daily {interval} => *interval,
+            Self::Weekly {interval, ..} => *interval,
+        }
+    }
+
+    // these square brackets mean it is a slice, it can be an array or vector or whatever
+    pub fn days(&self) -> Option<&[Weekday]> {
+        match &self {
+            Self::Daily {..} => None,
+            Self::Weekly {days, ..} => Some(days),
+        }
+    }
+
 }
 
 pub struct Date {
