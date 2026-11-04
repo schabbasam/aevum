@@ -61,6 +61,30 @@ impl Recurrence {
 
         Ok(())
     }
+    pub fn daily(interval: u32) -> Result<Self, String> {
+        if interval == 0 {
+            return Err("invalid interval".to_string());
+        }
+
+        Ok(Self::Daily{interval})
+    }
+
+    pub fn weekly(interval: u32, days: Vec<Weekday>) -> Result<Self, String> {
+        if interval == 0 {
+            return Err("invalid interval".to_string());
+        }
+        // check for duplicate or no days
+        let unique_count: HashSet<&Weekday> = days.iter().collect();
+        if days.is_empty() {
+            return Err("no days".to_string());
+        }
+        if unique_count.len() != days.len() {
+            return Err("duplicate days".to_string());
+        }
+
+        Ok(Self::Weekly {interval, days})
+    }
+
 }
 
 pub struct Date {
