@@ -11,6 +11,20 @@ pub enum Weekday {
     Saturday,
     Sunday,
 }
+impl Weekday {
+    pub fn to_number(&self) -> u8 {
+        match self {
+            Weekday::Monday     => 0,
+            Weekday::Tuesday    => 1,
+            Weekday::Wednesday  => 2,
+            Weekday::Thursday   => 3,
+            Weekday::Friday     => 4,
+            Weekday::Saturday   => 5,
+            Weekday::Sunday     => 6,
+        }
+
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Recurrence {
@@ -49,7 +63,7 @@ impl Recurrence {
     }
 }
 
-struct Date {
+pub struct Date {
     day:    u8,
     month:  u8,
     year:   u16,
@@ -82,7 +96,7 @@ impl Date {
 }
 
 
-struct Time {
+pub struct Time {
     hour:   u8,
     minute: u8,
 }
