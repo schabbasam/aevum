@@ -100,6 +100,44 @@ impl Recurrence {
         }
     }
 
+    pub fn set_interval(&mut self, new_interval: u32) -> Result<(), String> {
+        if new_interval == 0 {
+            return Err("invalid interval".to_string());
+        }
+        
+        match self {
+            Self::Daily {interval} => {
+                *interval = new_interval;
+            }
+            Self::Weekly {interval, ..} => {
+                *interval = new_interval;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn set_days(&mut self, new_days: Vec<Weekday>) -> Result<(), String> {
+        
+        let unique_count: HashSet<&Weekday> = new_days.iter().collect();
+        if new_days.is_empty() {
+            return Err("no days".to_string());
+        }
+        if unique_count.len() != new_days.len() {
+            return Err("duplicate days".to_string());
+        }
+
+        match self {
+            Self::Daily {..} => {
+                return Err("not a Weekly".to_string());
+            }
+            Self::Weekly {days, ..} => {
+                *days = new_days;
+            }
+        }
+        Ok(())
+    }
+
 }
 
 pub struct Date {
