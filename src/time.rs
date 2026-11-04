@@ -22,13 +22,26 @@ pub enum Recurrence {
 }
 impl Recurrence {
     pub fn validate(&self) -> Result<(), String> {
-        if let Recurrence::Weekly {days, ..} = self {
-            let unique_count: HashSet<&Weekday> = days.iter().collect();
-            if days.is_empty() {
-                return Err("no days".to_string());
+        match self {
+            Recurrence::Daily {interval} => {
+                // the * is necessary to dereferentize the variable
+                if *interval == 0 {
+                    return Err("invalid interval".to_string());
+                }
             }
-            if unique_count.len() != days.len() {
-                return Err("duplicate days".to_string());
+            Recurrence::Weekly {interval, days} => {
+                if *interval == 0 {
+                    return Err("invalid interval".to_string());
+                }
+
+                // check for duplicate or no days
+                let unique_count: HashSet<&Weekday> = days.iter().collect();
+                if days.is_empty() {
+                    return Err("no days".to_string());
+                }
+                if unique_count.len() != days.len() {
+                    return Err("duplicate days".to_string());
+                }
             }
         }
 
