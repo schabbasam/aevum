@@ -1,5 +1,7 @@
 // this file contains all structs and enums about time
+use std::collections::HashSet;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Weekday {
     Monday,
     Tuesday,
@@ -10,12 +12,28 @@ pub enum Weekday {
     Sunday,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Recurrence {
     Daily { interval: u32 },
     Weekly {
         interval: u32,
         days: Vec<Weekday>
     },
+}
+impl Recurrence {
+    pub fn validate(&self) -> Result<(), String> {
+        if let Recurrence::Weekly {days, ..} = self {
+            let unique_count: HashSet<&Weekday> = days.iter().collect();
+            if days.is_empty() {
+                return Err("no days".to_string());
+            }
+            if unique_count.len() != days.len() {
+                return Err("duplicate days".to_string());
+            }
+        }
+
+        Ok(())
+    }
 }
 
 struct Date {
@@ -69,4 +87,13 @@ impl Time {
 // because we can add methods to it later on
 pub struct Duration {
     minutes: u16,
+}
+impl Duration {
+    pub fn new(minutes: u16) -> Result<Self, String> {
+        if minutes == 0 {
+            return Err("invalid minutes".to_string());
+        }
+
+        Ok(Self {minutes})
+    }
 }
