@@ -116,6 +116,49 @@ pub struct Category {
     color:  Color,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Color {
-    // TODO finish this with rgb values
+    // beautiful rgb color values from 0 to 255
+    red:    u8,
+    green:  u8,
+    blue:   u8,
+}
+impl Color {
+    pub fn new(r: u8, g: u8, b: u8) -> Self {
+        // fortunately we don't need validation because u8 can't be out of range
+        Self {red: r, green: g, blue: b}
+    }
+
+    pub fn red(&self) -> u8 { self.red }
+    pub fn green(&self) -> u8 { self.green }
+    pub fn blue(&self) -> u8 { self.blue }
+
+    pub fn to_hex(&self) -> String {
+        // formatting it as an uppercase hexadecimal string
+        format!("#{:02X}{:02X}{:02X}", self.red, self.green, self.blue)
+    }
+
+    pub fn from_hex(&mut self, hex: &str) -> Result<Self, String> {
+        // strip the leading # if it exists
+        let hex = hex.strip_prefix('#').unwrap_or(hex);
+
+        if hex.len() != 6 {
+            return Err("invalid hex length, expected 6 characters".to_string());
+        }
+
+        // helper function
+        fn parse_pair(pair: &str) -> Result<u8, String> {
+            // from_str_radix converts pair from a base 16 (aka hex) to a u8 as a Result<>
+            // if it is an Err, it gets converted to a String with map_err()
+            u8::from_str_radix(pair, 16).map_err(|e| format!("failed to parse '{}': {}", pair, e))
+        }
+
+        Ok(Color {
+            // string slicing: extracting 2 bytes at a time and checking if it is an Err or Ok
+            red:    parse_pair(&hex[0..2])?,
+            green:  parse_pair(&hex[2..4])?,
+            blue:   parse_pair(&hex[4..6])?,
+        })
+    }
+
 }
