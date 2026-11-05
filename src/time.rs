@@ -26,7 +26,7 @@ impl Weekday {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Recurrence {
     Daily { interval: u32 },
     Weekly {
@@ -77,8 +77,8 @@ impl Recurrence {
 
     pub fn interval(&self) -> u32 {
         match &self {
-            Self::Daily {interval} => *interval,
-            Self::Weekly {interval, ..} => *interval,
+            Self::Daily {interval}
+            | Self::Weekly {interval, ..} => *interval,
         }
     }
 
@@ -131,7 +131,7 @@ impl Recurrence {
 }
 
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Date {
     day:    u8,
     month:  u8,
@@ -164,15 +164,8 @@ impl Date {
     }
 
     pub fn new(day: u8, month: u8, year: u16) -> Result<Self, String> {
-        let validation: Result<(), String> = Self::validate(day, month, year);
-        match validation {
-            Ok(()) => {
-                Ok(Self {day, month, year})
-            }
-            Err(message) => {
-                Err(message)
-            }
-        }
+        Self::validate(day, month, year)?;
+        Ok(Self {day, month, year})
     }
     
     pub fn day(&self) -> u8 {
@@ -187,7 +180,7 @@ impl Date {
 }
 
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Time {
     hour:   u8,
     minute: u8,
@@ -202,11 +195,8 @@ impl Time {
     }
 
     pub fn new(hour: u8, minute: u8) -> Result<Self, String> {
-        let validation: Result<(), String> = Self::validate(hour, minute);
-        match validation {
-            Ok(()) => Ok(Self {hour, minute}),
-            Err(message) => Err(message),
-        }
+        Self::validate(hour, minute)?;
+        Ok(Self {hour, minute})
     }
 
     pub fn hour(self) -> u8{
@@ -216,22 +206,28 @@ impl Time {
         self.minute
     }
 
-    pub fn to_minute(self) -> u16 {
+    pub fn to_minutes(self) -> u16 {
         self.hour() as u16 * 60 + self.minute() as u16
     }
 }
 
 // even tough it is just one attribute, it is better to have a struct
 // because we can add methods to it later on
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Duration {
     minutes: u16,
 }
 impl Duration {
+    // setters, validate and to_hours functions are unneeded
     pub fn new(minutes: u16) -> Result<Self, String> {
         if minutes == 0 {
             return Err("invalid minutes".to_string());
         }
 
         Ok(Self {minutes})
+    }
+
+    pub fn minutes(self) -> u16 {
+        self.minutes
     }
 }
