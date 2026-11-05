@@ -138,16 +138,16 @@ pub struct Date {
     year:   u16,
 }
 impl Date {
-    pub fn new(day: u8, month: u8, year: u16) -> Result<Self, String> {
+    pub fn validate(day: u8, month: u8, year: u16) -> Result<(), String> {
+
         if year == 0 {
             return Err("invalid year".to_string());
         }
-
         let max_days = match month {
             1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
             4 | 6 | 9 | 11 => 30,
             2 => {
-                if year % 400 == 0 || (year % 4 == 0 && year % 100 != 0) {
+                if year.is_multiple_of(400) || (year.is_multiple_of(4) && !year.is_multiple_of(100)) {
                     29
                 } else {
                     28
@@ -160,7 +160,19 @@ impl Date {
             return Err("invalid day".to_string());
         }
 
-        Ok(Self {day, month, year})
+        Ok(())
+    }
+
+    pub fn new(day: u8, month: u8, year: u16) -> Result<Self, String> {
+        let validation: Result<(), String> = Self::validate(day, month, year);
+        match validation {
+            Ok(()) => {
+                Ok(Self {day, month, year})
+            }
+            Err(message) => {
+                Err(message)
+            }
+        }
     }
     
     // sind die hier überhaupt nötig?
