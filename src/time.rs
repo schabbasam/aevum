@@ -12,7 +12,7 @@ pub enum Weekday {
     Sunday,
 }
 impl Weekday {
-    pub fn to_number(&self) -> u8 {
+    pub fn to_number(self) -> u8 {
         match self {
             Weekday::Monday     => 0,
             Weekday::Tuesday    => 1,
@@ -62,27 +62,17 @@ impl Recurrence {
         Ok(())
     }
     pub fn daily(interval: u32) -> Result<Self, String> {
-        if interval == 0 {
-            return Err("invalid interval".to_string());
-        }
+        let recurrence = Self::Daily {interval};
+        recurrence.validate()?;
 
-        Ok(Self::Daily{interval})
+        Ok(recurrence)
     }
 
     pub fn weekly(interval: u32, days: Vec<Weekday>) -> Result<Self, String> {
-        if interval == 0 {
-            return Err("invalid interval".to_string());
-        }
-        // check for duplicate or no days
-        let unique_count: HashSet<&Weekday> = days.iter().collect();
-        if days.is_empty() {
-            return Err("no days".to_string());
-        }
-        if unique_count.len() != days.len() {
-            return Err("duplicate days".to_string());
-        }
+        let recurrence = Self::Weekly {interval, days};
+        recurrence.validate()?;
 
-        Ok(Self::Weekly {interval, days})
+        Ok(recurrence)
     }
 
     pub fn interval(&self) -> u32 {
@@ -119,19 +109,19 @@ impl Recurrence {
 
     pub fn set_days(&mut self, new_days: Vec<Weekday>) -> Result<(), String> {
         
-        let unique_count: HashSet<&Weekday> = new_days.iter().collect();
-        if new_days.is_empty() {
-            return Err("no days".to_string());
-        }
-        if unique_count.len() != new_days.len() {
-            return Err("duplicate days".to_string());
-        }
-
         match self {
             Self::Daily {..} => {
                 return Err("not a Weekly".to_string());
             }
             Self::Weekly {days, ..} => {
+                let unique_count: HashSet<&Weekday> = new_days.iter().collect();
+                if new_days.is_empty() {
+                    return Err("no days".to_string());
+                }
+                if unique_count.len() != new_days.len() {
+                    return Err("duplicate days".to_string());
+                }
+
                 *days = new_days;
             }
         }
@@ -140,6 +130,8 @@ impl Recurrence {
 
 }
 
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Date {
     day:    u8,
     month:  u8,
@@ -170,9 +162,25 @@ impl Date {
 
         Ok(Self {day, month, year})
     }
+    
+    // sind die hier überhaupt nötig?
+    // und brauchen wir wirklich ein validate und setter für alles?
+    pub fn day(&self) -> u8 {
+        self.day
+    }
+    pub fn month(&self) -> u8 {
+        self.month
+    }
+    pub fn year(&self) -> u16 {
+        self.year
+    }
+
+
+
 }
 
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Time {
     hour:   u8,
     minute: u8,
