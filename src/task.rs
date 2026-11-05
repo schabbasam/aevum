@@ -13,6 +13,8 @@ pub struct Task {
     start_time:     Option<Time>,
     duration:       Option<Duration>,
     recurrence:     Option<Recurrence>,
+    category:       Option<u64>,
+    color:          Option<Color>,
     // completion status
     completed:      bool,
 }
@@ -45,7 +47,9 @@ impl Task {
             start_time: None,
             duration: None,
             recurrence: None,
-            completed: false
+            category: None,
+            color: None,
+            completed: false,
         })
     }
 
@@ -106,3 +110,12 @@ impl Task {
     }
 }
 
+pub struct Category {
+    id:     u64,
+    name:   String,
+    color:  Color,
+}
+
+pub struct Color {
+    // TODO finish this with rgb values
+}
