@@ -19,6 +19,9 @@ pub struct Task {
 
 const MAX_TITLE: usize = 16;
 const MAX_DESCRIPTION: usize = 100;
+
+// static means this variable can only exist once for the entire program
+// AtomicU64 is able to be changed safely and simultaneously
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
 
 impl Task {
@@ -33,6 +36,7 @@ impl Task {
             return Err("title too long".to_string());
         }
 
+        // every time this thing is read, it returns the old value and adds +1 to it for later
         let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
 
         Ok(Self {
