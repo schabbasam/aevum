@@ -175,8 +175,6 @@ impl Date {
         }
     }
     
-    // sind die hier überhaupt nötig?
-    // und brauchen wir wirklich ein validate und setter für alles?
     pub fn day(&self) -> u8 {
         self.day
     }
@@ -186,24 +184,40 @@ impl Date {
     pub fn year(&self) -> u16 {
         self.year
     }
-
-
-
 }
 
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Time {
     hour:   u8,
     minute: u8,
 }
 impl Time {
-    pub fn new(hour: u8, minute: u8) -> Result<Self, String> {
+    pub fn validate(hour: u8, minute: u8) -> Result<(), String> {
         if hour < 24 && minute < 60 {
-            Ok(Self {hour, minute})
+            Ok(())
         } else {
             Err("out of valid range".to_string())
         }
+    }
+
+    pub fn new(hour: u8, minute: u8) -> Result<Self, String> {
+        let validation: Result<(), String> = Self::validate(hour, minute);
+        match validation {
+            Ok(()) => Ok(Self {hour, minute}),
+            Err(message) => Err(message),
+        }
+    }
+
+    pub fn hour(self) -> u8{
+        self.hour
+    }
+    pub fn minute(self) -> u8{
+        self.minute
+    }
+
+    pub fn to_minute(self) -> u16 {
+        self.hour() as u16 * 60 + self.minute() as u16
     }
 }
 
