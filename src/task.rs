@@ -55,7 +55,8 @@ impl Task {
     pub fn date(&self) -> &Date { &self.date }
     
     // as_ref() converts from &Option<Type> to Option<&Type>, meaning it's perfect for this
-    pub fn description(&self) -> Option<&String> { self.description.as_ref() }
+    // as_deref() does the same from Option<&String> to Option<&str> (string slices better)
+    pub fn description(&self) -> Option<&str> { self.description.as_deref() }
     pub fn start_time(&self) -> Option<&Time> { self.start_time.as_ref() }
     pub fn duration(&self) -> Option<&Duration> { self.duration.as_ref() }
     pub fn recurrence(&self) -> Option<&Recurrence> { self.recurrence.as_ref() }
@@ -76,13 +77,11 @@ impl Task {
         Ok(())
     }
 
-    pub fn set_description(&mut self, desc: impl Into<String>) -> Result<(), String> {
-        let desc = desc.into();
-        
-        if desc.chars().count() > MAX_DESCRIPTION {
+    pub fn set_description(&mut self, desc: Option<String>) -> Result<(), String> {
+        if let Some(ref text) = desc && text.chars().count() > MAX_DESCRIPTION {
             return Err("description too long".to_string());
         }
-        self.description = Some(desc);
+        self.description = desc;
         Ok(())
     }
 
