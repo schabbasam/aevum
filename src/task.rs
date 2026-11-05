@@ -138,9 +138,14 @@ impl Color {
         format!("#{:02X}{:02X}{:02X}", self.red, self.green, self.blue)
     }
 
-    pub fn from_hex(&mut self, hex: &str) -> Result<Self, String> {
+    pub fn from_hex(hex: &str) -> Result<Self, String> {
         // strip the leading # if it exists
         let hex = hex.strip_prefix('#').unwrap_or(hex);
+        
+        // check if the hex is ascii
+        if !hex.is_ascii() {
+            return Err("hex color must contain only ASCII characters".to_string());
+        }
 
         if hex.len() != 6 {
             return Err("invalid hex length, expected 6 characters".to_string());
