@@ -81,7 +81,7 @@ impl Task {
     pub fn start_time(&self) -> Option<Time> { self.start_time }
     pub fn duration(&self) -> Option<Duration> { self.duration }
     pub fn recurrence(&self) -> Option<&Recurrence> { self.recurrence.as_ref() }
-    pub fn category(&self) -> Option<&u64> { self.category.as_ref() }
+    pub fn category(&self) -> Option<u64> { self.category }
     pub fn color(&self) -> Option<Color> { self.color }
 
     pub fn completed(&self) -> bool { self.completed }

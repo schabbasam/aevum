@@ -231,3 +231,35 @@ impl Duration {
         self.minutes
     }
 }
+
+// --- TEST ---
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_time() {
+        let time = Time::new(14, 30).unwrap();
+        
+        // check if it stores and converts as it should
+        assert_eq!(time.hour(), 14);
+        assert_eq!(time.minute(), 30);
+        assert_eq!(time.to_minutes(), 870);
+    }
+    
+    #[test]
+    fn test_invalid_time() {
+        // just check if its true, in this context if it throws an error
+        assert!(Time::new(24, 0).is_err());
+        assert!(Time::new(12, 60).is_err());
+    }
+
+    #[test]
+    fn test_duration() {
+        let duration = Duration::new(90).unwrap();
+
+        assert_eq!(duration.minutes(), 90);
+        assert!(Duration::new(0).is_err());
+    }
+}
