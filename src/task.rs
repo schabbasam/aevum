@@ -19,9 +19,9 @@ pub struct Task {
     completed:      bool,
 }
 
-const MAX_TITLE: usize = 16;
-const MAX_DESCRIPTION: usize = 100;
-const MAX_CATEGORY_NAME: usize = 20;
+pub const MAX_TITLE: usize = 16;
+pub const MAX_DESCRIPTION: usize = 100;
+pub const MAX_CATEGORY_NAME: usize = 20;
 
 // static means this variable can only exist once for the entire program
 // AtomicU64 is able to be changed safely and simultaneously
@@ -81,6 +81,8 @@ impl Task {
     pub fn start_time(&self) -> Option<&Time> { self.start_time.as_ref() }
     pub fn duration(&self) -> Option<&Duration> { self.duration.as_ref() }
     pub fn recurrence(&self) -> Option<&Recurrence> { self.recurrence.as_ref() }
+    pub fn category(&self) -> Option<&u64> { self.category.as_ref() }
+    pub fn color(&self) -> Option<&Color> { self.color.as_ref() }
 
     pub fn completed(&self) -> bool { self.completed }
 
@@ -120,6 +122,14 @@ impl Task {
     
     pub fn set_completed(&mut self, done: bool) {
         self.completed = done;
+    }
+
+    pub fn set_category(&mut self, id: Option<u64>) {
+        self.category = id;
+    }
+
+    pub fn set_color(&mut self, color: Option<Color>) {
+        self.color = color;
     }
 }
 
