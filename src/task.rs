@@ -133,6 +133,32 @@ impl Category {
 
         Ok(Self {id, name, color})
     }
+
+    // ---- getters ----
+    pub fn id(&self) -> u64 { self.id }
+    pub fn name(&self) -> &str { &self.name }
+    pub fn color(&self) -> Color { self.color }
+
+    // ---- setters ----
+    pub fn set_name(&mut self, name: impl Into<String>) -> Result<(), String> {
+        let name = name.into();
+
+        if name.trim().is_empty() {
+            return Err("category name cannot be empty".to_string());
+        }
+
+        if name.chars().count() > MAX_CATEGORY_NAME {
+            return Err("category name too long".to_string());
+        }
+
+        self.name = name;
+        Ok(())
+    }
+
+    pub fn set_color(&mut self, color: Color) {
+        // no validation necessary here 
+        self.color = color;
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
