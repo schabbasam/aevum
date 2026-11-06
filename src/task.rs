@@ -29,16 +29,31 @@ static NEXT_TASK_ID: AtomicU64 = AtomicU64::new(1);
 static NEXT_CATEGORY_ID: AtomicU64 = AtomicU64::new(1);
 
 impl Task {
+
+    pub fn validate_title(title: &str) -> Result<(), String> {
+        if title.trim().is_empty() {
+            return Err("title cannot be empty".to_string());
+        }
+
+        if title.chars().count() > MAX_TITLE {
+            return Err("title too long".to_string());
+        }
+
+        Ok(())
+    }
+
+    pub fn validate_description(description: &str) -> Result<(), String> {
+        if description.chars().count() > MAX_DESCRIPTION {
+            return Err("description too long".to_string());
+        }
+
+        Ok(())
+    }
     
     pub fn new(title: impl Into<String>, date: Date) -> Result<Self, String> {
         let title = title.into();
 
-        if title.is_empty() {
-            return Err("title cannot be empty".to_string());
-        }
-        if title.chars().count() > MAX_TITLE {
-            return Err("title too long".to_string());
-        }
+        Self::validate_title(&title)?;
 
         // every time this thing is read, it returns the old value and adds +1 to it for later
         let id = NEXT_TASK_ID.fetch_add(1, Ordering::Relaxed);
@@ -73,20 +88,16 @@ impl Task {
     pub fn set_title(&mut self, title: impl Into<String>) -> Result<(), String> {
         // using impl Into<String> and .into() to accept anything convertible to a String
         let title = title.into();
-        if title.is_empty() {
-            return Err("title connot be empty".to_string());
-        }
-        if title.chars().count() > MAX_TITLE {
-            return Err("title too long".to_string());
-        }
+        Self::validate_title(&title)?;
         self.title = title;
         Ok(())
     }
 
     pub fn set_description(&mut self, desc: Option<String>) -> Result<(), String> {
-        if let Some(ref text) = desc && text.chars().count() > MAX_DESCRIPTION {
-            return Err("description too long".to_string());
+        if let Some(ref d) = desc {
+            Self::validate_description(d)?;
         }
+
         self.description = desc;
         Ok(())
     }
