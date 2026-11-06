@@ -21,10 +21,12 @@ pub struct Task {
 
 const MAX_TITLE: usize = 16;
 const MAX_DESCRIPTION: usize = 100;
+const MAX_CATEGORY_NAME: usize = 20;
 
 // static means this variable can only exist once for the entire program
 // AtomicU64 is able to be changed safely and simultaneously
-static NEXT_ID: AtomicU64 = AtomicU64::new(1);
+static NEXT_TASK_ID: AtomicU64 = AtomicU64::new(1);
+static NEXT_CATEGORY_ID: AtomicU64 = AtomicU64::new(1);
 
 impl Task {
     
@@ -39,7 +41,7 @@ impl Task {
         }
 
         // every time this thing is read, it returns the old value and adds +1 to it for later
-        let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
+        let id = NEXT_TASK_ID.fetch_add(1, Ordering::Relaxed);
 
         Ok(Self {
             id, title, date,
@@ -114,6 +116,23 @@ pub struct Category {
     id:     u64,
     name:   String,
     color:  Color,
+}
+impl Category {
+    pub fn new(name: impl Into<String>, color: Color) -> Result<Self, String> {
+        let name = name.into();
+        
+        if name.trim().is_empty() {
+            return Err("category name cannot be empty".to_string());
+        }
+
+        if name.chars().count() > MAX_CATEGORY_NAME {
+            return Err("category name too long".to_string());
+        }
+
+        let id = NEXT_CATEGORY_ID.fetch_add(1, Ordering::Relaxed);
+
+        Ok(Self {id, name, color})
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
