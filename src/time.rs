@@ -131,7 +131,7 @@ impl Recurrence {
 }
 
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Date {
     day:    u8,
     month:  u8,
@@ -168,13 +168,13 @@ impl Date {
         Ok(Self {day, month, year})
     }
     
-    pub fn day(&self) -> u8 {
+    pub fn day(self) -> u8 {
         self.day
     }
-    pub fn month(&self) -> u8 {
+    pub fn month(self) -> u8 {
         self.month
     }
-    pub fn year(&self) -> u16 {
+    pub fn year(self) -> u16 {
         self.year
     }
 }

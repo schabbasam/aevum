@@ -78,11 +78,11 @@ impl Task {
     // as_ref() converts from &Option<Type> to Option<&Type>, meaning it's perfect for this
     // as_deref() does the same from Option<&String> to Option<&str> (string slices better)
     pub fn description(&self) -> Option<&str> { self.description.as_deref() }
-    pub fn start_time(&self) -> Option<&Time> { self.start_time.as_ref() }
-    pub fn duration(&self) -> Option<&Duration> { self.duration.as_ref() }
+    pub fn start_time(&self) -> Option<Time> { self.start_time }
+    pub fn duration(&self) -> Option<Duration> { self.duration }
     pub fn recurrence(&self) -> Option<&Recurrence> { self.recurrence.as_ref() }
     pub fn category(&self) -> Option<&u64> { self.category.as_ref() }
-    pub fn color(&self) -> Option<&Color> { self.color.as_ref() }
+    pub fn color(&self) -> Option<Color> { self.color }
 
     pub fn completed(&self) -> bool { self.completed }
 
