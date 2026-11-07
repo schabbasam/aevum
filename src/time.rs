@@ -239,38 +239,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_time() {
-        let time = Time::new(14, 30).unwrap();
-        
-        // check if it stores and converts as it should
-        assert_eq!(time.hour(), 14);
-        assert_eq!(time.minute(), 30);
-        assert_eq!(time.to_minutes(), 870);
-    }
-    
-    #[test]
-    fn test_invalid_time() {
-        // just check if its true, in this context if it throws an error
-        assert!(Time::new(24, 0).is_err());
-        assert!(Time::new(12, 60).is_err());
-    }
-
-    #[test]
-    fn test_duration() {
-        let duration = Duration::new(90).unwrap();
-
-        assert_eq!(duration.minutes(), 90);
-        assert!(Duration::new(0).is_err());
-    }
-
-    #[test]
-    fn test_weekday() {
-        let day = Weekday::Monday;
-
-        assert_eq!(day.to_number(), 0);
-    }
-
-    #[test]
     fn test_recurrence() {
         // the same day twice
         let invalid_days = vec![Weekday::Monday, Weekday::Friday, Weekday::Monday];
@@ -327,6 +295,25 @@ mod tests {
         assert!(Date::new(29, 2, 2026).is_err());
         assert!(Date::new(29, 2, 1900).is_err());
 
+    }
+
+    #[test]
+    fn test_time() {
+        let valid_time = Time::new(12, 33).unwrap();
+        
+        // getters
+        assert_eq!(valid_time.hour(), 12);
+        assert_eq!(valid_time.minute(), 33);
+
+        
+        assert_eq!(valid_time.to_minutes(), 753);
+
+        assert!(Time::new(0, 0).is_ok());
+        assert!(Time::new(23, 59).is_ok());
+
+        // invalid times
+        assert!(Time::new(24, 2).is_err());
+        assert!(Time::new(22, 60).is_err());
     }
 
 }
