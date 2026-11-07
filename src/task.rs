@@ -233,3 +233,111 @@ impl Color {
     }
 
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    
+    #[test]
+    fn test_task() {
+        let random_date = Date::new(23, 11, 2020).unwrap();
+        let other_date = Date::new(24, 11, 2020).unwrap();
+        let random_time = Time::new(11, 55).unwrap();
+        let random_duration = Duration::new(20).unwrap();
+        let random_recurrence = Recurrence::daily(3).unwrap();
+        let random_color = Color::new(200, 211, 23);
+        let random_category = Category::new("cat", random_color).unwrap();
+
+        let mut t = Task::new("something", random_date).unwrap();
+        let other_task = Task::new("second task", random_date).unwrap();
+
+        // ---- constructor and default values ----
+        assert_ne!(t.id(), 0);
+        assert_ne!(other_task.id(), 0);
+        assert_ne!(t.id(), other_task.id());
+
+        assert_eq!(t.title(), "something");
+        assert_eq!(t.date(), &random_date);
+        assert_eq!(t.description(), None);
+        assert_eq!(t.start_time(), None);
+        assert_eq!(t.duration(), None);
+        assert_eq!(t.recurrence(), None);
+        assert_eq!(t.category(), None);
+        assert_eq!(t.color(), None);
+        assert!(!t.completed());
+
+        // ---- constructor validation ----
+        assert!(Task::new("", random_date).is_err());
+        assert!(Task::new("   ", random_date).is_err());
+        assert!(Task::new("a".repeat(MAX_TITLE + 1), random_date).is_err());
+        assert!(Task::new("a".repeat(MAX_TITLE), random_date).is_ok());
+
+        // ---- title validation ----
+        assert!(Task::validate_title("").is_err());
+        assert!(Task::validate_title("   ").is_err());
+        assert!(Task::validate_title("a".repeat(MAX_TITLE + 1).as_str()).is_err());
+        assert!(Task::validate_title("a".repeat(MAX_TITLE).as_str()).is_ok());
+
+        // ---- description validation ----
+        assert!(Task::validate_description("a".repeat(MAX_DESCRIPTION + 1).as_str()).is_err());
+        assert!(Task::validate_description("a".repeat(MAX_DESCRIPTION).as_str()).is_ok());
+        assert!(Task::validate_description("").is_ok());
+
+        // ---- valid setters ----
+        assert!(t.set_title("new title").is_ok());
+        assert!(t.set_description(Some("description".to_string())).is_ok());
+        t.set_date(other_date);
+        t.set_start_time(Some(random_time));
+        t.set_duration(Some(random_duration));
+        // for some reason the Recurrence can't implement Copy
+        // i guess it is because of the Vec<> in it
+        // if we don't want to move it to somewhere, we need to clone it
+        t.set_recurrence(Some(random_recurrence.clone()));
+        t.set_category(Some(random_category.id()));
+        t.set_color(Some(random_color));
+        t.set_completed(true);
+
+        // ---- getters after setting values ----
+        assert_eq!(t.title(), "new title");
+        assert_eq!(t.date(), &other_date);
+        assert_eq!(t.description(), Some("description"));
+        assert_eq!(t.start_time(), Some(random_time));
+        assert_eq!(t.duration(), Some(random_duration));
+        assert_eq!(t.recurrence(), Some(&random_recurrence.clone()));
+        assert_eq!(t.category(), Some(random_category.id()));
+        assert_eq!(t.color(), Some(random_color));
+        assert!(t.completed());
+
+        // ---- invalid setters ----
+        assert!(t.set_title("").is_err());
+        assert!(t.set_title("   ").is_err());
+        assert!(t.set_title("a".repeat(MAX_TITLE + 1)).is_err());
+
+        assert!(t.set_description(Some("a".repeat(MAX_DESCRIPTION + 1))).is_err());
+
+        // Failed setters must not modify existing values
+        assert_eq!(t.title(), "new title");
+        assert_eq!(t.description(), Some("description"));
+
+        // ---- reset optional values ----
+        assert!(t.set_description(None).is_ok());
+        t.set_start_time(None);
+        t.set_duration(None);
+        t.set_recurrence(None);
+        t.set_category(None);
+        t.set_color(None);
+
+        assert_eq!(t.description(), None);
+        assert_eq!(t.start_time(), None);
+        assert_eq!(t.duration(), None);
+        assert_eq!(t.recurrence(), None);
+        assert_eq!(t.category(), None);
+        assert_eq!(t.color(), None);
+
+        // ---- completion status ----
+        t.set_completed(false);
+        assert!(!t.completed());
+    }
+
+}
