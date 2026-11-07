@@ -270,7 +270,8 @@ mod tests {
         assert_eq!(day.to_number(), 0);
     }
 
-    fn test_recurrence_validation() {
+    #[test]
+    fn test_recurrence() {
         // the same day twice
         let invalid_days = vec![Weekday::Monday, Weekday::Friday, Weekday::Monday];
         assert!(Recurrence::weekly(3, invalid_days.clone()).is_err());
@@ -299,6 +300,32 @@ mod tests {
 
         // empty weekday vector
         assert!(Recurrence::weekly(1, Vec::new()).is_err());
+
+    }
+
+    #[test]
+    fn test_date() {
+        let valid_date = Date::new(30, 3, 2010).unwrap();
+        // getters
+        assert_eq!(valid_date.day(), 30);
+        assert_eq!(valid_date.month(), 3);
+        assert_eq!(valid_date.year(), 2010);
+
+        // invalid values
+        assert!(Date::new(0, 3, 2010).is_err());
+        assert!(Date::new(2, 0, 23).is_err());
+        assert!(Date::new(23, 1, 0).is_err());
+
+        assert!(Date::new(32, 3, 890).is_err());
+        assert!(Date::new(28, 13, 323).is_err());
+        
+        // leap year testing
+        // last leap year was 2024
+        assert!(Date::new(29, 2, 2024).is_ok());
+        assert!(Date::new(29, 2, 2000).is_ok());
+
+        assert!(Date::new(29, 2, 2026).is_err());
+        assert!(Date::new(29, 2, 1900).is_err());
 
     }
 
