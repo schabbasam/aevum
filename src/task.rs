@@ -340,4 +340,43 @@ mod tests {
         assert!(!t.completed());
     }
 
+    #[test]
+    fn test_category() {
+        let random_color = Color::new(200, 211, 23);
+        let other_color = Color::new(23, 122, 188);
+
+        let mut c = Category::new("idk some random stuff", random_color).unwrap();
+        let c2 = Category::new("something else", other_color).unwrap();
+
+        // ---- constructor and defaults ----
+        // IDs must be nonzero and unique
+        assert_ne!(c.id(), 0);
+        assert_ne!(c2.id(), 0);
+        assert_ne!(c.id(), c2.id());
+
+        assert_eq!(c.name(), "idk some random stuff");
+        assert_eq!(c.color(), random_color);
+        
+        // check if empty names throw an error
+        assert!(Category::new("", random_color).is_err());
+        assert!(Category::new("     ", random_color).is_err());
+        
+        // the symbol im using for the name has no meaning at all
+        assert!(Category::new("x".repeat(MAX_CATEGORY_NAME + 1), random_color).is_err());
+        assert!(Category::new("7".repeat(MAX_CATEGORY_NAME), random_color).is_err());
+
+        // ---- setters ----
+        assert!(c.set_name("smthing").is_ok());
+        c.set_color(other_color);
+
+        // ---- getters ----
+        assert_eq!(c.name(), "smthing");
+        assert_eq!(c.color(), other_color);
+
+        // idk why lets check this too just in case
+        // maybe atomicu64 bugs around
+        assert_eq!(c.id(), c.id());
+
+    }
+
 }
