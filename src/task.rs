@@ -363,7 +363,7 @@ mod tests {
         
         // the symbol im using for the name has no meaning at all
         assert!(Category::new("x".repeat(MAX_CATEGORY_NAME + 1), random_color).is_err());
-        assert!(Category::new("7".repeat(MAX_CATEGORY_NAME), random_color).is_err());
+        assert!(Category::new("7".repeat(MAX_CATEGORY_NAME), random_color).is_ok());
 
         // ---- setters ----
         assert!(c.set_name("smthing").is_ok());
