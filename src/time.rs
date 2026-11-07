@@ -315,5 +315,12 @@ mod tests {
         assert!(Time::new(24, 2).is_err());
         assert!(Time::new(22, 60).is_err());
     }
+    
+    #[test]
+    fn test_duration() {
+        let valid_duration = Duration::new(30).unwrap();
 
+        assert_eq!(valid_duration.minutes(), 30);
+        assert!(Duration::new(0).is_err());
+    }
 }
