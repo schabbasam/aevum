@@ -262,4 +262,44 @@ mod tests {
         assert_eq!(duration.minutes(), 90);
         assert!(Duration::new(0).is_err());
     }
+
+    #[test]
+    fn test_weekday() {
+        let day = Weekday::Monday;
+
+        assert_eq!(day.to_number(), 0);
+    }
+
+    fn test_recurrence_validation() {
+        // the same day twice
+        let invalid_days = vec![Weekday::Monday, Weekday::Friday, Weekday::Monday];
+        assert!(Recurrence::weekly(3, invalid_days.clone()).is_err());
+        
+        let days = vec![Weekday::Thursday, Weekday::Sunday];
+
+        let mut a_recurrence = Recurrence::weekly(2, days.clone()).unwrap();
+        assert!(a_recurrence.set_days(days.clone()).is_ok());
+        assert!(a_recurrence.set_interval(9).is_ok());
+        assert_eq!(a_recurrence.interval(), 9);
+        assert_eq!(a_recurrence.days().unwrap(), days);
+
+        // setter validation
+        assert!(a_recurrence.set_interval(0).is_err());
+        assert!(a_recurrence.set_days(vec![]).is_err());
+        assert!(a_recurrence.set_days(invalid_days.clone()).is_err());
+
+        let mut daily_recurrence = Recurrence::daily(3).unwrap();
+        assert!(daily_recurrence.set_days(days.clone()).is_err());
+        assert_eq!(daily_recurrence.interval(), 3);
+
+        
+        // invalid interval
+        assert!(Recurrence::daily(0).is_err());
+        assert!(Recurrence::weekly(0, days).is_err());
+
+        // empty weekday vector
+        assert!(Recurrence::weekly(1, Vec::new()).is_err());
+
+    }
+
 }
