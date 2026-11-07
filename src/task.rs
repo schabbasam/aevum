@@ -345,7 +345,7 @@ mod tests {
         let random_color = Color::new(200, 211, 23);
         let other_color = Color::new(23, 122, 188);
 
-        let mut c = Category::new("idk some random stuff", random_color).unwrap();
+        let mut c = Category::new("idk random stuff", random_color).unwrap();
         let c2 = Category::new("something else", other_color).unwrap();
 
         // ---- constructor and defaults ----
@@ -354,7 +354,7 @@ mod tests {
         assert_ne!(c2.id(), 0);
         assert_ne!(c.id(), c2.id());
 
-        assert_eq!(c.name(), "idk some random stuff");
+        assert_eq!(c.name(), "idk random stuff");
         assert_eq!(c.color(), random_color);
         
         // check if empty names throw an error
