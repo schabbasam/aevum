@@ -373,10 +373,38 @@ mod tests {
         assert_eq!(c.name(), "smthing");
         assert_eq!(c.color(), other_color);
 
-        // idk why lets check this too just in case
-        // maybe atomicu64 bugs around
-        assert_eq!(c.id(), c.id());
-
     }
+    
+    #[test]
+    fn test_color() {
+        let c = Color::new(200, 123, 9);
 
+        assert_eq!(c.red(), 200);
+        assert_eq!(c.green(), 123);
+        assert_eq!(c.blue(), 9);
+
+        // test maximum and minimum of u8 thingies
+        Color::new(0, 0, 0);
+        Color::new(255, 255, 255);
+
+        // ---- hex conversion ----
+        assert_eq!(c.to_hex(), "#C87B09");
+        
+        // check if the same color from hex is converted correctly
+        // while we're at it lets check if lowercase works too
+        assert_eq!(Color::from_hex("#C87b09").unwrap(), c);
+
+        // ---- validation ----
+        assert!(Color::from_hex("").is_err());
+        assert!(Color::from_hex("#").is_err());
+        assert!(Color::from_hex("12345").is_err());
+        assert!(Color::from_hex("1234567").is_err());
+        
+        // whithout # should be fine too
+        assert!(Color::from_hex("123456").is_ok());
+        
+        // should not work because G is invalid
+        assert!(Color::from_hex("G349b8").is_err());
+        
+    }
 }
