@@ -12,7 +12,7 @@ fn main() -> Result<(), slint::PlatformError> {
     Ok(())
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen(start))]
 pub fn main() {
     let app = MainWindow::new().unwrap();
     app.run().unwrap();
