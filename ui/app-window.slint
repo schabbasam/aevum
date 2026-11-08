@@ -1,45 +1,23 @@
-import { Button } from "std-widgets.slint";
+import { Theme } from "style.slint";
 
-export component AppWindow inherits Window {
-    
-    // this closes the app when escape key is pressed
-    forward-focus: keyboard;
-    keyboard := FocusScope {
-        capture-key-pressed(event) => {
-            if (event.text == Key.Escape) {
-                root.close();
-                accept
-            } else {
-                reject
-            }
-        }
-    }
+export component MainWindow inherits Window {
+    title: "Aevum";
+    background: Theme.background;
 
-    width: 200px;
-    height: 200px;
+    preferred-width: 1200px;
+    preferred-height: 800px;
 
-    callback pressed(bool);
-    VerticalLayout {
+    HorizontalLayout {
+        spacing: 0px;
+
         Rectangle {
-            background: navy;
-            Text {
-                text: "hi im a button";
-                font-size: 20px;
-            }
-            TouchArea {
-                clicked => {
-                    root.pressed(false);
-                }
-                double-clicked => {
-                    root.pressed(true);
-                }
-            }
+            width: Theme.panel-width;
+            background: Theme.surface;
         }
-        Button {
-            text: "im am better";
-            clicked => {
-                debug("debug msg becuz i got clicked");
-            }
+
+        Rectangle {
+            background: Theme.background;
+            horizontal-stretch: 1;
         }
     }
 }
