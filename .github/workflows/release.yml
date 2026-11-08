@@ -1,0 +1,149 @@
+
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # --------------------------------
+  # Web Preview (GitHub Pages)
+  # --------------------------------
+  web-preview:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack --locked
+
+      - name: Build WebAssembly
+        run: |
+          RUSTC="$(rustup which rustc)" wasm-pack build --release --target web
+
+      - name: Prepare Pages
+        run: |
+          mkdir -p docs
+          cp index.html docs/index.html
+          rm -rf docs/pkg
+          cp -r pkg docs/pkg
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # --------------------------------
+  # Desktop Builds
+  # --------------------------------
+  build-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: aevum-linux
+            binary: target/release/aevum
+            asset: aevum-linux-x86_64
+
+          - os: windows-latest
+            artifact: aevum-windows
+            binary: target/release/aevum.exe
+            asset: aevum-windows-x86_64.exe
+
+          - os: macos-latest
+            artifact: aevum-macos
+            binary: target/release/aevum
+            asset: aevum-macos
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxkbcommon-dev \
+            libwayland-dev \
+            libx11-dev \
+            libxcb1-dev \
+            libxcb-render0-dev \
+            libxcb-shape0-dev \
+            libxcb-xfixes0-dev
+
+      - name: Build
+        run: cargo build --release --bin aevum
+
+      - name: Prepare Release Asset
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp "${{ matrix.binary }}" "dist/${{ matrix.asset }}"
+
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/*
+
+  # --------------------------------
+  # Create GitHub Release
+  # --------------------------------
+  publish-release:
+    needs: build-release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Builds
+        uses: actions/download-artifact@v4
+        with:
+          pattern: aevum-*
+          path: dist
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+
