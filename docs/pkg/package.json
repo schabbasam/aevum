@@ -1,0 +1,15 @@
+{
+  "name": "aevum",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "aevum_bg.wasm",
+    "aevum.js",
+    "aevum.d.ts"
+  ],
+  "main": "aevum.js",
+  "types": "aevum.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
