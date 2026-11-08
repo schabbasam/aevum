@@ -1,0 +1,24 @@
+import { Theme } from "../style.slint";
+
+export component TaskBlock inherits Rectangle {
+    in property <string> task-title: "Task";
+    in property <int> duration: 60;
+
+    width: Theme.task-block-width;
+    height: max(
+        Theme.task-block-min-height,
+        duration * Theme.hour-height / 60
+    );
+
+    background: Theme.surface-hover;
+    border-radius: 6px;
+
+    Text {
+        text: parent.task-title;
+        color: Theme.text;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+
