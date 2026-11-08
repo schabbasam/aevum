@@ -1,5 +1,6 @@
 import { Theme } from "style.slint";
 import { TaskPanel } from "components/task-panel.slint";
+import { TaskAttributes } from "components/task-attributes.slint";
 
 export component MainWindow inherits Window {
     title: "Aevum";
@@ -11,8 +12,16 @@ export component MainWindow inherits Window {
     HorizontalLayout {
         spacing: 0px;
         
-        TaskPanel {
+        VerticalLayout {
             width: Theme.panel-width;
+            spacing: 0px;
+
+            TaskPanel {
+                vertical-stretch: 1;
+            }
+
+            TaskAttributes {
+            }
         }
 
         Rectangle {
