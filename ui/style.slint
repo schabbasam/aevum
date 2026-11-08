@@ -7,13 +7,14 @@ export global Theme {
 
     in-out property <color> text: #e5e7eb;
 
-    in-out property <length> panel-width:  240px;
 
     in-out property <length> task-panel-padding:    12px;
     in-out property <length> task-grid-spacing:     8px;
     in-out property <length> task-block-width:      100px;
     in-out property <length> task-block-min-height: 50px;
 
+    in-out property <length> panel-width:  task-block-width * 2 + task-panel-padding * 2;
+    
     in-out property <length> hour-height: 60px;
 
     // task attributes
