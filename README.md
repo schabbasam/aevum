@@ -67,7 +67,7 @@ cargo run --release
 
 ## Web preview
 
-A web preview is also available: link
+A web preview is also available: https://schabbasam.github.io/aevum/
 
 ## License
 
