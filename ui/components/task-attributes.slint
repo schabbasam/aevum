@@ -1,0 +1,144 @@
+import { Theme } from "../style.slint";
+import { Button, LineEdit, CheckBox } from "std-widgets.slint";
+
+export component TaskAttributes inherits Rectangle {
+    // ---- modes and states ----
+    in property <bool> edit-mode: false;
+    in property <bool> has-changes: false;
+    in property <bool> is-valid: false;
+    
+    in property <string> status-message: "";
+    in property <bool> is-error: false;
+
+    // ---- input values ----
+    in-out property <string> title-input: "";
+    in-out property <string> date-input: "";
+    in-out property <string> description-input: "";
+    in-out property <string> duration-input: "";
+    in-out property <string> recurrence-input: "";
+    in-out property <string> category-input: "";
+    in-out property <string> color-input: "";
+    in-out property <bool> completed-input: false;
+
+    // ---- callbacks ----
+    callback save-task(
+        string, // title
+        string, // date
+        string, // description
+        string, // duration
+        string, // recurrence
+        string, // category
+        string, // color
+        bool    // completed
+    );
+
+    // ---- general appearance ----
+    background: Theme.surface;
+    height: Theme.task-attributes-height;
+
+    // ---- main layout ----
+
+    VerticalLayout {
+        padding: Theme.task-attributes-padding;
+        spacing: Theme.task-attributes-spacing;
+
+        // heading changes depending on the currend mode
+        Text {
+            // if edit-mode = true blabla else blabla
+            text: root.edit-mode ? "Edit Task" : "Create Task";
+
+            color: Theme.text;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        HorizontalLayout {
+            spacing: Theme.task-attributes-spacing;
+
+            // required inputs
+
+            LineEdit {
+                horizontal-stretch: 1;
+                height: Theme.input-height;
+                placeholder-text: "Title";
+
+                // links the input with property
+                // if one changes, the other changes as well
+                text <=> root.title-input;
+            }
+
+            LineEdit {
+                horizontal-stretch: 1;
+                height: Theme.input-height;
+                placeholder-text: "DD.MM.YYYY";
+                text <=> root.date-input;
+            }
+        }
+        
+        // optional stuff
+
+        LineEdit {
+            horizontal-stretch: 1;
+            height: Theme.input-height;
+            placeholder-text: "Descripton (optional)";
+            text <=> root.description-input;
+        }
+
+        HorizontalLayout {
+            spacing: Theme.task-attributes-spacing;
+
+            LineEdit {
+                horizontal-stretch: 1;
+                height: Theme.input-height;
+                placeholder-text: "Duration [min]";
+                text <=> root.duration-input;
+            }
+
+            LineEdit {
+                horizontal-stretch: 1;
+                height: Theme.input-height;
+                placeholder-text: "#RRGGBB";
+                text <=> root.recurrence-input;
+            }
+
+        }
+        
+        // ill add recurrence and category later
+        
+        CheckBox {
+            text: "Completed";
+            checked <=> root.completed-input;
+        }
+
+        // ---- status message ----
+        Text {
+            text: root.status-message;
+            visible: root.status-message != "";
+            color: root.is-error ? Theme.error-color : Theme.success-color;
+            font-size: 11px;
+        }
+
+        // ---- save/create button ----
+        Button {
+            horizontal-stretch: 1;
+            text: root.edit-mode ? "Save Changes" : "Add Task";
+
+            // in create mode, validity is enough
+            // in edit mode, changes must also exist
+            enabled: root.is-valid && (!root.edit-mode || root.has-changes);
+            
+            clicked => {
+                root.save-task(
+                    root.title-input,
+                    root.date-input,
+                    root.description-input,
+                    root.duration-input,
+                    root.recurrence-input,
+                    root.category-input,
+                    root.color-input,
+                    root.completed-input
+                );
+            }
+        }
+    }
+}
