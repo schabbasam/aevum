@@ -34,10 +34,45 @@ export component MainWindow inherits Window {
                 TaskAttributes {
                 }
             }
-
             Rectangle {
                 background: Theme.background;
                 horizontal-stretch: 1;
+
+                VerticalLayout {
+                    alignment: center;
+                    spacing: 8px;
+
+                    Text {
+                        text: "right now, this UI does nothing really";
+                        color: white;
+                        font-size: 18px;
+                        horizontal-alignment: center;
+                    }
+                    Text {
+                        text: "in the future, there should be a grid with";
+                        color: white;
+                        font-size: 15px;
+                        horizontal-alignment: center;
+                    }
+                    Text {
+                        text: "seven columns here, one for each weekday";
+                        color: white;
+                        font-size: 15px;
+                        horizontal-alignment: center;
+                    }
+                    Text {
+                        text: "the task should be able to be drag & dropped onto here";
+                        color: white;
+                        font-size: 15px;
+                        horizontal-alignment: center;
+                    }
+                    Text {
+                        text: "(btw you can press escape to close the window)";
+                        color: white;
+                        font-size: 10px;
+                        horizontal-alignment: center;
+                    }
+                }
             }
         }
     }

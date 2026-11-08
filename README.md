@@ -71,8 +71,6 @@ A web preview is also available: link
 
 ## License
 
-Feel free to use, modify and distribute this software under the terms of its license, provided that you give appropriate credit to the original authors.
+Feel free to use, modify and distribute this software under the terms of its license, provided that you give appropriate credit to the original authors. Actually just do what you want.
 
-See the [LICENSE](LICENSE) file for the full license text.
-
-Please also refer to the [Slint licensing information](https://slint.dev/pricing) regarding Slint's license terms.
+Please refer to the [Slint licensing information](https://slint.dev/pricing) regarding Slint's license terms.
