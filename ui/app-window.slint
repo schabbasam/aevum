@@ -6,27 +6,39 @@ export component MainWindow inherits Window {
     title: "Aevum";
     background: Theme.background;
 
-    preferred-width: 1200px;
-    preferred-height: 800px;
-
-    HorizontalLayout {
-        spacing: 0px;
-        
-        VerticalLayout {
-            width: Theme.panel-width;
-            spacing: 0px;
-
-            TaskPanel {
-                vertical-stretch: 1;
-            }
-
-            TaskAttributes {
+    width: 1200px;
+    height: 800px;
+    
+    keyboard-scope := FocusScope {
+        // ---- escape to exit ----
+        capture-key-pressed(event) => {
+            if (event.text == Key.Escape) {
+                root.close();
+                accept
+            } else {
+                reject
             }
         }
 
-        Rectangle {
-            background: Theme.background;
-            horizontal-stretch: 1;
+        HorizontalLayout {
+            spacing: 0px;
+            
+            VerticalLayout {
+                width: Theme.panel-width;
+                spacing: 0px;
+
+                TaskPanel {
+                    vertical-stretch: 1;
+                }
+
+                TaskAttributes {
+                }
+            }
+
+            Rectangle {
+                background: Theme.background;
+                horizontal-stretch: 1;
+            }
         }
     }
 }

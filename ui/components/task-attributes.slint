@@ -96,9 +96,18 @@ export component TaskAttributes inherits Rectangle {
     
         // ill add recurrence and category later
         
-        CheckBox {
-            text: "Completed";
-            checked <=> root.completed-input;
+        HorizontalLayout {
+            spacing: Theme.task-attributes-spacing;
+            alignment: center;
+
+            CheckBox {
+                checked <=> root.completed-input;
+            }
+            Text {
+                text: "Completed";
+                color: Theme.text;
+                vertical-alignment: center;
+            }
         }
 
         // ---- status message ----
