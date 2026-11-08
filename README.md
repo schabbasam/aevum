@@ -2,7 +2,7 @@
 *Work in progress*
 
 A simple weekly planner with time boxing, written in Rust and Slint.
-
+![Aevum screenshot](screenshot.png)
 
 ## About
 
@@ -47,6 +47,8 @@ These are the features I plan to implement in the finished application:
 ## Installation
 
 Download the latest version for your platform from the [Releases](../../releases) page.
+Note: the builds don't work right now, but it doesn't matter because it was just the UI anyway (as of now).
+I will fix that later when it is important. You can just look at the web preview.
 
 ## Building from Source
 
