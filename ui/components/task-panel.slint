@@ -28,11 +28,13 @@ export component TaskPanel inherits Rectangle {
         width: 100%;
         height: 100%;
 
-        GridLayout {
+        HorizontalLayout {
             padding: Theme.task-panel-padding;
             spacing: Theme.task-grid-spacing;
 
-            Row {
+            VerticalLayout {
+                spacing: Theme.task-grid-spacing;
+
                 TaskBlock {
                     task-title: "first task";
                 }
@@ -42,7 +44,9 @@ export component TaskPanel inherits Rectangle {
                 }
             }
 
-            Row {
+            VerticalLayout {
+                spacing: Theme.task-grid-spacing;
+
                 TaskBlock {
                     task-title: "third task";
                     duration: 90;
