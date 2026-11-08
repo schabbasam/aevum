@@ -52,27 +52,23 @@ export component TaskAttributes inherits Rectangle {
             font-weight: 600;
         }
 
-        HorizontalLayout {
-            spacing: Theme.task-attributes-spacing;
+        // required inputs
 
-            // required inputs
+        LineEdit {
+            horizontal-stretch: 1;
+            height: Theme.input-height;
+            placeholder-text: "Title";
 
-            LineEdit {
-                horizontal-stretch: 1;
-                height: Theme.input-height;
-                placeholder-text: "Title";
+            // links the input with property
+            // if one changes, the other changes as well
+            text <=> root.title-input;
+        }
 
-                // links the input with property
-                // if one changes, the other changes as well
-                text <=> root.title-input;
-            }
-
-            LineEdit {
-                horizontal-stretch: 1;
-                height: Theme.input-height;
-                placeholder-text: "DD.MM.YYYY";
-                text <=> root.date-input;
-            }
+        LineEdit {
+            horizontal-stretch: 1;
+            height: Theme.input-height;
+            placeholder-text: "DD.MM.YYYY";
+            text <=> root.date-input;
         }
         
         // optional stuff
@@ -84,25 +80,21 @@ export component TaskAttributes inherits Rectangle {
             text <=> root.description-input;
         }
 
-        HorizontalLayout {
-            spacing: Theme.task-attributes-spacing;
 
-            LineEdit {
-                horizontal-stretch: 1;
-                height: Theme.input-height;
-                placeholder-text: "Duration [min]";
-                text <=> root.duration-input;
-            }
-
-            LineEdit {
-                horizontal-stretch: 1;
-                height: Theme.input-height;
-                placeholder-text: "#RRGGBB";
-                text <=> root.recurrence-input;
-            }
-
+        LineEdit {
+            horizontal-stretch: 1;
+            height: Theme.input-height;
+            placeholder-text: "Duration [min]";
+            text <=> root.duration-input;
         }
-        
+
+        LineEdit {
+            horizontal-stretch: 1;
+            height: Theme.input-height;
+            placeholder-text: "#RRGGBB";
+            text <=> root.recurrence-input;
+        }
+    
         // ill add recurrence and category later
         
         CheckBox {
