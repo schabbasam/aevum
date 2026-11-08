@@ -8,8 +8,8 @@ export component MainWindow inherits Window {
 
     width: 1200px;
     height: 800px;
-    
-    keyboard-scope := FocusScope {
+   
+   keyboard-scope := FocusScope {
         // ---- escape to exit ----
         capture-key-pressed(event) => {
             if (event.text == Key.Escape) {
