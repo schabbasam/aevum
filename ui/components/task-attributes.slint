@@ -1,5 +1,5 @@
 import { Theme } from "../style.slint";
-import { Button, LineEdit, CheckBox } from "std-widgets.slint";
+import { Button, LineEdit, CheckBox, SpinBox } from "std-widgets.slint";
 
 export component TaskAttributes inherits Rectangle {
     // ---- modes and states ----
@@ -14,7 +14,7 @@ export component TaskAttributes inherits Rectangle {
     in-out property <string> title-input: "";
     in-out property <string> date-input: "";
     in-out property <string> description-input: "";
-    in-out property <string> duration-input: "";
+    in-out property <int> duration-input: 0;
     in-out property <string> recurrence-input: "";
     in-out property <string> category-input: "";
     in-out property <string> color-input: "";
@@ -25,7 +25,7 @@ export component TaskAttributes inherits Rectangle {
         string, // title
         string, // date
         string, // description
-        string, // duration
+        int, // duration
         string, // recurrence
         string, // category
         string, // color
@@ -79,12 +79,21 @@ export component TaskAttributes inherits Rectangle {
             text <=> root.description-input;
         }
 
-
-        LineEdit {
-            horizontal-stretch: 1;
+        HorizontalLayout {
             height: Theme.input-height;
-            placeholder-text: "Duration [min]";
-            text <=> root.duration-input;
+
+            Text {
+                horizontal-stretch: 1;
+                text: "Duration:";
+                color: Theme.text;
+            }
+
+            SpinBox {
+                horizontal-stretch: 1;
+                height: Theme.input-height;
+                value <=> root.duration-input;
+            }
+
         }
 
         LineEdit {
