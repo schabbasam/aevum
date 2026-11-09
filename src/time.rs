@@ -165,7 +165,7 @@ impl Date {
             1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
             4 | 6 | 9 | 11 => 30,
             2 => {
-                if is_leap_year(year) {
+                if Self::is_leap_year(year) {
                     29
                 } else {
                     28
@@ -178,7 +178,20 @@ impl Date {
     }
 
     fn days_since_epoch(&self) -> u64 {
+        // returns days since 01.01.0001
+        let mut days = 0;
+
+        for year in 1..self.year {
+            days += if Self::is_leap_year(year) { 366 } else { 365 };
+        }
+
+        for month in 1..self.month {
+            days += Self::days_in_month(month, self.year);
+        }
+
+        days += self.day -1;
         
+        days
     }
 
     pub fn validate(day: u8, month: u8, year: u16) -> Result<(), String> {
@@ -187,7 +200,7 @@ impl Date {
             return Err("invalid year".to_string());
         }
 
-        if day == 0 || day > days_in_month(month, year)? {
+        if day == 0 || day > Self::days_in_month(month, year)? {
             return Err("invalid day".to_string());
         }
 
