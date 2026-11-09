@@ -152,16 +152,20 @@ pub struct Date {
     year:   u16,
 }
 impl Date {
-    pub fn validate(day: u8, month: u8, year: u16) -> Result<(), String> {
 
-        if year == 0 {
-            return Err("invalid year".to_string());
+    fn is_leap_year(year: u16) -> bool {
+        if year.is_multiple_of(400) || (year.is_multiple_of(4) && !year.is_multiple_of(100)) {
+            return true;
         }
-        let max_days = match month {
+        return false;
+    }
+
+    fn days_in_month(month: u8, year: u16) -> Result<u8, String> {
+        let max_days: u8 = match month {
             1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
             4 | 6 | 9 | 11 => 30,
             2 => {
-                if year.is_multiple_of(400) || (year.is_multiple_of(4) && !year.is_multiple_of(100)) {
+                if is_leap_year(year) {
                     29
                 } else {
                     28
@@ -169,8 +173,21 @@ impl Date {
             },
             _ => return Err("invalid month".to_string()),
         };
+        
+        Ok(max_days)
+    }
 
-        if day == 0 || day > max_days {
+    fn days_since_epoch(&self) -> u64 {
+        
+    }
+
+    pub fn validate(day: u8, month: u8, year: u16) -> Result<(), String> {
+
+        if year == 0 {
+            return Err("invalid year".to_string());
+        }
+
+        if day == 0 || day > days_in_month(month, year)? {
             return Err("invalid day".to_string());
         }
 
