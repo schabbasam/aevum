@@ -1,5 +1,5 @@
 import { Theme } from "../style.slint";
-import { Button, LineEdit, CheckBox, SpinBox } from "std-widgets.slint";
+import { Button, LineEdit, CheckBox, SpinBox, DatePickerPopup} from "std-widgets.slint";
 
 export component TaskAttributes inherits Rectangle {
     // ---- modes and states ----
@@ -62,12 +62,26 @@ export component TaskAttributes inherits Rectangle {
             // if one changes, the other changes as well
             text <=> root.title-input;
         }
-
-        LineEdit {
+        
+        // date picker
+        datepicker := DatePickerPopup {
+            x: 100px;
+            y: 100px;
+            close-policy: PopupClosePolicy.no-auto-close;
+            accepted(date) => {
+                debug(date);
+            }
+            canceled => {
+                datepicker.close()
+            }
+        }
+        Button {
             horizontal-stretch: 1;
             height: Theme.input-height;
-            placeholder-text: "DD.MM.YYYY";
-            text <=> root.date-input;
+            text: "Date: " + root.date-input;
+            clicked => {
+                datepicker.show();
+            }
         }
         
         // optional stuff
