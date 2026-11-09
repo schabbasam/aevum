@@ -24,6 +24,20 @@ impl Weekday {
         }
 
     }
+    
+    pub fn from_number(n: u8) -> Result<Self, String> {
+        match n {
+            0 => Ok(Weekday::Monday),
+            1 => Ok(Weekday::Tuesday),
+            2 => Ok(Weekday::Wednesday),
+            3 => Ok(Weekday::Thursday),
+            4 => Ok(Weekday::Friday),
+            5 => Ok(Weekday::Saturday),
+            6 => Ok(Weekday::Sunday),
+            _ => Err("invalid number".to_string())
+        }
+
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
