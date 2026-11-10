@@ -1,4 +1,5 @@
 import { Theme } from "../style.slint";
+import { TaskForm } from "../types.slint";
 import { Button, LineEdit, CheckBox, SpinBox, DatePickerPopup} from "std-widgets.slint";
 
 export component TaskAttributes inherits Rectangle {
@@ -21,16 +22,7 @@ export component TaskAttributes inherits Rectangle {
     in-out property <bool> completed-input: false;
 
     // ---- callbacks ----
-    callback save-task(
-        string, // title
-        string, // date
-        string, // description
-        int, // duration
-        string, // recurrence
-        string, // category
-        string, // color
-        bool    // completed
-    );
+    callback save-task(TaskForm);
 
     // ---- general appearance ----
     background: Theme.surface;
@@ -65,8 +57,6 @@ export component TaskAttributes inherits Rectangle {
         
         // date picker
         datepicker := DatePickerPopup {
-            x: 100px;
-            y: 100px;
             close-policy: PopupClosePolicy.no-auto-close;
             accepted(date) => {
                 debug(date);
@@ -151,16 +141,16 @@ export component TaskAttributes inherits Rectangle {
             enabled: root.is-valid && (!root.edit-mode || root.has-changes);
             
             clicked => {
-                root.save-task(
-                    root.title-input,
-                    root.date-input,
-                    root.description-input,
-                    root.duration-input,
-                    root.recurrence-input,
-                    root.category-input,
-                    root.color-input,
-                    root.completed-input
-                );
+                root.save-task({
+                    title:          root.title-input,
+                    date:           root.date-input,
+                    description:    root.description-input,
+                    duration:       root.duration-input,
+                    recurrence:     root.recurrence-input,
+                    category:       root.category-input,
+                    color:          root.color-input,
+                    completed:      root.completed-input
+                });
             }
         }
     }
