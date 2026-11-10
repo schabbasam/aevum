@@ -1,7 +1,8 @@
 // this file contains all structs and enums about time
 use std::collections::HashSet;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+// since we derived Ord and PartialOrd, we can sort a Vec<Weekday>
 pub enum Weekday {
     Monday,
     Tuesday,
@@ -275,10 +276,12 @@ impl Time {
 pub struct Duration {
     minutes: u16,
 }
+// 1440 minutes = 1 day
+pub const MAX_DURATION: u16 = 1440;
 impl Duration {
     // setters, validate and to_hours functions are unneeded
     pub fn new(minutes: u16) -> Result<Self, String> {
-        if minutes == 0 {
+        if minutes == 0 || minutes > MAX_DURATION {
             return Err("invalid minutes".to_string());
         }
 
