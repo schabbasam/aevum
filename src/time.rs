@@ -194,6 +194,20 @@ impl Date {
         days
     }
 
+    fn weekday(&self) -> Weekday {
+        // the 01.01.0001 was a monday
+        match self.days_since_epoch() % 7 {
+            0 => Weekday::Monday,
+            1 => Weekday::Tuesday,
+            2 => Weekday::Wednesday,
+            3 => Weekday::Thursday,
+            4 => Weekday::Friday,
+            5 => Weekday::Saturday,
+            6 => Weekday::Sunday,
+            _ => unreachable!()
+        }
+    }
+
     pub fn validate(day: u8, month: u8, year: u16) -> Result<(), String> {
 
         if year == 0 {
