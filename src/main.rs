@@ -7,15 +7,21 @@ use aevum::color::*;
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
-//    let app_handle = app.as_weak();
+    let app_handle = app.as_weak();
     
     app.on_save_task(move |form| {
+        let app = app_handle.upgrade().unwrap();
         match build_task(&form) {
             Ok(task) => {
                 // TODO: store ts in a vec or smth
                 println!("task created \n{:?}", task);
+                app.set_is_error(false);
+                app.set_status_message("task created".into());
             }
-            Err(e) => eprintln!("invalid task: {e}")
+            Err(e) => {
+                app.set_is_error(true);
+                app.set_status_message(e.into());
+            }
         }
     });
     

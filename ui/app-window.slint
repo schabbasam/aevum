@@ -13,7 +13,9 @@ export component MainWindow inherits Window {
     height: 800px;
 
     callback save-task(TaskForm);
-   
+    in-out property <string> status-message: "";
+    in-out property <bool> is-error: false;
+
     keyboard-scope := FocusScope {
         // ---- escape to exit ----
         capture-key-pressed(event) => {
@@ -38,6 +40,8 @@ export component MainWindow inherits Window {
 
                 TaskAttributes {
                     save-task(form) => { root.save-task(form); }
+                    status-message <=> root.status-message;
+                    is-error <=> root.is-error;
                 }
             }
             Rectangle {
