@@ -2,6 +2,7 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::time::*;
+use crate::color::Color;
 
 #[derive(Debug, Clone)]
 pub struct Task {
