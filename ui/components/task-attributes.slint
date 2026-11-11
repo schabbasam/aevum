@@ -13,7 +13,9 @@ export component TaskAttributes inherits Rectangle {
 
     // ---- input values ----
     in-out property <string> title-input: "";
-    in-out property <string> date-input: "";
+    in-out property <int> day-input: 0;
+    in-out property <int> month-input: 0;
+    in-out property <int> year-input: 0;
     in-out property <string> description-input: "";
     in-out property <int> duration-input: 0;
     in-out property <string> recurrence-input: "";
@@ -59,7 +61,9 @@ export component TaskAttributes inherits Rectangle {
         datepicker := DatePickerPopup {
             close-policy: PopupClosePolicy.no-auto-close;
             accepted(date) => {
-                debug(date);
+                root.day-input = date.day;
+                root.month-input = date.month;
+                root.year-input = date.year;
             }
             canceled => {
                 datepicker.close()
@@ -68,7 +72,7 @@ export component TaskAttributes inherits Rectangle {
         Button {
             horizontal-stretch: 1;
             height: Theme.input-height;
-            text: "Date: " + root.date-input;
+            text: "Date: " + root.day-input + "." + root.month-input + "." + root.year-input;
             clicked => {
                 datepicker.show();
             }
@@ -143,7 +147,9 @@ export component TaskAttributes inherits Rectangle {
             clicked => {
                 root.save-task({
                     title:          root.title-input,
-                    date:           root.date-input,
+                    day:            root.day-input,
+                    month:          root.month-input,
+                    year:           root.year-input,
                     description:    root.description-input,
                     duration:       root.duration-input,
                     recurrence:     root.recurrence-input,
