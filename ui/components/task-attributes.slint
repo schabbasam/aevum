@@ -3,13 +3,6 @@ import { TaskForm } from "../types.slint";
 import { Button, LineEdit, CheckBox, SpinBox, DatePickerPopup} from "std-widgets.slint";
 
 export component TaskAttributes inherits Rectangle {
-    // ---- modes and states ----
-    in property <bool> edit-mode: false;
-    in property <bool> has-changes: false;
-    in property <bool> is-valid: false;
-    
-    in property <string> status-message: "";
-    in property <bool> is-error: false;
 
     // ---- input values ----
     in-out property <string> title-input: "";
@@ -26,9 +19,17 @@ export component TaskAttributes inherits Rectangle {
     // ---- callbacks ----
     callback save-task(TaskForm);
 
+    // ---- modes and states ----
+    in property <bool> edit-mode: false;
+    in property <bool> has-changes: false;
+    in property <bool> is-valid: title-input >= 1;
+
+    in property <string> status-message: "";
+    in property <bool> is-error: false;
+
+
     // ---- general appearance ----
     background: Theme.surface;
-//    height: 0px;
     // ---- main layout ----
 
     VerticalLayout {
@@ -142,7 +143,7 @@ export component TaskAttributes inherits Rectangle {
 
             // in create mode, validity is enough
             // in edit mode, changes must also exist
-            enabled: root.is-valid && (!root.edit-mode || root.has-changes);
+            enabled: root.is-valid; //&& (!root.edit-mode || root.has-changes);
             
             clicked => {
                 root.save-task({
