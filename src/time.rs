@@ -178,20 +178,19 @@ impl Date {
         Ok(max_days)
     }
 
-    fn days_since_epoch(&self) -> u64 {
+    fn days_since_epoch(&self) -> u32 {
         // returns days since 01.01.0001
-        let mut days = 0;
+        let mut days: u32 = 0;
 
         for year in 1..self.year {
             days += if Self::is_leap_year(year) { 366 } else { 365 };
         }
 
         for month in 1..self.month {
-            days += Self::days_in_month(month, self.year);
+            days += u32::from(Self::days_in_month(month, self.year).unwrap());
         }
-
-        days += self.day -1;
         
+        days += u32::from(self.day -1);
         days
     }
 
