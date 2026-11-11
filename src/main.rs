@@ -2,7 +2,7 @@
 slint::include_modules!();
 use aevum::task::*;
 use aevum::time::Date as DateThing;
-use aevum::color::*;
+// use aevum::color::*;
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> Result<(), slint::PlatformError> {
