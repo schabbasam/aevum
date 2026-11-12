@@ -189,7 +189,14 @@ export component SpinBox inherits Rectangle {
     }
 
     // ---- up/down buttons on the right edge ----
-
+    Rectangle {
+    x: 0px;
+    y: 1px;
+    height: parent.height - 2px;
+    clip: true;
+    border-top-right-radius: Theme.radius-small;
+    border-bottom-right-radius: Theme.radius-small;
+    background: transparent;
     VerticalLayout {
         x: parent.width - 24px;
         width: 24px;
@@ -236,6 +243,7 @@ export component SpinBox inherits Rectangle {
                 clicked => { root.decrement(); }
             }
         }
+    }
     }
 
     // ---- little vertical seperator between the buttons and text ----
