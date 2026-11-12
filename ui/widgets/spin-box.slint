@@ -16,7 +16,7 @@ export component SpinBox inherits Rectangle {
     in property <bool> read-only;
     out property <bool> has-focus <=> text-input.has-focus;
     in-out property <int> value: minimum;
-
+    out property <bool> has-hover: text-ta.has-hover || field-ta.has-hover || up-ta.has-hover || down-ta.has-hover;
     callback edited(value: int);
 
     // ---- proper background and border
@@ -25,6 +25,7 @@ export component SpinBox inherits Rectangle {
     border-width: 1px;
     border-color: !enabled  ? Theme.border-disabled
                 : has-focus ? Theme.border-focus
+                : true ? Theme.border-focus
                 : Theme.border;
     background: !enabled ? Theme.control-disabled
               : Theme.control-bg;
@@ -34,7 +35,7 @@ export component SpinBox inherits Rectangle {
 
     // focus ring
     Rectangle {
-        visible: root.has-focus && root.enabled;
+        visible: (root.has-focus || root.has-hover) && root.enabled;
         x: -2px;
         y: -2px;
         width: parent.width + 4px;
@@ -113,11 +114,9 @@ export component SpinBox inherits Rectangle {
         );
     }
 
-    TouchArea {
+    field-ta := TouchArea {
         enabled: root.enabled && !root.read-only;
-
-        out property <bool> hovered: self.has-hover;
-
+        
         scroll-event(event) => {
             if event.delta-y > 0 {
                 root.increment();
@@ -179,6 +178,14 @@ export component SpinBox inherits Rectangle {
                 root.set-text-to-value();
             }
         }
+
+        text-ta := TouchArea {
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down {
+                    text-input.focus();
+                }
+            }
+        }
     }
 
     // ---- up/down buttons on the right edge ----
@@ -234,8 +241,9 @@ export component SpinBox inherits Rectangle {
     // ---- little vertical seperator between the buttons and text ----
     Rectangle {
         x: parent.width - 25px;
+        y: 2px;
         width: 1px;
-        height: parent.height;
+        height: parent.height - 4px;
         background: Theme.border;
     }
 }
