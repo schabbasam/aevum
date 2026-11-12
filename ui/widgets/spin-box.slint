@@ -190,60 +190,62 @@ export component SpinBox inherits Rectangle {
 
     // ---- up/down buttons on the right edge ----
     Rectangle {
-    x: 0px;
-    y: 1px;
-    height: parent.height - 2px;
-    clip: true;
-    border-top-right-radius: Theme.radius-small;
-    border-bottom-right-radius: Theme.radius-small;
-    background: transparent;
-    VerticalLayout {
-        x: parent.width - 24px;
-        width: 24px;
-        height: parent.height;
+        x: 0px;
+        y: 1px;
+        width: parent.width - 1px;
+        height: parent.height - 2px;
+        clip: true;
+        border-top-right-radius: Theme.radius-small;
+        border-bottom-right-radius: Theme.radius-small;
+        background: transparent;
 
-        // up btn
-        Rectangle {
-            height: 50%;
-            background: up-ta.pressed ? Theme.control-pressed
-                      : up-ta.has-hover ? Theme.control-hover
-                      : transparent;
-            border-top-right-radius: Theme.radius-small;
-            Text {
-                text: "▲";
-                color: root.enabled ? Theme.foreground-muted
-                     : Theme.foreground-muted.with-alpha(0.4);
-                font-size: 9px;
-                horizontal-alignment: center;
-                vertical-alignment: center;
+        VerticalLayout {
+            x: parent.width - 24px;
+            width: 24px;
+            height: parent.height;
+
+            // up btn
+            Rectangle {
+                height: 50%;
+                background: up-ta.pressed ? Theme.control-pressed
+                          : up-ta.has-hover ? Theme.control-hover
+                          : transparent;
+                border-top-right-radius: Theme.radius-small;
+                Text {
+                    text: "▲";
+                    color: root.enabled ? Theme.foreground-muted
+                         : Theme.foreground-muted.with-alpha(0.4);
+                    font-size: 9px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+                up-ta := TouchArea {
+                    enabled: root.enabled && !root.read-only;
+                    clicked => { root.increment(); }
+                }
             }
-            up-ta := TouchArea {
-                enabled: root.enabled && !root.read-only;
-                clicked => { root.increment(); }
+            
+            // down btn
+            Rectangle {
+                height: 50%;
+                background: down-ta.pressed ? Theme.control-pressed
+                          : down-ta.has-hover ? Theme.control-hover
+                          : transparent;
+                border-bottom-right-radius: Theme.radius-small;
+                Text {
+                    text: "▼";
+                    color: root.enabled ? Theme.foreground-muted
+                         : Theme.foreground-muted.with-alpha(0.4);
+                    font-size: 9px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+                down-ta := TouchArea {
+                    enabled: root.enabled && !root.read-only;
+                    clicked => { root.decrement(); }
+                }
             }
         }
-        
-        // down btn
-        Rectangle {
-            height: 50%;
-            background: down-ta.pressed ? Theme.control-pressed
-                      : down-ta.has-hover ? Theme.control-hover
-                      : transparent;
-            border-bottom-right-radius: Theme.radius-small;
-            Text {
-                text: "▼";
-                color: root.enabled ? Theme.foreground-muted
-                     : Theme.foreground-muted.with-alpha(0.4);
-                font-size: 9px;
-                horizontal-alignment: center;
-                vertical-alignment: center;
-            }
-            down-ta := TouchArea {
-                enabled: root.enabled && !root.read-only;
-                clicked => { root.decrement(); }
-            }
-        }
-    }
     }
 
     // ---- little vertical seperator between the buttons and text ----
