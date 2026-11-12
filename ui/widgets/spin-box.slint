@@ -136,7 +136,7 @@ export component SpinBox inherits Rectangle {
     text-input := TextInput {
 
         x: Theme.spacing-small;
-        width: parent.width - root.arrow-column-width - 2 * Theme.spacing-small - Theme.border-width;
+        width: parent.width - root.arrow-column-width - 2 * Theme.spacing-small - 2 * Theme.border-width;
         height: 100%;
         vertical-alignment: center;
         horizontal-alignment: root.horizontal-alignment;
@@ -193,18 +193,18 @@ export component SpinBox inherits Rectangle {
 
     // this rect's purpose is to clip the children (so they don't cover focus-ring)
     Rectangle {
-        x: 0px;
+        x: Theme.border-width;
         y: Theme.border-width;
-        width: parent.width - Theme.border-width;
+        width: parent.width - 2 * Theme.border-width;
         height: parent.height - 2 * Theme.border-width;
         clip: true;
-        border-top-right-radius: Theme.radius-small;
-        border-bottom-right-radius: Theme.radius-small;
+        border-top-right-radius: Theme.radius-small - Theme.border-width;
+        border-bottom-right-radius: Theme.radius-small - Theme.border-width;
         background: transparent;
 
         VerticalLayout {
-            x: parent.width - root.arrow-column-width - Theme.border-width;
-            width: root.arrow-column-width + Theme.border-width;
+            x: parent.width - root.arrow-column-width;
+            width: root.arrow-column-width;
             height: parent.height;
 
             // up btn
@@ -253,7 +253,7 @@ export component SpinBox inherits Rectangle {
 
     // ---- little vertical seperator between the buttons and text ----
     Rectangle {
-        x: parent.width - root.arrow-column-width - Theme.border-width;
+        x: parent.width - root.arrow-column-width - 2 * Theme.border-width;
         y: Theme.border-width;
         width: Theme.border-width;
         height: parent.height - 2 * Theme.border-width;
