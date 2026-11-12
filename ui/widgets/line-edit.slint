@@ -1,0 +1,101 @@
+
+import { Theme } from "../theme.slint";
+
+export component LineEdit inherits Rectangle {
+    in-out property <string> text;
+    in property <string> placeholder-text;
+    in property <bool> enabled: true;
+    in property <bool> read-only: false;
+
+    in property <brush> text-color: Theme.foreground;
+    in property <brush> placeholder-color: Theme.foreground-muted;
+    in property <brush> selection-background-color: Theme.accent;
+    in property <brush> selection-foreground-color: Theme.on-accent;
+    in property <length> font-size: Theme.font-size-md;
+    in property <int> font-weight: Theme.font-weight-normal;
+    in property <TextHorizontalAlignment> horizontal-alignment: start;
+
+    out property <bool> has-focus: text-input.has-focus;
+    out property <bool> has-hover: field-ta.has-hover || hover-ta.has-hover;
+
+    callback accepted(text: string);
+    callback edited(text: string);
+
+    forward-focus: text-input;
+
+    // ---- chrome ----
+    height: Theme.control-height;
+    border-radius: Theme.radius-small;
+    border-width: Theme.border-width;
+    border-color: !enabled    ? Theme.border-disabled
+               :  has-focus   ? Theme.border-focus
+               :  has-hover   ? Theme.border-focus
+               :                Theme.border;
+    background: !enabled ? Theme.control-disabled
+              :  has-hover ? Theme.control-hover
+              :              Theme.control-bg;
+    animate border-color { duration: Theme.anim-fast; }
+    animate background  { duration: Theme.anim-fast; }
+
+    // ---- focus ring ----
+    Rectangle {
+        visible: (root.has-focus || root.has-hover) && root.enabled;
+        x: -Theme.focus-ring-width;
+        y: -Theme.focus-ring-width;
+        width: parent.width + 2 * Theme.focus-ring-width;
+        height: parent.height + 2 * Theme.focus-ring-width;
+        border-radius: root.border-radius;
+        border-width: Theme.focus-ring-width;
+        border-color: Theme.border-focus;
+        background: transparent;
+    }
+
+    // ---- hover detection over the padding (not the text) ----
+    // The text area is covered by `text-input`; this catches hover on the
+    // inner padding around it. Same approach you used in SpinBox.
+    field-ta := TouchArea {
+        enabled: root.enabled;
+        x: 0;
+        y: 0;
+        width: parent.width;
+        height: parent.height;
+        // don't steal clicks — text-input above handles them
+    }
+
+    // ---- text input ----
+    text-input := TextInput {
+        x: Theme.spacing-small;
+        width: parent.width - 2 * Theme.spacing-small;
+        height: 100%;
+        vertical-alignment: center;
+        horizontal-alignment: root.horizontal-alignment;
+
+        text <=> root.text;
+        enabled: root.enabled;
+        read-only: root.read-only;
+
+        color: root.enabled ? root.text-color : Theme.foreground-muted;
+        selection-background-color: root.selection-background-color;
+        selection-foreground-color: root.selection-foreground-color;
+        font-size: root.font-size;
+        font-weight: root.font-weight;
+        single-line: true;
+
+        placeholder-text: root.placeholder-text;
+        placeholder-color: root.placeholder-color;
+
+        accepted => { root.accepted(self.text); }
+        edited    => { root.edited(self.text); }
+
+        // on top of text-input — hover-only, forwards clicks via focus()
+        hover-ta := TouchArea {
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down {
+                    text-input.focus();
+                    return accept;
+                }
+                reject
+            }
+        }
+    }
+}
