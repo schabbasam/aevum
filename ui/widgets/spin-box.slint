@@ -26,7 +26,7 @@ export component SpinBox inherits Rectangle {
     border-width: Theme.border-width;
     border-color: !enabled  ? Theme.border-disabled
                 : has-focus ? Theme.border-focus
-                : true ? Theme.border-focus
+                : has-hover ? Theme.border-focus
                 : Theme.border;
     background: !enabled ? Theme.control-disabled
               : Theme.control-bg;
@@ -41,7 +41,7 @@ export component SpinBox inherits Rectangle {
         y: - Theme.focus-ring-width;
         width: parent.width + 2 * Theme.focus-ring-width;
         height: parent.height + 2 * Theme.focus-ring-width;
-        border-radius: root.border-radius;
+        border-radius: root.border-radius + Theme.focus-ring-width;
         border-width: Theme.focus-ring-width;
         border-color: Theme.border-focus;
         background: transparent;
@@ -136,7 +136,7 @@ export component SpinBox inherits Rectangle {
     text-input := TextInput {
 
         x: Theme.spacing-small;
-        width: parent.width - root.arrow-column-width - Theme.border-width;
+        width: parent.width - root.arrow-column-width - 2 * Theme.spacing-small - Theme.border-width;
         height: 100%;
         vertical-alignment: center;
         horizontal-alignment: root.horizontal-alignment;
@@ -190,11 +190,13 @@ export component SpinBox inherits Rectangle {
     }
 
     // ---- up/down buttons on the right edge ----
+
+    // this rect's purpose is to clip the children (so they don't cover focus-ring)
     Rectangle {
         x: 0px;
-        y: 1px;
-        width: parent.width - Theme.focus-ring-width / 2;
-        height: parent.height - Theme.focus-ring-width;
+        y: Theme.border-width;
+        width: parent.width - Theme.border-width;
+        height: parent.height - 2 * Theme.border-width;
         clip: true;
         border-top-right-radius: Theme.radius-small;
         border-bottom-right-radius: Theme.radius-small;
@@ -251,10 +253,10 @@ export component SpinBox inherits Rectangle {
 
     // ---- little vertical seperator between the buttons and text ----
     Rectangle {
-        x: parent.width - root.arrow-column-width;
-        y: Theme.focus-ring-width;
-        width: Theme.focus-ring-width / 2;
-        height: parent.height - 2 * Theme.focus-ring-width;
+        x: parent.width - root.arrow-column-width - Theme.border-width;
+        y: Theme.border-width;
+        width: Theme.border-width;
+        height: parent.height - 2 * Theme.border-width;
         background: Theme.border;
     }
 }
