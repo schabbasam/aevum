@@ -1,0 +1,241 @@
+
+import { Theme } from "../theme.slint";
+
+export component SpinBox inherits Rectangle {
+
+    in property <int> minimum;
+    in property <int> maximum: 100;
+    in property <bool> enabled: true;
+    in property <brush> text-color: Theme.foreground;
+    in property <length> font-size: Theme.font-size-medium;
+    in property <int> font-weight: Theme.font-weight-normal;
+    in property <color> selection-background-color <=> text-input.selection-background-color;
+    in property <color> selection-foreground-color <=> text-input.selection-foreground-color;
+    in property <TextHorizontalAlignment> horizontal-alignment <=> text-input.horizontal-alignment;
+    in property <int> step-size: 1;
+    in property <bool> read-only;
+    out property <bool> has-focus <=> text-input.has-focus;
+    in-out property <int> value: minimum;
+
+    callback edited(value: int);
+
+    // ---- proper background and border
+    height: Theme.control-height;
+    border-radius: Theme.radius-small;
+    border-width: 1px;
+    border-color: !enabled  ? Theme.border-disabled
+                : has-focus ? Theme.border-focus
+                : Theme.border;
+    background: !enabled ? Theme.control-disabled
+              : Theme.control-bg;
+    
+    animate border-color { duration: Theme.anim-fast; }
+    animate background { duration: Theme.anim-fast; }
+
+    // focus ring
+    Rectangle {
+        visible: root.has-focus && root.enabled;
+        x: -2px;
+        y: -2px;
+        width: parent.width + 4px;
+        height: parent.height + 4px;
+        border-radius: root.border-radius;
+        border-width: 2px;
+        border-color: Theme.border-focus;
+        background: transparent;
+    }
+
+
+    public function update-value(value: int) {
+        if root.read-only || !root.enabled {
+            return;
+        }
+
+        let clamped = clamp(value, root.minimum, root.maximum);
+        if root.value == clamped {
+            return;
+        }
+
+        root.value = clamped;
+        root.edited(root.value);
+    }
+
+    // Unlike 'update-value', a number that leaves the minimum/maximum range
+    // leaves the value alone, so that typing the first digits of a longer
+    // number doesn't move the value and rewrite the text under the cursor.
+    function update-value-from-text(value: int) {
+        if value >= root.minimum && value <= root.maximum {
+            root.update-value(value);
+        }
+    }
+
+    public function set-selection-offsets(anchor: int, focus: int) {
+        text-input.set-selection-offsets(anchor, focus);
+    }
+
+    public function increment() {
+        if !root.read-only {
+           root.update-value(root.value + root.step-size);
+           root.update-text-and-cursor();
+        }
+    }
+
+    public function decrement() {
+        if !root.read-only {
+           root.update-value(root.value - root.step-size);
+           root.update-text-and-cursor();
+        }
+    }
+
+    private property <length> scroll-delta: 2px;
+
+    forward-focus: text-input;
+
+    changed value => {
+        root.set-text-to-value();
+    }
+
+    changed has-focus => {
+        if !root.has-focus {
+            root.set-text-to-value();
+        }
+    }
+
+    function set-text-to-value() {
+        text-input.text = root.value;
+    }
+
+    function update-text-and-cursor() {
+        root.set-text-to-value();
+        text-input.set-selection-offsets(
+            text-input.text.character-count, 
+            text-input.text.character-count
+        );
+    }
+
+    TouchArea {
+        enabled: root.enabled && !root.read-only;
+
+        out property <bool> hovered: self.has-hover;
+
+        scroll-event(event) => {
+            if event.delta-y > 0 {
+                root.increment();
+                return accept;
+            }
+
+            if event.delta-y < 0 {
+                root.decrement();
+                return accept;
+            }
+
+            reject
+        }
+    }
+
+    text-input := TextInput {
+
+        x: Theme.spacing-small;
+        width: parent.width - 2 * Theme.spacing-small - 24px;
+        height: 100%;
+        vertical-alignment: center;
+        horizontal-alignment: root.horizontal-alignment;
+
+        color: root.enabled ? root.text-color : Theme.foreground-muted;
+        selection-background-color: Theme.accent;
+        selection-foreground-color: Theme.on-accent;
+        font-size: root.font-size;
+        font-weight: root.font-weight;
+
+        text: root.value;
+        enabled: root.enabled;
+        read-only: root.read-only;
+        accessible-role: none;
+
+        key-pressed(event) => {
+            if !root.read-only && event.text == Key.UpArrow {
+                root.increment();
+                return accept;
+            }
+
+            if !root.read-only && event.text == Key.DownArrow {
+                root.decrement();
+                return accept;
+            }
+
+            reject
+        }
+
+        accepted => {
+            // 'update-value-from-text' ignores an edit that leaves the minimum/maximum
+            // range, so the text can hold a number the value never took.
+            root.update-text-and-cursor();
+        }
+
+        edited => {
+            if self.text.is-float() && self.text.to-float() != root.value {
+                root.update-value-from-text(self.text.to-float());
+            } else if !self.text.is-float() && self.text != "" {
+                root.set-text-to-value();
+            }
+        }
+    }
+
+    // ---- up/down buttons on the right edge ----
+
+    VerticalLayout {
+        x: parent.width - 24px;
+        width: 24px;
+        height: parent.height;
+
+        // up btn
+        Rectangle {
+            height: 50%;
+            background: up-ta.pressed ? Theme.control-pressed
+                      : up-ta.has-hover ? Theme.control-hover
+                      : transparent;
+            border-top-right-radius: Theme.radius-small;
+            Text {
+                text: "▲";
+                color: root.enabled ? Theme.foreground-muted
+                     : Theme.foreground-muted.with-alpha(0.4);
+                font-size: 9px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+            up-ta := TouchArea {
+                enabled: root.enabled && !root.read-only;
+                clicked => { root.increment(); }
+            }
+        }
+        
+        // down btn
+        Rectangle {
+            height: 50%;
+            background: down-ta.pressed ? Theme.control-pressed
+                      : down-ta.has-hover ? Theme.control-hover
+                      : transparent;
+            border-bottom-right-radius: Theme.radius-small;
+            Text {
+                text: "▼";
+                color: root.enabled ? Theme.foreground-muted
+                     : Theme.foreground-muted.with-alpha(0.4);
+                font-size: 9px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+            down-ta := TouchArea {
+                enabled: root.enabled && !root.read-only;
+                clicked => { root.decrement(); }
+            }
+        }
+    }
+
+    // ---- little vertical seperator between the buttons and text ----
+    Rectangle {
+        x: parent.width - 25px;
+        width: 1px;
+        height: parent.height;
+        background: Theme.border;
+    }
+}
