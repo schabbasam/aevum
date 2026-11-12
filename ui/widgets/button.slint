@@ -10,7 +10,7 @@ export component Button inherits Rectangle {
     height: Theme.control-height;
     min-width: 80px;
     border-radius: Theme.radius-small;
-    border-width: primary ? 0px : 1px;
+    border-width: primary ? 0px : Theme.border-width;
     border-color: !enabled ? Theme.border-disabled
                : has-hover ? Theme.border-focus
                : Theme.border;
@@ -31,13 +31,14 @@ export component Button inherits Rectangle {
     // focus ring
     Rectangle {
         visible: has-hover && root.enabled;
-        border-radius: root.border-radius;
-        border-width: 2px;
+        border-radius: root.border-radius + Theme.focus-ring-width;
+        border-width: Theme.focus-ring-width;
         border-color: Theme.border-focus;
         background: transparent;
-        x: -2px; y: -2px;
-        width: parent.width + 4px;
-        height: parent.height + 4px;
+        x: - Theme.focus-ring-width; 
+        y: - Theme.focus-ring-width;
+        width: parent.width + 2 * Theme.focus-ring-width;
+        height: parent.height + 2 * Theme.focus-ring-width;
     }
 
     Text {
