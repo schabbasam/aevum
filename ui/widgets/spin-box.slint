@@ -11,7 +11,7 @@ export component SpinBox inherits Rectangle {
     in property <int> font-weight: Theme.font-weight-normal;
     in property <color> selection-background-color <=> text-input.selection-background-color;
     in property <color> selection-foreground-color <=> text-input.selection-foreground-color;
-    in property <TextHorizontalAlignment> horizontal-alignment <=> text-input.horizontal-alignment;
+    in property <TextHorizontalAlignment> horizontal-alignment: start;
     in property <int> step-size: 1;
     in property <bool> read-only;
     out property <bool> has-focus <=> text-input.has-focus;

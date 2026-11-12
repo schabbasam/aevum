@@ -1,7 +1,8 @@
 import { Theme } from "../style.slint";
 import { TaskForm } from "../types.slint";
-import {  LineEdit, CheckBox, SpinBox, DatePickerPopup} from "std-widgets.slint";
+import {  LineEdit, CheckBox, DatePickerPopup} from "std-widgets.slint";
 import { Button } from "../widgets/button.slint";
+import { SpinBox } from "../widgets/spin-box.slint";
 
 export component TaskAttributes inherits Rectangle {
 
@@ -99,8 +100,7 @@ export component TaskAttributes inherits Rectangle {
             }
 
             SpinBox {
-                horizontal-stretch: 1;
-                height: Theme.input-height;
+                step-size: 5;
                 value <=> root.duration-input;
             }
 
