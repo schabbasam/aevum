@@ -3,7 +3,7 @@ slint::include_modules!();
 use aevum::task::*;
 use aevum::time::Date as DateThing;
 use aevum::time::*;
-// use aevum::color::*;
+use aevum::color::*;
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> Result<(), slint::PlatformError> {
@@ -13,6 +13,7 @@ fn main() -> Result<(), slint::PlatformError> {
     // set max length
     app.set_max_title(MAX_TITLE as i32);
     app.set_max_description(MAX_DESCRIPTION as i32);
+    app.set_max_duration(MAX_DURATION as i32);
 
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
@@ -93,6 +94,18 @@ fn build_task(form: &TaskForm) -> Result<Task, String> {
             })?;
 
         task.set_duration(Some(dura));
+    }
+    
+    if form.color.is_empty() {
+        task.set_color(None);
+    } else {
+        let c = Color::from_hex(&form.color);
+        if let Err(e) = c {
+            eprintln!("error when creating Color: {e}");
+            return Err("invalid color".to_string());
+        } else {
+            task.set_color(Some(c.unwrap()));
+        }
     }
     Ok(task)
 }
