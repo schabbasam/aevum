@@ -1,4 +1,4 @@
-import { Theme } from "../style.slint";
+import { Theme } from "../theme.slint";
 
 export component TaskBlock inherits Rectangle {
     in property <string> task-title: "Task";
@@ -10,12 +10,12 @@ export component TaskBlock inherits Rectangle {
         duration * Theme.hour-height / 60
     );
 
-    background: Theme.surface-hover;
+    background: Theme.surface;
     border-radius: 6px;
 
     Text {
         text: parent.task-title;
-        color: Theme.text;
+        color: Theme.foreground;
         horizontal-alignment: center;
         vertical-alignment: center;
     }
@@ -29,11 +29,11 @@ export component TaskPanel inherits Rectangle {
         height: 100%;
 
         HorizontalLayout {
-            padding: Theme.task-panel-padding;
-            spacing: Theme.task-grid-spacing;
+            padding: Theme.spacing-medium;
+            spacing: Theme.spacing-medium;
 
             VerticalLayout {
-                spacing: Theme.task-grid-spacing;
+                spacing: Theme.spacing-medium;
 
                 TaskBlock {
                     task-title: "first task";
@@ -45,7 +45,7 @@ export component TaskPanel inherits Rectangle {
             }
 
             VerticalLayout {
-                spacing: Theme.task-grid-spacing;
+                spacing: Theme.spacing-medium;
 
                 TaskBlock {
                     task-title: "third task";

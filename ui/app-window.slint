@@ -1,4 +1,4 @@
-import { Theme } from "style.slint";
+import { Theme } from "theme.slint";
 import { TaskPanel } from "components/task-panel.slint";
 import { TaskAttributes } from "components/task-attributes.slint";
 import { TaskForm } from "types.slint";
@@ -17,6 +17,7 @@ export component MainWindow inherits Window {
     in-out property <bool> is-error: false;
     in-out property <int> max-title;
     in-out property <int> max-description;
+    in-out property <int> max-duration;
 
     keyboard-scope := FocusScope {
         // ---- escape to exit ----
@@ -33,7 +34,7 @@ export component MainWindow inherits Window {
             spacing: 0px;
             
             VerticalLayout {
-                width: Theme.panel-width;
+                width: 300px; // TODO make a variable
                 spacing: 0px;
 
                 TaskPanel {
@@ -46,6 +47,7 @@ export component MainWindow inherits Window {
                     is-error <=> root.is-error;
                     max-title <=> root.max-title;
                     max-description <=> root.max-description;
+                    max-duration <=> root.max-duration;
                 }
             }
             Rectangle {

@@ -1,4 +1,4 @@
-import { Theme } from "../style.slint";
+import { Theme } from "../theme.slint";
 import { TaskForm } from "../types.slint";
 import { CheckBox, DatePickerPopup} from "std-widgets.slint";
 import { Button } from "../widgets/button.slint";
@@ -22,6 +22,7 @@ export component TaskAttributes inherits Rectangle {
     // ---- max length ----
     in property <int> max-title: 0;
     in property <int> max-description: 0;
+    in property <int> max-duration: 0;
 
     // ---- callbacks ----
     callback save-task(TaskForm);
@@ -43,13 +44,13 @@ export component TaskAttributes inherits Rectangle {
     background: Theme.surface;
 
     VerticalLayout {
-        padding: Theme.task-attributes-padding;
-        spacing: 2 * Theme.task-attributes-spacing;
+        padding: Theme.spacing-medium;
+        spacing: 2 * Theme.spacing-medium;
 
         // heading changes depending on the currend mode
         Text {
             text: root.edit-mode ? "Edit Task" : "Create Task";
-            color: Theme.text;
+            color: Theme.foreground;
             font-size: 16px;
             font-weight: 600;
         }
@@ -78,7 +79,7 @@ export component TaskAttributes inherits Rectangle {
 
         Button {
             horizontal-stretch: 1;
-            height: Theme.input-height;
+            height: Theme.control-height;
             text: "Date: " + root.day-input + "." + root.month-input + "." + root.year-input;
             clicked => {
                 datepicker.show();
@@ -96,16 +97,17 @@ export component TaskAttributes inherits Rectangle {
         
         // 4. duration 
         HorizontalLayout {
-            height: Theme.input-height;
+            height: Theme.control-height;
 
             Text {
                 horizontal-stretch: 1;
                 text: "Duration:";
-                color: Theme.text;
+                color: Theme.foreground;
             }
 
             SpinBox {
                 step-size: 5;
+                maximum: root.max-duration;
                 value <=> root.duration-input;
             }
 
@@ -124,7 +126,7 @@ export component TaskAttributes inherits Rectangle {
         
         // 8. completed
         HorizontalLayout {
-            spacing: Theme.task-attributes-spacing;
+            spacing: Theme.spacing-small;
             alignment: center;
 
             CheckBox {
@@ -133,7 +135,7 @@ export component TaskAttributes inherits Rectangle {
 
             Text {
                 text: "Completed";
-                color: Theme.text;
+                color: Theme.foreground;
                 vertical-alignment: center;
             }
         }
@@ -143,7 +145,7 @@ export component TaskAttributes inherits Rectangle {
         Text {
             text: root.status-message;
             visible: root.status-message != "";
-            color: root.is-error ? Theme.error-color : Theme.success-color;
+            color: root.is-error ? Theme.danger : Theme.success;
             font-size: 11px;
         }
 
