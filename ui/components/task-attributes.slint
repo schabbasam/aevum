@@ -52,6 +52,7 @@ export component TaskAttributes inherits Rectangle {
         
         // 1. title
         LineEdit {
+            placeholder-text: "Title";
             max-length: 30;
             text <=> root.title-input;
         }

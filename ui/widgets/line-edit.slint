@@ -70,6 +70,20 @@ export component LineEdit inherits Rectangle {
         height: 100%;
         clip: true;
 
+        // ---- placeholder text ----
+        Text {
+            visible: root.text == "";
+            x: Theme.spacing-small;
+            vertical-alignment: center;
+            horizontal-alignment: root.horizontal-alignment;
+
+            text: root.placeholder-text;
+            color: root.placeholder-color;
+            font-size: root.font-size;
+            font-weight: root.font-weight;
+            overflow: elide;
+        }
+
         text-input := TextInput {
             width: max(parent.width, self.preferred-width);
             height: 100%;
@@ -86,9 +100,6 @@ export component LineEdit inherits Rectangle {
             font-size: root.font-size;
             font-weight: root.font-weight;
             single-line: true;
-
-    //        placeholder-text: root.placeholder-text;
-    //      placeholder-color: root.placeholder-color;
 
             accepted => { root.accepted(self.text); }
             edited    => { root.edited(self.text); }
