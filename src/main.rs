@@ -1,5 +1,8 @@
 
 slint::include_modules!();
+use slint::{Model, ModelRc, VecModel};
+use std::rc::Rc;
+
 use aevum::task::*;
 use aevum::time::Date as DateThing;
 use aevum::time::*;
@@ -14,6 +17,10 @@ fn main() -> Result<(), slint::PlatformError> {
     app.set_max_title(MAX_TITLE as i32);
     app.set_max_description(MAX_DESCRIPTION as i32);
     app.set_max_duration(MAX_DURATION as i32);
+
+    // tasks list
+    let tasks: Rc<VecModel<TaskForm>> = Rc::new(VecModel::default());
+    app.set_tasks(ModelRc::from(tasks.clone()));
 
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
