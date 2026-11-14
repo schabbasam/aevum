@@ -60,7 +60,7 @@ export component LineEdit inherits Rectangle {
         width: parent.width;
         height: parent.height;
     }
-
+    
     // ---- text input ----
     text-input := TextInput {
         x: Theme.spacing-small;
@@ -96,12 +96,18 @@ export component LineEdit inherits Rectangle {
         }
     }
 
-    HorizontalLayout {
+    Rectangle {
+        visible: root.max-length > 0 && (root.has-hover || root.has-focus);
         x: root.width - self.width - Theme.spacing-small;
-        y: (root.height - self.height) / 2;
-        spacing: Theme.spacing-small;
+        y: root.height - self.height / 2;
+        width: counter-text.preferred-width + 2 * Theme.spacing-small;
+        height: counter-text.preferred-height;
 
-        if root.max-length > 0 : Text {
+        background: root.background;
+        border-width: 0px;
+        border-color: counter-text.color;
+
+        counter-text := Text {
             text: root.text.character-count + "/" + root.max-length;
             color: root.text.character-count >= root.max-length
                  ? Theme.danger
@@ -109,6 +115,5 @@ export component LineEdit inherits Rectangle {
             font-size: Theme.font-size-small;
             vertical-alignment: center;
         }
-        // clear button here
     }
 }
