@@ -8,6 +8,7 @@ export component LineEdit inherits Rectangle {
     in property <int> max-length: 0; // 0 = unlimited
     in property <bool> enabled: true;
     in property <bool> read-only: false;
+    in property <bool> center-counter: true;
 
     in property <brush> text-color: Theme.foreground;
     in property <brush> placeholder-color: Theme.foreground-muted;
@@ -95,9 +96,12 @@ export component LineEdit inherits Rectangle {
             }
         }
     }
-
+    
+    // ---- character counter ----
     Rectangle {
-        x: root.width - self.width - Theme.spacing-medium;
+        x: root.center-counter 
+            ? (root.width - self.width) / 2
+            : root.width - self.width - Theme.spacing-medium;
         y: root.height - self.height / 2;
         width: counter-text.preferred-width + 2 * Theme.spacing-small;
         height: counter-text.preferred-height;
