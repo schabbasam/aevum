@@ -40,7 +40,7 @@ export component LineEdit inherits Rectangle {
     animate background  { duration: Theme.anim-fast; }
 
     // ---- focus ring ----
-    Rectangle {
+    focus-ring := Rectangle {
         visible: (root.has-focus || root.has-hover) && root.enabled;
         x: -Theme.focus-ring-width;
         y: -Theme.focus-ring-width;
@@ -98,21 +98,21 @@ export component LineEdit inherits Rectangle {
 
     Rectangle {
         visible: root.max-length > 0 && (root.has-hover || root.has-focus);
-        x: root.width - self.width - Theme.spacing-small;
+        x: root.width - self.width - Theme.spacing-medium;
         y: root.height - self.height / 2;
         width: counter-text.preferred-width + 2 * Theme.spacing-small;
         height: counter-text.preferred-height;
 
-        background: root.background;
+        background: focus-ring.border-color;
         border-width: 0px;
         border-color: counter-text.color;
+        border-radius: Theme.radius-medium;
 
         counter-text := Text {
             text: root.text.character-count + "/" + root.max-length;
-            color: root.text.character-count >= root.max-length
-                 ? Theme.danger
-                 : root.placeholder-color;
-            font-size: Theme.font-size-small;
+            font-weight: Theme.font-weight-bold;
+            color: white;
+            font-size: root.font-size * 0.7;
             vertical-alignment: center;
         }
     }
