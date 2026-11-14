@@ -2,20 +2,19 @@ import { Theme } from "../theme.slint";
 import { TaskForm } from "../types.slint";
 
 export component TaskBlock inherits Rectangle {
-    in property <string> task-title: "Task";
-    in property <int> duration: 60;
+    in property <TaskForm> form;
 
-//    width: Theme.task-block-width;
+    width: Theme.task-block-width;
     height: max(
         Theme.task-block-min-height,
-        duration * Theme.hour-height / 60
+        form.duration * Theme.hour-height / 60
     );
 
     background: Theme.surface-raised;
-    border-radius: 6px;
+    border-radius: Theme.radius-small;
 
     Text {
-        text: parent.task-title;
+        text: form.title;
         color: Theme.foreground;
         horizontal-alignment: center;
         vertical-alignment: center;
