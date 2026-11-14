@@ -72,6 +72,7 @@ export component LineEdit inherits Rectangle {
 
         // ---- placeholder text ----
         Text {
+            width: root.width - Theme.spacing-small;
             visible: root.text == "";
             x: Theme.spacing-small;
             vertical-alignment: center;
