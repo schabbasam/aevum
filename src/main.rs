@@ -2,6 +2,7 @@
 slint::include_modules!();
 use aevum::task::*;
 use aevum::time::Date as DateThing;
+use aevum::time::*;
 // use aevum::color::*;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -67,11 +68,32 @@ fn build_task(form: &TaskForm) -> Result<Task, String> {
         eprintln!("error when setting description: {e}");
         return Err("description too long".to_string());
     }
+   
+    match form.duration {
+        0 => {
+            task.set_duration(None);
+        }
+        _ => {
+            if let Err(e) = Duration::new(form.duration as u16) {
+                eprintln!("error when creating Duration: {e}");
+                return Err("duration can't be longer than a day".to_string());
+            } else {
+                task.set_duration(Some(Duration::new(form.duration as u16).unwrap()));
+            }
+        }
+    }
 
-    
+    if form.duration == 0 {
+        task.set_duration(None);
+    } else {
+        let dura = Duration::new(form.duration as u16)
+            .map_err(|e| {
+                eprintln!("error when creating Duration: {e}");
+                "duration can't be longer than a day".to_string()
+            })?;
 
-
-
+        task.set_duration(Some(dura));
+    }
     Ok(task)
 }
 
