@@ -9,6 +9,10 @@ fn main() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
     let app_handle = app.as_weak();
     
+    // set max length
+    app.set_max_title(MAX_TITLE as i32);
+    app.set_max_description(MAX_DESCRIPTION as i32);
+
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
         match build_task(&form) {
@@ -59,7 +63,14 @@ fn build_task(form: &TaskForm) -> Result<Task, String> {
     } else {
         Some(form.description.to_string())
     };
-    task.set_description(desc)?;
+    if let Err(e) = task.set_description(desc) {
+        eprintln!("error when setting description: {e}");
+        return Err("description too long".to_string());
+    }
+
+    
+
+
 
     Ok(task)
 }
@@ -70,6 +81,7 @@ fn parse_date(day: i32, month: i32, year: i32) -> Option<DateThing> {
     }
     Some(DateThing::new(day as u8, month as u8, year as u16).unwrap())
 }
+
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen::prelude::wasm_bindgen(start)]
