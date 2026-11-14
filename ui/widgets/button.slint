@@ -50,14 +50,6 @@ export component Button inherits Rectangle {
         font-weight: Theme.font-weight-bold;
     }
 
-    // expose focus to parent
-    out property <bool> has-hover: ta.has-hover;
-
-    ta := TouchArea {
-        enabled: root.enabled;
-        clicked => { if (root.enabled) { root.clicked(); } }
-    }
-
     // keyboard support
     FocusScope {
         key-pressed(event) => {
@@ -67,5 +59,16 @@ export component Button inherits Rectangle {
             }
             return reject;
         }
+        ta := TouchArea {
+            enabled: root.enabled;
+            clicked => { 
+                if (root.enabled) { 
+                    root.clicked(); 
+                } 
+            }
+        }
     }
+    
+    // expose focus to parent
+    out property <bool> has-hover: ta.has-hover;
 }
