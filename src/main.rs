@@ -53,6 +53,13 @@ fn build_task(form: &TaskForm) -> Result<Task, String> {
             task.set_date(d);
         }
     }
+    
+    let desc = if form.description.is_empty() {
+        None
+    } else {
+        Some(form.description.to_string())
+    };
+    task.set_description(desc)?;
 
     Ok(task)
 }
