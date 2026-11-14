@@ -38,13 +38,21 @@ fn build_task(form: &TaskForm) -> Result<Task, String> {
         None => return Err("no date selected".to_string()),
     };
 
-    let task = match Task::new(title, date) {
+    let mut task = match Task::new(title, date) {
         Ok(t) => t,
         Err(e) => {
             eprintln!("error when creating a new task: {e}");
             return Err("invalid title".to_string());
         }
     };
+    match parse_date(form.day, form.month, form.year) {
+        None => {
+            return Err("no date selected".to_string());
+        }
+        Some(d) => {
+            task.set_date(d);
+        }
+    }
 
     Ok(task)
 }
