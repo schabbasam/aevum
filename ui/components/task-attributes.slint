@@ -19,6 +19,10 @@ export component TaskAttributes inherits Rectangle {
     in-out property <string> color-input: "";
     in-out property <bool> completed-input: false;
 
+    // ---- max length ----
+    in property <int> max-title: 0;
+    in property <int> max-description: 0;
+
     // ---- callbacks ----
     callback save-task(TaskForm);
 
@@ -53,7 +57,7 @@ export component TaskAttributes inherits Rectangle {
         // 1. title
         LineEdit {
             placeholder-text: "Title";
-            max-length: 30;
+            max-length: root.max-title;
             text <=> root.title-input;
         }
         
@@ -83,7 +87,7 @@ export component TaskAttributes inherits Rectangle {
         
         // 3. description
         LineEdit {
-            max-length: 2;
+            max-length: root.max-description;
             placeholder-text: "Descripton (optional)";
             text <=> root.description-input;
         }
@@ -107,7 +111,7 @@ export component TaskAttributes inherits Rectangle {
 
         // 5. color as hex
         LineEdit {
-            horizontal-stretch: 1;
+            max-length: 7;
             placeholder-text: "#RRGGBB";
             text <=> root.color-input;
         }
