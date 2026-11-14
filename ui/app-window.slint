@@ -18,6 +18,7 @@ export component MainWindow inherits Window {
     in-out property <int> max-title;
     in-out property <int> max-description;
     in-out property <int> max-duration;
+    in-out property <[TaskForm]> tasks;
 
     keyboard-scope := FocusScope {
         // ---- escape to exit ----
@@ -38,7 +39,7 @@ export component MainWindow inherits Window {
                 spacing: 0px;
 
                 TaskPanel {
-                    vertical-stretch: 1;
+                    tasks <=> root.tasks;
                 }
 
                 TaskAttributes {
