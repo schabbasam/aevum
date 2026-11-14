@@ -144,7 +144,7 @@ export component LineEdit inherits Rectangle {
         counter-text := Text {
             text: root.text.character-count + "/" + root.max-length;
             font-weight: Theme.font-weight-bold;
-            color: root.background;
+            color: Theme.on-accent;
             font-size: root.font-size * 0.6;
             vertical-alignment: center;
         }
