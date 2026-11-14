@@ -8,7 +8,7 @@ export component LineEdit inherits Rectangle {
     in property <int> max-length: 0; // 0 = unlimited
     in property <bool> enabled: true;
     in property <bool> read-only: false;
-    in property <bool> center-counter: true;
+    in property <bool> center-counter: false;
 
     in property <brush> text-color: Theme.foreground;
     in property <brush> placeholder-color: Theme.foreground-muted;
@@ -63,35 +63,50 @@ export component LineEdit inherits Rectangle {
     }
     
     // ---- text input ----
-    text-input := TextInput {
+
+    clip-rect := Rectangle {
         x: Theme.spacing-small;
         width: parent.width - 2 * Theme.spacing-small;
         height: 100%;
-        vertical-alignment: center;
-        horizontal-alignment: root.horizontal-alignment;
+        clip: true;
 
-        text <=> root.text;
-        enabled: root.enabled;
-        read-only: root.read-only;
+        text-input := TextInput {
+            width: max(parent.width, self.preferred-width);
+            height: 100%;
+            vertical-alignment: center;
+            horizontal-alignment: root.horizontal-alignment;
 
-        color: root.enabled ? root.text-color : Theme.foreground-muted;
-        selection-background-color: root.selection-background-color;
-        selection-foreground-color: root.selection-foreground-color;
-        font-size: root.font-size;
-        font-weight: root.font-weight;
-        single-line: true;
+            text <=> root.text;
+            enabled: root.enabled;
+            read-only: root.read-only;
 
-//        placeholder-text: root.placeholder-text;
-//      placeholder-color: root.placeholder-color;
+            color: root.enabled ? root.text-color : Theme.foreground-muted;
+            selection-background-color: root.selection-background-color;
+            selection-foreground-color: root.selection-foreground-color;
+            font-size: root.font-size;
+            font-weight: root.font-weight;
+            single-line: true;
 
-        accepted => { root.accepted(self.text); }
-        edited    => { root.edited(self.text); }
+    //        placeholder-text: root.placeholder-text;
+    //      placeholder-color: root.placeholder-color;
 
-        // on top of text-input — hover-only, forwards clicks via focus()
-        hover-ta := TouchArea {
-            pointer-event(event) => {
-                if event.kind == PointerEventKind.down {
-                    text-input.focus();
+            accepted => { root.accepted(self.text); }
+            edited    => { root.edited(self.text); }
+
+            // on top of text-input — hover-only, forwards clicks via focus()
+            hover-ta := TouchArea {
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down {
+                        text-input.focus();
+                    }
+                }
+            }
+
+            cursor-position-changed(pos) => {
+                if (pos.x + self.x < Theme.spacing-small) {
+                    self.x = Theme.spacing-small - pos.x;
+                } else if (pos.x + self.x > parent.width - Theme.spacing-small) {
+                    self.x = parent.width - Theme.spacing-small - pos.x;
                 }
             }
         }
@@ -122,4 +137,6 @@ export component LineEdit inherits Rectangle {
             vertical-alignment: center;
         }
     }
+
+    
 }
