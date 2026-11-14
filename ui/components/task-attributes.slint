@@ -36,6 +36,8 @@ export component TaskAttributes inherits Rectangle {
     in property <string> status-message: "";
     in property <bool> is-error: false;
 
+    
+    height: self.preferred-height;
 
     // ---- general appearance ----
     background: Theme.surface;
@@ -135,12 +137,6 @@ export component TaskAttributes inherits Rectangle {
                 vertical-alignment: center;
             }
         }
-
-        // just to test things
-        CheckBox {
-    
-        }
-
 
         // ---- status message ----
 
