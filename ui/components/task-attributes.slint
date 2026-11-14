@@ -1,8 +1,9 @@
 import { Theme } from "../style.slint";
 import { TaskForm } from "../types.slint";
-import {  LineEdit, CheckBox, DatePickerPopup} from "std-widgets.slint";
+import { CheckBox, DatePickerPopup} from "std-widgets.slint";
 import { Button } from "../widgets/button.slint";
 import { SpinBox } from "../widgets/spin-box.slint";
+import { LineEdit } from "../widgets/line-edit.slint";
 
 export component TaskAttributes inherits Rectangle {
 
@@ -51,9 +52,7 @@ export component TaskAttributes inherits Rectangle {
         
         // 1. title
         LineEdit {
-            horizontal-stretch: 1;
-            height: Theme.input-height;
-            placeholder-text: "Title";
+            max-length: 30;
             text <=> root.title-input;
         }
         
@@ -83,8 +82,7 @@ export component TaskAttributes inherits Rectangle {
         
         // 3. description
         LineEdit {
-            horizontal-stretch: 1;
-            height: Theme.input-height;
+            max-length: 0;
             placeholder-text: "Descripton (optional)";
             text <=> root.description-input;
         }
@@ -109,7 +107,6 @@ export component TaskAttributes inherits Rectangle {
         // 5. color as hex
         LineEdit {
             horizontal-stretch: 1;
-            height: Theme.input-height;
             placeholder-text: "#RRGGBB";
             text <=> root.color-input;
         }
