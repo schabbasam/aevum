@@ -1,9 +1,11 @@
+// line-edit.slint
 
 import { Theme } from "../theme.slint";
 
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
     in property <string> placeholder-text;
+    in property <int> max-length: 0; // 0 = unlimited
     in property <bool> enabled: true;
     in property <bool> read-only: false;
 
@@ -51,15 +53,12 @@ export component LineEdit inherits Rectangle {
     }
 
     // ---- hover detection over the padding (not the text) ----
-    // The text area is covered by `text-input`; this catches hover on the
-    // inner padding around it. Same approach you used in SpinBox.
     field-ta := TouchArea {
         enabled: root.enabled;
         x: 0;
         y: 0;
         width: parent.width;
         height: parent.height;
-        // don't steal clicks — text-input above handles them
     }
 
     // ---- text input ----
@@ -81,8 +80,8 @@ export component LineEdit inherits Rectangle {
         font-weight: root.font-weight;
         single-line: true;
 
-        placeholder-text: root.placeholder-text;
-        placeholder-color: root.placeholder-color;
+//        placeholder-text: root.placeholder-text;
+//      placeholder-color: root.placeholder-color;
 
         accepted => { root.accepted(self.text); }
         edited    => { root.edited(self.text); }
@@ -92,10 +91,24 @@ export component LineEdit inherits Rectangle {
             pointer-event(event) => {
                 if event.kind == PointerEventKind.down {
                     text-input.focus();
-                    return accept;
                 }
-                reject
             }
         }
+    }
+
+    HorizontalLayout {
+        x: root.width - self.width - Theme.spacing-small;
+        y: (root.height - self.height) / 2;
+        spacing: Theme.spacing-small;
+
+        if root.max-length > 0 : Text {
+            text: root.text.character-count + "/" + root.max-length;
+            color: root.text.character-count >= root.max-length
+                 ? Theme.danger
+                 : root.placeholder-color;
+            font-size: Theme.font-size-small;
+            vertical-alignment: center;
+        }
+        // clear button here
     }
 }
