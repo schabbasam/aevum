@@ -11,7 +11,6 @@ export component TaskBlock inherits Rectangle {
     
     out property <int> task-id: form.id;
 
-    property <bool> dragging;
 
     width: Theme.task-block-width;
     height: max(
@@ -28,15 +27,27 @@ export component TaskBlock inherits Rectangle {
         horizontal-alignment: center;
         vertical-alignment: center;
     }
-
-    DragArea {
+    
+    ta := TouchArea {
         property <length> drag-start-x;
         property <length> drag-start-y;
-    
-        data: Api.text-to-transfer("hello im being dragged");
-        allow-move: true;
-        drag-image: root.form.drag-preview;
+        
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                self.drag-start-x = self.pressed-x;
+                self.drag-start-y = self.pressed-y;
+                debug(drag-start-x, drag-start-y)
+            }
+        }
 
+        da := DragArea {
+            data: Api.text-to-transfer("hello im being dragged");
+            allow-move: true;
+
+            drag-image: root.form.drag-preview;
+            drag-image-offset-x: root.width / 2phx;
+            drag-image-offset-y: root.height / 2phx;
+        }
     }
 
 }
