@@ -27,26 +27,28 @@ export component TaskBlock inherits Rectangle {
         horizontal-alignment: center;
         vertical-alignment: center;
     }
-    
-    ta := TouchArea {
+   
+
+    da := DragArea {
         property <length> drag-start-x;
         property <length> drag-start-y;
+
+        data: Api.text-to-transfer("hello im being dragged");
+        allow-move: true;
+
+        drag-image: root.form.drag-preview;
+        drag-image-offset-x: drag-start-x / 1phx; 
+        drag-image-offset-y: drag-start-y / 1phx;
         
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down {
-                self.drag-start-x = self.pressed-x;
-                self.drag-start-y = self.pressed-y;
-                debug(drag-start-x, drag-start-y)
+        ta := TouchArea {
+            
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down {
+                    da.drag-start-x = self.pressed-x;
+                    da.drag-start-y = self.pressed-y;
+                }
             }
-        }
 
-        da := DragArea {
-            data: Api.text-to-transfer("hello im being dragged");
-            allow-move: true;
-
-            drag-image: root.form.drag-preview;
-            drag-image-offset-x: root.width / 2phx;
-            drag-image-offset-y: root.height / 2phx;
         }
     }
 
