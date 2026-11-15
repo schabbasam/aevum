@@ -21,7 +21,7 @@ export component TaskBlock inherits Rectangle {
 
     background: Theme.surface-raised;
     border-radius: Theme.radius-small;
-
+    
     Text {
         text: form.title;
         color: Theme.foreground;
@@ -32,7 +32,7 @@ export component TaskBlock inherits Rectangle {
     DragArea {
         data: Api.text-to-transfer("hello im being dragged");
         allow-move: true;
-        drag-image: root.form.drag-preview;
+        drag-image: @image-url("../images.jpeg");
     }
 
 }

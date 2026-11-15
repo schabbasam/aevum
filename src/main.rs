@@ -170,6 +170,7 @@ fn balance_columns(t: &[TaskForm], hour_height: f32, min_height: f32)
 }
 
 fn make_drag_preview(width: f32, height: f32, hex: Option<&str>) -> slint::Image {
+    /*
     let w = width.round() as u32;
     let h = height.round() as u32;
     
@@ -178,15 +179,19 @@ fn make_drag_preview(width: f32, height: f32, hex: Option<&str>) -> slint::Image
         .map(|c| (c.red(), c.green(), c.blue()))
         .unwrap_or((124, 114, 232)); // fallback color (accent)
     
-    let mut raw = Vec::with_capacity((w * h * 4) as usize);
-    for _ in 0..(w * h) {
-        raw.extend_from_slice(&[r, g, b, 200]);
+    let mut buf = slint::SharedPixelBuffer::<slint::Rgba8Pixel>::new(w, h);
+    let slice = buf.make_mut_slice();
+    for p in slice {
+        *p = slint::Rgba8Pixel { r, g, b, a: 255 };
     }
-    let buf = slint::SharedPixelBuffer::<slint::Rgba8Pixel>::clone_from_slice(&raw, w, h);
-
-    let img = slint::Image::from_rgba8(buf);
-    eprintln!("img size: {:?}", img.size());
-    img
+    eprintln!("first 4 bytes: {:?}", &buf.make_mut_slice()[0..1]);
+    slint::Image::from_rgba8_premultiplied(buf)
+    */
+    let mut buf = slint::SharedPixelBuffer::<slint::Rgba8Pixel>::new(64, 64);
+    for p in buf.make_mut_slice() {
+        *p = slint::Rgba8Pixel { r: 255, g: 0, b: 0, a: 255 };
+    }
+    slint::Image::from_rgba8_premultiplied(buf) 
 }
 
 #[cfg(target_arch = "wasm32")]
