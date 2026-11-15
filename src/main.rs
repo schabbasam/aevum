@@ -44,6 +44,8 @@ fn main() -> Result<(), slint::PlatformError> {
         let app = app_handle.upgrade().unwrap();
         match build_task(&form) {
             Ok(task) => {
+                let mut form = form;
+                form.id = task.id() as i32;
                 tasks_handle.push(form);
                 refresh();
                 println!("task created \n{:?}", task);

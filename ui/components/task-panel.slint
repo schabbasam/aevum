@@ -6,6 +6,8 @@ export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> left-column;
     in-out property <[TaskForm]> right-column;
 
+    in property <image> drag-preview;
+
     background: Theme.surface;
 
     Flickable {
