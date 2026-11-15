@@ -16,6 +16,10 @@ export component WeekView inherits Rectangle {
     }
 
     da := DropArea {
+        can-drop(event) => {
+            return event.proposed-action;
+        }
+
         dropped(event) => {
             root.dropped(
                 Api.transfer-to-int(event.data),
@@ -23,7 +27,7 @@ export component WeekView inherits Rectangle {
                 event.position.y,
             );
             // this callback requires a return value of DragAction
-            move
+            return event.proposed-action;
         }
     }
 }
