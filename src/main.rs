@@ -23,13 +23,13 @@ fn main() -> Result<(), slint::PlatformError> {
     let tasks_handle = tasks.clone();
 
     let refresh = {
-        let a = app_handle.clone();
-        let t = task_handle.clone();
+        let app_handle = app_handle.clone();
+        let task_handle = tasks_handle.clone();
         move || {
             let Some(a) = app_handle.upgrade() else { return };
             let hour_height = a.get_hour_height();
             let min_height = a.get_task_block_min_height();
-            let snapshot: Vec<TaskForm> = t.iter().collect();
+            let snapshot: Vec<TaskForm> = task_handle.iter().collect();
             let (l, r) = balance_columns(&snapshot, hour_height, min_height);
             a.set_left_column_tasks(ModelRc::from(Rc::new(VecModel::from(l))));
             a.set_right_column_tasks(ModelRc::from(Rc::new(VecModel::from(r))));
