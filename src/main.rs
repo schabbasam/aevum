@@ -51,10 +51,19 @@ fn main() -> Result<(), slint::PlatformError> {
                 let w = app.get_task_block_width();
                 let hour_height = app.get_hour_height();
                 let min_height = app.get_task_block_min_height();
+                let default_color = app.get_default_task_color();
                 let h = task_height_px(form.duration, hour_height, min_height);
                 
                 let hex = task.color().map(|c| c.to_hex());
-                form.drag_preview = make_drag_preview(w, h, hex.as_deref().into());
+                form.drag_preview = make_drag_preview(w, h, hex.as_deref());
+                
+                let parsed = Color::from_hex(&form.color).ok();
+                let brush = match parsed {
+                    Some(c) => slint::Color::from_rgb_u8(c.red(), c.green(), c.blue()),
+                    None => default_color
+                };
+                
+                form.color_brush = brush;
 
                 tasks_handle.push(form);
                 refresh();

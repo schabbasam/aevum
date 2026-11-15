@@ -31,6 +31,10 @@ export component MainWindow inherits Window {
     out property <length> task-block-min-height: Theme.task-block-min-height;
     out property <length> task-block-width: Theme.task-block-width;
 
+    // had to do color on this one to make my rust code work
+    // since im not using a gradient in the near future, it doesn't matter for now
+    out property <color> default-task-color: Theme.surface-raised;
+
     keyboard-scope := FocusScope {
         // ---- escape to exit ----
         capture-key-pressed(event) => {

@@ -36,13 +36,5 @@ export component WeekView inherits Rectangle {
         }
     }
 
-    if root.dragging : Rectangle {
-        x: root.tb-x - root.absolute-position.x;
-        y: root.tb-y - root.absolute-position.y;
-
-        width: Theme.task-block-width;
-        height: 40px;
-        background: Theme.accent;
-    }
 
 }
