@@ -21,12 +21,13 @@ fn main() -> Result<(), slint::PlatformError> {
     // tasks list
     let tasks: Rc<VecModel<TaskForm>> = Rc::new(VecModel::default());
     app.set_tasks(ModelRc::from(tasks.clone()));
+    let tasks_handle = tasks.clone();
 
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
         match build_task(&form) {
             Ok(task) => {
-                // TODO: store ts in a vec or smth
+                tasks_handle.push(form);
                 println!("task created \n{:?}", task);
                 app.set_is_error(false);
                 app.set_status_message("task created".into());
