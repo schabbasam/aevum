@@ -23,8 +23,7 @@ fn main() -> Result<(), slint::PlatformError> {
     let tasks_handle = tasks.clone();
 
     let api = app.global::<Api>();
-
-    api.on_text_to_transfer(Into::into);
+    api.on_int_to_transfer(Into::into);
 
     let refresh = {
         let app_handle = app_handle.clone();
