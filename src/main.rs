@@ -46,6 +46,15 @@ fn main() -> Result<(), slint::PlatformError> {
             Ok(task) => {
                 let mut form = form;
                 form.id = task.id() as i32;
+
+                // compute the pixel size the block will have
+                let w = app.get_task_block_width();
+                let hour_height = app.get_hour_height();
+                let min_height = app.get_task_block_min_height();
+                let h = task_height_px(form.duration, hour_height, min_height);
+
+                form.drag_preview = make_drag_preview(w, h, &form.color);
+
                 tasks_handle.push(form);
                 refresh();
                 println!("task created \n{:?}", task);
