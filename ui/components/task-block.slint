@@ -8,6 +8,8 @@ export global Api {
 
 export component TaskBlock inherits Rectangle {
     in property <TaskForm> form;
+    
+    out property <int> task-id: form.id;
 
     property <bool> dragging;
 

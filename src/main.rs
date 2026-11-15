@@ -1,6 +1,6 @@
 
 slint::include_modules!();
-use slint::{Model, ModelRc, VecModel};
+use slint::{Model, ModelRc, VecModel, Rgba8Pixel};
 use std::rc::Rc;
 
 use aevum::task::*;
@@ -158,6 +158,22 @@ fn balance_columns(t: &[TaskForm], hour_height: f32, min_height: f32)
     (left, right)
 }
 
+fn make_drag_preview(width: f32, height: f32, color: &str) -> slint::Image {
+    let w = width.round() as u32;
+    let h = height.round() as u32;
+    
+    let (r, g, b) = Color::from_hex(color)
+        .map(|c| (c.red(), c.green(), c.blue()))
+        .unwrap_or((0, 0, 0)); // if something goes wrong, use black
+
+    let mut buf = slint::SharedPixelBuffer::<slint::Rgba8Pixel>::new(w, h);
+    let px = buf.make_mut_slice();
+    for p in px.iter_mut() {
+        *p = slint::Rgba8Pixel { r, g, b, a: 200 };
+    }
+
+    slint::Image::from_rgba8(buf)
+}
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen::prelude::wasm_bindgen(start)]
