@@ -20,14 +20,28 @@ fn main() -> Result<(), slint::PlatformError> {
 
     // tasks list
     let tasks: Rc<VecModel<TaskForm>> = Rc::new(VecModel::default());
-    app.set_tasks(ModelRc::from(tasks.clone()));
     let tasks_handle = tasks.clone();
+
+    let refresh = {
+        let a = app_handle.clone();
+        let t = task_handle.clone();
+        move || {
+            let Some(a) = app_handle.upgrade() else { return };
+            let hour_height = a.get_hour_height();
+            let min_height = a.get_task_block_min_height();
+            let snapshot: Vec<TaskForm> = t.iter().collect();
+            let (l, r) = balance_columns(&snapshot, hour_height, min_height);
+            a.set_left_column_tasks(ModelRc::from(Rc::new(VecModel::from(l))));
+            a.set_right_column_tasks(ModelRc::from(Rc::new(VecModel::from(r))));
+        }
+    };
 
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
         match build_task(&form) {
             Ok(task) => {
                 tasks_handle.push(form);
+                refresh();
                 println!("task created \n{:?}", task);
                 app.set_is_error(false);
                 app.set_status_message("task created".into());
@@ -123,6 +137,33 @@ fn parse_date(day: i32, month: i32, year: i32) -> Option<DateThing> {
         return None;
     }
     Some(DateThing::new(day as u8, month as u8, year as u16).unwrap())
+}
+
+fn task_height_px(duration: i32, hour_height: f32, min_height: f32) -> f32 {
+    let height = (duration as f32 / 60.0) * hour_height;
+    height.max(min_height)
+}
+
+fn balance_columns(t: &[TaskForm], hour_height: f32, min_height: f32)
+    -> (Vec<TaskForm>, Vec<TaskForm>) {
+    
+    let mut left = Vec::new();
+    let mut right = Vec::new();
+    let mut left_height = 0.0f32;
+    let mut right_height = 0.0f32;
+
+    for task in t {
+        let h = task_height_px(task.duration, hour_height, min_height);
+        if left_height <= right_height {
+            left.push(task.clone());
+            left_height += h;
+        } else {
+            right.push(task.clone());
+            right_height += h;
+        }
+    }
+
+    (left, right)
 }
 
 

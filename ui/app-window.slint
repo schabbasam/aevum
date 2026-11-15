@@ -22,6 +22,9 @@ export component MainWindow inherits Window {
     in-out property <[TaskForm]> left-column-tasks;
     in-out property <[TaskForm]> right-column-tasks;
 
+    out property <length> hour-height: Theme.hour-height;
+    out property <length> task-block-min-height: Theme.task-block-min-height;
+
     keyboard-scope := FocusScope {
         // ---- escape to exit ----
         capture-key-pressed(event) => {
