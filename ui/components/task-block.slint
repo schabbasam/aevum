@@ -20,10 +20,16 @@ export component TaskBlock inherits Rectangle {
 
     background: form.color-brush;
     border-radius: Theme.radius-small;
+
+    property <color> text-color:
+        self.background.mix(Theme.foreground, 0.5).mix(Theme.background, 0.5)
+        == form.color-brush.mix(Theme.foreground, 0.5).mix(Theme.foreground, 0.5)
+        ? Theme.background
+        : Theme.foreground;
     
     Text {
         text: form.title;
-        color: Theme.foreground;
+        color: root.text-color;
         horizontal-alignment: center;
         vertical-alignment: center;
     }
