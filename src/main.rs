@@ -184,7 +184,9 @@ fn make_drag_preview(width: f32, height: f32, hex: Option<&str>) -> slint::Image
     }
     let buf = slint::SharedPixelBuffer::<slint::Rgba8Pixel>::clone_from_slice(&raw, w, h);
 
-    slint::Image::from_rgba8(buf)
+    let img = slint::Image::from_rgba8(buf);
+    eprintln!("img size: {:?}", img.size());
+    img
 }
 
 #[cfg(target_arch = "wasm32")]
