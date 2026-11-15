@@ -170,7 +170,6 @@ fn balance_columns(t: &[TaskForm], hour_height: f32, min_height: f32)
 }
 
 fn make_drag_preview(width: f32, height: f32, hex: Option<&str>) -> slint::Image {
-    /*
     let w = width.round() as u32;
     let h = height.round() as u32;
     
@@ -186,12 +185,6 @@ fn make_drag_preview(width: f32, height: f32, hex: Option<&str>) -> slint::Image
     }
     eprintln!("first 4 bytes: {:?}", &buf.make_mut_slice()[0..1]);
     slint::Image::from_rgba8_premultiplied(buf)
-    */
-    let mut buf = slint::SharedPixelBuffer::<slint::Rgba8Pixel>::new(64, 64);
-    for p in buf.make_mut_slice() {
-        *p = slint::Rgba8Pixel { r: 255, g: 0, b: 0, a: 255 };
-    }
-    slint::Image::from_rgba8_premultiplied(buf) 
 }
 
 #[cfg(target_arch = "wasm32")]
