@@ -4,31 +4,45 @@ import { Api } from "task-block.slint";
 export component WeekView inherits Rectangle {
     background: Theme.background;
 
-    in-out property <length> tb-x;
-    in-out property <length> tb-y;
+    in-out property <length> tb-x: 0px;
+    in-out property <length> tb-y: 0px;
+    in-out property <bool> dragging: false;
+
+    // cursor offset inside the block at grab time
+    property <length> grab-x: 0px;
+    property <length> grab-y: 0px;
 
     TouchArea {
-        property <length> grab-x;
-        property <length> grab-y;
-        mouse-cursor: grab;
+        mouse-cursor: self.pressed ? grab : default;
         
-        // im not sure wtf im doing, but i want to get the position of
-        // the dragged task block and move it there
         pointer-event(event) => {
             if event.kind == PointerEventKind.down
                 && event.button == PointerEventButton.left {
                 
-                grab-x = self.mouse-x;
-                grab-y = self.mouse-y;
+                root.grab-x = self.mouse-x - (root.tb-x - self.absolute-position.x);
+                root.grab-y = self.mouse-y - (root.tb-y - self.absolute-position.y);
+                root.dragging = true;
+
             } else if event.kind == PointerEventKind.move && self.pressed {
-                root.tb-x = self.absolute-position.x + self.mouse-x;
-                root.tb-y = self.absolute-position.y + self.mouse-y;
+
+                root.tb-x = self.absolute-position.x + self.mouse-x - root.grab-x;
+                root.tb-y = self.absolute-position.y + self.mouse-y - root.grab-y;
+
             } else if event.kind == PointerEventKind.up
                 && event.button == PointerEventButton.left {
-                root.tb-x = self.absolute-position.x + self.mouse-x;
-                root.tb-y = self.absolute-position.y + self.mouse-y;
+                
+                root.dragging = false;
             }
         }
+    }
+
+    if root.dragging : Rectangle {
+        x: root.tb-x - self.absolute-position.x;
+        y: root.tb-y - self.absolute-position.y;
+
+        width: Theme.task-block-width;
+        height: 40px;
+        background: Theme.accent;
     }
 
 }
