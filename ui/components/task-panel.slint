@@ -3,7 +3,9 @@ import { TaskBlock } from "task-block.slint";
 import { TaskForm } from "../types.slint";
 
 export component TaskPanel inherits Rectangle {
-    in-out property <[TaskForm]> tasks;
+    in-out property <[TaskForm]> left-column;
+    in-out property <[TaskForm]> right-column;
+
     background: Theme.surface;
 
     Flickable {
@@ -13,18 +15,23 @@ export component TaskPanel inherits Rectangle {
         HorizontalLayout {
             padding: Theme.spacing-medium;
             spacing: Theme.spacing-medium;
-
+            
+            // left column
             VerticalLayout {
                 spacing: Theme.spacing-medium;
                 
-                for task in tasks : TaskBlock {
+                for task in left-column : TaskBlock {
                     form: task;
                 }
             }
-
+            
+            // right column
             VerticalLayout {
                 spacing: Theme.spacing-medium;
-
+                
+                for task in right-column : TaskBlock {
+                    form: task;
+                }
             }
         }
     }
