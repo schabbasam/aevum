@@ -52,11 +52,13 @@ fn main() -> Result<(), slint::PlatformError> {
                 let hour_height = app.get_hour_height();
                 let min_height = app.get_task_block_min_height();
                 let h = task_height_px(form.duration, hour_height, min_height);
-
-                form.drag_preview = make_drag_preview(w, h, &form.color);
+                
+                let hex = task.color().map(|c| c.to_hex());
+                form.drag_preview = make_drag_preview(w, h, hex.as_deref().into());
 
                 tasks_handle.push(form);
                 refresh();
+
                 println!("task created \n{:?}", task);
                 app.set_is_error(false);
                 app.set_status_message("task created".into());
@@ -167,20 +169,21 @@ fn balance_columns(t: &[TaskForm], hour_height: f32, min_height: f32)
     (left, right)
 }
 
-fn make_drag_preview(width: f32, height: f32, color: &str) -> slint::Image {
+fn make_drag_preview(width: f32, height: f32, hex: Option<&str>) -> slint::Image {
     let w = width.round() as u32;
     let h = height.round() as u32;
     
-    let (r, g, b) = Color::from_hex(color)
+    let (r, g, b) = hex
+        .and_then(|s| Color::from_hex(s).ok())
         .map(|c| (c.red(), c.green(), c.blue()))
-        .unwrap_or((0, 0, 0)); // if something goes wrong, use black
+        .unwrap_or((124, 114, 232)); // fallback color (accent)
 
     let mut buf = slint::SharedPixelBuffer::<slint::Rgba8Pixel>::new(w, h);
     let px = buf.make_mut_slice();
     for p in px.iter_mut() {
         *p = slint::Rgba8Pixel { r, g, b, a: 200 };
     }
-
+    eprintln!("first pixel after loop: {:?}", px[0]);
     slint::Image::from_rgba8(buf)
 }
 
