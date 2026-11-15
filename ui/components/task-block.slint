@@ -33,7 +33,7 @@ export component TaskBlock inherits Rectangle {
         property <length> drag-start-x;
         property <length> drag-start-y;
 
-        data: Api.to-transfer(root.task-id);
+        data: Api.int-to-transfer(root.task-id);
         allow-move: true;
 
         drag-image: root.form.drag-preview;

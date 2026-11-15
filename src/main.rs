@@ -83,7 +83,7 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     });
     
-    let panel = task_handle.clone();
+    let panel = tasks_handle.clone();
     let sched = scheduled.clone();
     let refresh_drop = refresh.clone();
 
