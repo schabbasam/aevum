@@ -6,7 +6,7 @@ import { WeekView } from "components/week-view.slint";
 
 export { TaskForm }
 
-import { Api } from "components/task-block.slint";
+import { TaskBlock, Api } from "components/task-block.slint";
 export { Api }
 
 
@@ -29,6 +29,7 @@ export component MainWindow inherits Window {
 
     out property <length> hour-height: Theme.hour-height;
     out property <length> task-block-min-height: Theme.task-block-min-height;
+
 
     keyboard-scope := FocusScope {
         // ---- escape to exit ----
@@ -67,5 +68,19 @@ export component MainWindow inherits Window {
 
             }
         }
+    }
+
+    // ---- drag preview ----
+    in-out property <bool> drag-preview: false;
+    in-out property <TaskForm> dragged-tb;
+    in-out property <length> drag-x;
+    in-out property <length> drag-y;
+
+    drag-preview := TaskBlock {
+        visible: root.drag-preview;
+        opacity: 0.8;
+        form: root.dragged-tb;
+        x: root.drag-x;
+        y: root.drag-y;
     }
 }
