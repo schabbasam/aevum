@@ -18,6 +18,9 @@ export component MainWindow inherits Window {
     height: 800px;
 
     callback save-task(TaskForm);
+    callback task-dropped(int, length, length);
+    in-out property <[TaskForm]> scheduled-tasks;
+
     in-out property <string> status-message: "";
     in-out property <bool> is-error: false;
     in-out property <int> max-title;
@@ -69,7 +72,8 @@ export component MainWindow inherits Window {
             }
 
             WeekView {
-
+                scheduled-tasks <=> root.scheduled-tasks;
+                dropped(id, x, y) => { root.task-dropped(id, x, y) }
             }
         }
     }

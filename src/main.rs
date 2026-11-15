@@ -21,14 +21,17 @@ fn main() -> Result<(), slint::PlatformError> {
     // tasks list
     let tasks: Rc<VecModel<TaskForm>> = Rc::new(VecModel::default());
     let tasks_handle = tasks.clone();
+    let scheduled: Rc<VecModel<TaskForm>> = Rc::new(VecModel::default());
+    app.set_scheduled_tasks(ModelRc::from(scheduled.clone()));
 
     let api = app.global::<Api>();
     api.on_int_to_transfer(Into::into);
+    // TODO fix api
 
     let refresh = {
         let app_handle = app_handle.clone();
         let task_handle = tasks_handle.clone();
-        move || {
+        Rc::new(move || {
             let Some(a) = app_handle.upgrade() else { return };
             let hour_height = a.get_hour_height();
             let min_height = a.get_task_block_min_height();
@@ -36,9 +39,10 @@ fn main() -> Result<(), slint::PlatformError> {
             let (l, r) = balance_columns(&snapshot, hour_height, min_height);
             a.set_left_column_tasks(ModelRc::from(Rc::new(VecModel::from(l))));
             a.set_right_column_tasks(ModelRc::from(Rc::new(VecModel::from(r))));
-        }
+        })
     };
-
+    
+    let refresh_save = refresh.clone();
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
         match build_task(&form) {
@@ -65,7 +69,7 @@ fn main() -> Result<(), slint::PlatformError> {
                 form.color_brush = brush;
 
                 tasks_handle.push(form);
-                refresh();
+                refresh_save();
 
                 println!("task created \n{:?}", task);
                 app.set_is_error(false);
@@ -76,6 +80,19 @@ fn main() -> Result<(), slint::PlatformError> {
                 app.set_status_message(e.into());
             }
         }
+    });
+    
+    let panel = task_handle.clone();
+    let sched = scheduled.clone();
+    let refresh_drop = refresh.clone();
+
+    app.on_task_dropped(move |id, x, y| {
+        let Some(idx) = panel.iter().position(|t| t.id == id) else { return };
+        let mut form = panel.remove(idx as usize);
+        form.drop_x = x;
+        form.drop_y = y;
+        sched.push(form);
+        refresh_drop();
     });
     
     app.run()?;
