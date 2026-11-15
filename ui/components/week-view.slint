@@ -1,40 +1,29 @@
 import { Theme } from "../theme.slint";
-import { Api } from "task-block.slint";
+import { Api, TaskBlock } from "task-block.slint";
+import { TaskForm } from "../types.slint";
 
 export component WeekView inherits Rectangle {
     background: Theme.background;
 
-    in-out property <length> tb-x: 0px;
-    in-out property <length> tb-y: 0px;
-    in-out property <bool> dragging: false;
+    callback dropped(int, length, length);
 
-    // cursor offset inside the block at grab time
-    property <length> grab-x: 0px;
-    property <length> grab-y: 0px;
+    in-out property <[TaskForm]> scheduled-tasks;
 
-    TouchArea {
-        mouse-cursor: self.pressed ? grab : default;
-        
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down
-                && event.button == PointerEventButton.left {
-                
-                root.grab-x = self.mouse-x - (root.tb-x - self.absolute-position.x);
-                root.grab-y = self.mouse-y - (root.tb-y - self.absolute-position.y);
-                root.dragging = true;
-
-            } else if event.kind == PointerEventKind.move && self.pressed {
-
-                root.tb-x = self.absolute-position.x + self.mouse-x - root.grab-x;
-                root.tb-y = self.absolute-position.y + self.mouse-y - root.grab-y;
-
-            } else if event.kind == PointerEventKind.up
-                && event.button == PointerEventButton.left {
-                
-                root.dragging = false;
-            }
-        }
+    for task in scheduled-tasks : TaskBlock {
+        x: task.drop-x;
+        y: task.drop-y;
+        form: task;
     }
 
-
+    da := DropArea {
+        dropped(event) => {
+            root.dropped(
+                Api.transfer-to-int(event.data),
+                event.position.x,
+                event.position.y,
+            );
+            // this callback requires a return value of DragAction
+            move
+        }
+    }
 }
