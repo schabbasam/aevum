@@ -92,20 +92,6 @@ fn build_task(form: &TaskForm) -> Result<Task, String> {
         return Err("description too long".to_string());
     }
    
-    match form.duration {
-        0 => {
-            task.set_duration(None);
-        }
-        _ => {
-            if let Err(e) = Duration::new(form.duration as u16) {
-                eprintln!("error when creating Duration: {e}");
-                return Err("duration can't be longer than a day".to_string());
-            } else {
-                task.set_duration(Some(Duration::new(form.duration as u16).unwrap()));
-            }
-        }
-    }
-
     if form.duration == 0 {
         task.set_duration(None);
     } else {
