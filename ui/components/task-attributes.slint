@@ -19,6 +19,8 @@ export component TaskAttributes inherits Rectangle {
     in-out property <string> color-input: "";
     in-out property <bool> completed-input: false;
 
+    in-out property <image> drag-preview;
+
     // ---- max length ----
     in property <int> max-title: 0;
     in property <int> max-description: 0;
@@ -35,8 +37,7 @@ export component TaskAttributes inherits Rectangle {
     in property <bool> button-enabled: title-input > 0;
 
     in property <string> status-message: "";
-    in property <bool> is-error: false;
-
+    in property <bool> is-error: false; 
     
     height: self.preferred-height;
 
@@ -168,7 +169,8 @@ export component TaskAttributes inherits Rectangle {
                     recurrence:     root.recurrence-input,
                     category:       root.category-input,
                     color:          root.color-input,
-                    completed:      root.completed-input
+                    completed:      root.completed-input,
+                    drag-preview:   root.drag-preview,
                 });
             }
         }

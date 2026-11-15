@@ -69,18 +69,4 @@ export component MainWindow inherits Window {
             }
         }
     }
-
-    // ---- drag preview ----
-    in-out property <bool> drag-preview: false;
-    in-out property <TaskForm> dragged-tb;
-    in-out property <length> drag-x;
-    in-out property <length> drag-y;
-
-    drag-preview := TaskBlock {
-        visible: root.drag-preview;
-        opacity: 0.8;
-        form: root.dragged-tb;
-        x: root.drag-x;
-        y: root.drag-y;
-    }
 }

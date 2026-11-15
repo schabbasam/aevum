@@ -30,7 +30,7 @@ export component TaskBlock inherits Rectangle {
     DragArea {
         data: Api.text-to-transfer("hello im being dragged");
         allow-move: true;
-        drag-image: @image-url("../assets/images.jpeg");
+        drag-image: root.form.drag-preview;
     }
 
 }
