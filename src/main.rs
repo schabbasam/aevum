@@ -1,6 +1,6 @@
 
 slint::include_modules!();
-use slint::{Model, ModelRc, VecModel, Rgba8Pixel};
+use slint::{Model, ModelRc, VecModel, SharedString};
 use std::rc::Rc;
 
 use aevum::task::*;
@@ -25,9 +25,9 @@ fn main() -> Result<(), slint::PlatformError> {
     app.set_scheduled_tasks(ModelRc::from(scheduled.clone()));
 
     let api = app.global::<Api>();
-    api.on_int_to_transfer(|id| id.into());
-    api.on_transfer_to_int(|d| d.into());
-    // TODO fix api
+    api.on_int_to_transfer(|id| SharedString::from(id.to_string()).into());
+    api.on_transfer_to_int(|data| data.plain_text()
+        .unwrap_or_default().to_string().parse::<i32>().unwrap_or(0));
 
     let refresh = {
         let app_handle = app_handle.clone();
@@ -43,6 +43,7 @@ fn main() -> Result<(), slint::PlatformError> {
         })
     };
     
+    let tasks_save = tasks_handle.clone();
     let refresh_save = refresh.clone();
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
@@ -69,7 +70,7 @@ fn main() -> Result<(), slint::PlatformError> {
                 
                 form.color_brush = brush;
 
-                tasks_handle.push(form);
+                tasks_save.push(form);
                 refresh_save();
 
                 println!("task created \n{:?}", task);
@@ -89,7 +90,7 @@ fn main() -> Result<(), slint::PlatformError> {
 
     app.on_task_dropped(move |id, x, y| {
         let Some(idx) = panel.iter().position(|t| t.id == id) else { return };
-        let mut form = panel.remove(idx as usize);
+        let mut form = panel.remove(idx);
         form.drop_x = x;
         form.drop_y = y;
         sched.push(form);
@@ -209,7 +210,6 @@ fn make_drag_preview(width: f32, height: f32, hex: Option<&str>) -> slint::Image
     for p in slice {
         *p = slint::Rgba8Pixel { r, g, b, a: 255 };
     }
-    eprintln!("first 4 bytes: {:?}", &buf.make_mut_slice()[0..1]);
     slint::Image::from_rgba8_premultiplied(buf)
 }
 
