@@ -16,3 +16,9 @@ export struct TaskForm {
     drop-x:         length,
     drop-y:         length,
 }
+
+
+export global Api {
+    pure callback int-to-transfer(int) -> data-transfer;
+    pure callback transfer-to-int(data-transfer) -> int;
+}

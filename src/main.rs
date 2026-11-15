@@ -25,7 +25,8 @@ fn main() -> Result<(), slint::PlatformError> {
     app.set_scheduled_tasks(ModelRc::from(scheduled.clone()));
 
     let api = app.global::<Api>();
-    api.on_int_to_transfer(Into::into);
+    api.on_int_to_transfer(|id| id.into());
+    api.on_transfer_to_int(|d| d.into());
     // TODO fix api
 
     let refresh = {

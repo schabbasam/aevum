@@ -1,10 +1,5 @@
 import { Theme } from "../theme.slint";
-import { TaskForm } from "../types.slint";
-
-export global Api {
-    pure callback text-to-transfer(string) -> data-transfer;
-    pure callback transfer-to-text(data-transfer) -> string;
-}
+import { TaskForm, Api } from "../types.slint";
 
 export component TaskBlock inherits Rectangle {
     in property <TaskForm> form;
@@ -38,7 +33,7 @@ export component TaskBlock inherits Rectangle {
         property <length> drag-start-x;
         property <length> drag-start-y;
 
-        data: Api.text-to-transfer("hello im being dragged");
+        data: Api.to-transfer(root.task-id);
         allow-move: true;
 
         drag-image: root.form.drag-preview;
