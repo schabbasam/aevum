@@ -1,9 +1,14 @@
 import { Theme } from "../theme.slint";
+import { Api } from "task-block.slint";
 
 export component WeekView inherits Rectangle {
     background: Theme.background;
 
     DropArea {
-
+        can-drop(event) => DragAction.copy;
+        dropped(event) => {
+            debug("dropped");
+            return DragAction.copy;
+        }
     }
 }

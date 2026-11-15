@@ -22,6 +22,10 @@ fn main() -> Result<(), slint::PlatformError> {
     let tasks: Rc<VecModel<TaskForm>> = Rc::new(VecModel::default());
     let tasks_handle = tasks.clone();
 
+    let api = app.global::<Api>();
+
+    api.on_text_to_transfer(Into::into);
+
     let refresh = {
         let app_handle = app_handle.clone();
         let task_handle = tasks_handle.clone();
