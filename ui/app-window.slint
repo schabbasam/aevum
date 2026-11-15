@@ -2,6 +2,7 @@ import { Theme } from "theme.slint";
 import { TaskPanel } from "components/task-panel.slint";
 import { TaskAttributes } from "components/task-attributes.slint";
 import { TaskForm } from "types.slint";
+import { WeekView } from "components/week-view.slint";
 
 export { TaskForm }
 
@@ -57,16 +58,9 @@ export component MainWindow inherits Window {
                     max-duration <=> root.max-duration;
                 }
             }
-            Rectangle {
-                background: Theme.background;
-                horizontal-stretch: 1;
 
-                Text {
-                    text: "still in construction 🏗️";
-                    color: white;
-                    font-size: 18px;
-                    horizontal-alignment: center;
-                }
+            WeekView {
+
             }
         }
     }

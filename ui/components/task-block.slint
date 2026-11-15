@@ -1,8 +1,15 @@
 import { Theme } from "../theme.slint";
 import { TaskForm } from "../types.slint";
 
+export global Api {
+    pure callback text-to-transfer(string) -> data-transfer;
+    pure callback transfer-to-text(data-transfer) -> string;
+}
+
 export component TaskBlock inherits Rectangle {
     in property <TaskForm> form;
+
+    property <bool> dragging;
 
     width: Theme.task-block-width;
     height: max(
@@ -19,4 +26,9 @@ export component TaskBlock inherits Rectangle {
         horizontal-alignment: center;
         vertical-alignment: center;
     }
+
+    DragArea {
+        allow-copy: true;
+    }
+
 }
