@@ -10,8 +10,8 @@ export component WeekView inherits Rectangle {
     in-out property <[TaskForm]> scheduled-tasks;
 
     for task in scheduled-tasks : TaskBlock {
-        x: task.drop-x;
-        y: task.drop-y;
+        x: task.drop-x - task.drag-offset-x;
+        y: task.drop-y - task.drag-offset-y;
         form: task;
     }
 
@@ -25,6 +25,7 @@ export component WeekView inherits Rectangle {
                 Api.transfer-to-int(event.data),
                 event.position.x,
                 event.position.y,
+
             );
             // this callback requires a return value of DragAction
             return event.proposed-action;
