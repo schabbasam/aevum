@@ -37,8 +37,8 @@ export component TaskBlock inherits Rectangle {
         allow-move: true;
 
         drag-image: root.form.drag-preview;
-        drag-image-offset-x: drag-start-x / 1phx; 
-        drag-image-offset-y: drag-start-y / 1phx;
+        drag-image-offset-x: self.drag-start-x / 1phx; 
+        drag-image-offset-y: self.drag-start-y / 1phx;
         
         ta := TouchArea {
             
