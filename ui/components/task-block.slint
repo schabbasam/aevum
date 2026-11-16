@@ -2,7 +2,7 @@ import { Theme } from "../theme.slint";
 import { TaskForm, Api } from "../types.slint";
 
 export component TaskBlock inherits Rectangle {
-    in property <TaskForm> form;
+    in-out property <TaskForm> form;
     
     out property <int> task-id: form.id;
 
@@ -30,22 +30,20 @@ export component TaskBlock inherits Rectangle {
    
 
     da := DragArea {
-        property <length> drag-start-x;
-        property <length> drag-start-y;
 
         data: Api.int-to-transfer(root.task-id);
         allow-move: true;
 
         drag-image: root.form.drag-preview;
-        drag-image-offset-x: self.drag-start-x / 1phx; 
-        drag-image-offset-y: self.drag-start-y / 1phx;
+        drag-image-offset-x: root.form.drag-offset-x / 1phx; 
+        drag-image-offset-y: root.form.drag-offset-y / 1phx;
         
         ta := TouchArea {
             
             pointer-event(event) => {
                 if event.kind == PointerEventKind.down {
-                    da.drag-start-x = self.pressed-x;
-                    da.drag-start-y = self.pressed-y;
+                    root.form.drag-offset-x = self.pressed-x;
+                    root.form.drag-offset-y = self.pressed-y;
                 }
             }
 
