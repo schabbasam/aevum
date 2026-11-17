@@ -1,6 +1,22 @@
-import { Theme } from "../theme.slint";
+import { Theme, Border } from "../theme.slint";
 import { TaskBlock } from "task-block.slint";
 import { TaskForm, Api } from "../types.slint";
+
+export component DayHeader inherits Rectangle {
+    HorizontalLayout {
+        Border {}
+        Rectangle {
+background: Theme.surface;
+width: Theme.task-block-width;
+       Text {
+text: "Monday";
+color: Theme.foreground;
+       font-size: Theme.font-size-medium;
+       }
+        }
+        Border {}
+    }
+}
 
 export component WeekView inherits Rectangle {
     background: Theme.background;
@@ -39,4 +55,7 @@ export component WeekView inherits Rectangle {
             return event.proposed-action;
         }
     }
+
+    DayHeader {}
 }
+
