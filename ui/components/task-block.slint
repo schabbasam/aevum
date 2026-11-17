@@ -3,9 +3,12 @@ import { TaskForm, Api } from "../types.slint";
 
 export component TaskBlock inherits Rectangle {
     in-out property <TaskForm> form;
-    
     out property <int> task-id: form.id;
 
+    callback drag-offset-changed(length, length);
+
+    property <length> drag-offset-x: 0px;
+    property <length> drag-offset-y: 0px;
 
     width: Theme.task-block-width;
     height: max(
@@ -35,15 +38,19 @@ export component TaskBlock inherits Rectangle {
         allow-move: true;
 
         drag-image: root.form.drag-preview;
-        drag-image-offset-x: root.form.drag-offset-x / 1phx; 
-        drag-image-offset-y: root.form.drag-offset-y / 1phx;
+        drag-image-offset-x: root.drag-offset-x / 1phx; 
+        drag-image-offset-y: root.drag-offset-y / 1phx;
         
         ta := TouchArea {
             
             pointer-event(event) => {
                 if event.kind == PointerEventKind.down {
-                    root.form.drag-offset-x = self.pressed-x;
-                    root.form.drag-offset-y = self.pressed-y;
+                    root.drag-offset-x = self.pressed-x;
+                    root.drag-offset-y = self.pressed-y;
+                    root.drag-offset-changed(
+                        root.drag-offset-x,
+                        root.drag-offset-y,
+                    );
                 }
             }
 

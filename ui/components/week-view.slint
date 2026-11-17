@@ -10,6 +10,7 @@ export component WeekView inherits Rectangle {
     in-out property <[TaskForm]> scheduled-tasks;
 
     for task in scheduled-tasks : TaskBlock {
+        // THESE drag-offset VALUES ARE 0! BUT WHY?????
         x: task.drop-x - task.drag-offset-x;
         y: task.drop-y - task.drag-offset-y;
         form: task;
