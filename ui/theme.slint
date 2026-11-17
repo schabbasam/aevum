@@ -39,7 +39,7 @@ export global Theme {
     out property <length> spacing-medium:   8px;
     out property <length> spacing-large:    12px;
     out property <length> control-height:   32px;
-
+    
     out property <length> border-width:     1px;
     out property <length> focus-ring-width: 2px;
 
@@ -59,4 +59,8 @@ export global Theme {
     in-out property <length> task-block-width:      120px;
 }
 
-
+export component Border inherits Rectangle {
+    width: Theme.border-width;
+    height: 100%;
+    background: Theme.surface-raised;
+}
