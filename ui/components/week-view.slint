@@ -22,7 +22,7 @@ export component DayHeader inherits HorizontalLayout {
 export component DayColumn inherits HorizontalLayout {
     width: Theme.task-block-width;
     Rectangle {
-        background: cyan;
+        background: Theme.background;
         height: 2000px;
     }
 }
@@ -81,7 +81,6 @@ export component WeekView inherits Rectangle {
         DayHeader {}
         Border {}
         DayHeader {}
-        Border {}
     }
     Flickable {
         HorizontalLayout {
@@ -99,7 +98,6 @@ export component WeekView inherits Rectangle {
             DayColumn {}
             Border {}
             DayColumn {}
-            Border {}
         }
     }
     }
