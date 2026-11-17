@@ -43,9 +43,11 @@ export component DayColumn inherits HorizontalLayout {
     in-out property <length> offset-x;
     in-out property <length> offset-y;
 
-    width: self.preferred-width;
-    
+    width: Theme.task-block-width + border.width;
+    border := Border {}
     da := DropArea {
+        width: 100%;
+        height: 100%;
         can-drop(event) => {
             return event.proposed-action;
         }
@@ -53,8 +55,8 @@ export component DayColumn inherits HorizontalLayout {
         dropped(event) => {
             root.dropped(
                 Api.transfer-to-int(event.data),
-                event.position.x - root.offset-x,
-                event.position.y - root.offset-y,
+                da.absolute-position.x + event.position.x - root.offset-x,
+                da.absolute-position.y + event.position.y - root.offset-y,
 
             );
             // this callback requires a return value of DragAction
@@ -115,7 +117,14 @@ export component WeekView inherits Rectangle {
                 for i in 7: DayColumn {
                     offset-x: root.active-drag-offset-x;
                     offset-y: root.active-drag-offset-y;
-
+                    
+                    dropped(id, x, y) => {
+                        root.dropped(
+                            id,
+                            x - root.absolute-position.x, 
+                            y - root.absolute-position.y,
+                        );
+                    }
                 }
             }
         }
