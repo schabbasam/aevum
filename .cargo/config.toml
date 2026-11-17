@@ -1,0 +1,4 @@
+
+# this is necessary to render some things properly
+[env]
+SLINT-BACKEND = "winit-software"
