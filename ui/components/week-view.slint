@@ -17,8 +17,8 @@ export component WeekView inherits Rectangle {
             root.active-drag-offset-x = ox;
             root.active-drag-offset-y = oy;
         }
-        x: task.drop-x - root.active-drag-offset-x;
-        y: task.drop-y - root.active-drag-offset-y;
+        x: task.drop-x;
+        y: task.drop-y;
         form: task;
 
     }
@@ -31,8 +31,8 @@ export component WeekView inherits Rectangle {
         dropped(event) => {
             root.dropped(
                 Api.transfer-to-int(event.data),
-                event.position.x,
-                event.position.y,
+                event.position.x - root.active-drag-offset-x,
+                event.position.y - root.active-drag-offset-y,
 
             );
             // this callback requires a return value of DragAction
