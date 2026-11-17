@@ -1,4 +1,4 @@
-import { Theme, Border } from "../theme.slint";
+import { Theme, Border, HorizontalBorder } from "../theme.slint";
 import { TaskBlock } from "task-block.slint";
 import { TaskForm, Api } from "../types.slint";
 
@@ -19,12 +19,29 @@ export component DayHeader inherits HorizontalLayout {
     }
 }
 
-export component DayColumn inherits HorizontalLayout {
-    width: Theme.task-block-width;
+export component Idk inherits VerticalLayout {
+    in property <string> text;
+
+    height: self.preferred-height;
+
     Rectangle {
         background: Theme.background;
-        height: 2000px;
+        height: Theme.hour-height;
+        Text {
+            text: root.text;
+            font-size: Theme.font-size-small;
+            color: Theme.control-disabled;
+        }
     }
+    HorizontalBorder {background: Theme.surface-raised;}
+}
+
+export component DayColumn inherits HorizontalLayout {
+    in property <string> text:  "hour";
+
+    width: Theme.task-block-width;
+    
+    for i in 24: Idk { text: "hour " + i; }
 }
 
 export component WeekView inherits Rectangle {
@@ -67,37 +84,14 @@ export component WeekView inherits Rectangle {
     
     VerticalLayout {
     HorizontalLayout {
-        Border {}
-        DayHeader {}
-        Border {}
-        DayHeader {}
-        Border {}
-        DayHeader {}
-        Border {}
-        DayHeader {}
-        Border {}
-        DayHeader {}
-        Border {}
-        DayHeader {}
-        Border {}
-        DayHeader {}
+        for i in 7: DayHeader {
+            text: "Day " + i;
+        }
     }
+    HorizontalBorder {}
     Flickable {
         HorizontalLayout {
-            Border {}
-            DayColumn {}
-            Border {}
-            DayColumn {}
-            Border {}
-            DayColumn {}
-            Border {}
-            DayColumn {}
-            Border {}
-            DayColumn {}
-            Border {}
-            DayColumn {}
-            Border {}
-            DayColumn {}
+            for i in 7: DayColumn {}
         }
     }
     }
