@@ -9,11 +9,18 @@ export component WeekView inherits Rectangle {
 
     in-out property <[TaskForm]> scheduled-tasks;
 
+    in-out property <length> active-drag-offset-x: 0px;
+    in-out property <length> active-drag-offset-y: 0px;
+
     for task in scheduled-tasks : TaskBlock {
-        // THESE drag-offset VALUES ARE 0! BUT WHY?????
-        x: task.drop-x - task.drag-offset-x;
-        y: task.drop-y - task.drag-offset-y;
+        x: task.drop-x - root.active-drag-offset-x;
+        y: task.drop-y - root.active-drag-offset-y;
         form: task;
+
+        drag-offset-changed(ox, oy) => {
+            root.active-drag-offset-x = ox;
+            root.active-drag-offset-y = oy;
+        }
     }
 
     da := DropArea {
