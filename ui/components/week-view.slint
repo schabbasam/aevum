@@ -8,6 +8,7 @@ export component DayHeader inherits HorizontalLayout {
 
     height: Theme.control-height;
     width: self.preferred-width;
+    Border {}
     Rectangle {
         background: Theme.surface;
         width: Theme.task-block-width;
@@ -23,6 +24,7 @@ export component Idk inherits VerticalLayout {
     in property <string> text;
 
     height: self.preferred-height;
+    width: Theme.task-block-width;
 
     Rectangle {
         background: Theme.background;
@@ -30,18 +32,35 @@ export component Idk inherits VerticalLayout {
         Text {
             text: root.text;
             font-size: Theme.font-size-small;
-            color: Theme.control-disabled;
+            color: Theme.accent-disabled;
         }
     }
     HorizontalBorder {background: Theme.surface-raised;}
 }
 
 export component DayColumn inherits HorizontalLayout {
-    in property <string> text:  "hour";
+    callback dropped(int, length, length);
+    in-out property <length> offset-x;
+    in-out property <length> offset-y;
 
-    width: Theme.task-block-width;
+    width: self.preferred-width;
     
-    for i in 24: Idk { text: "hour " + i; }
+    da := DropArea {
+        can-drop(event) => {
+            return event.proposed-action;
+        }
+
+        dropped(event) => {
+            root.dropped(
+                Api.transfer-to-int(event.data),
+                event.position.x - root.offset-x,
+                event.position.y - root.offset-y,
+
+            );
+            // this callback requires a return value of DragAction
+            return event.proposed-action;
+        }
+    }
 }
 
 export component WeekView inherits Rectangle {
@@ -65,6 +84,7 @@ export component WeekView inherits Rectangle {
 
     }
 
+/*
     da := DropArea {
         can-drop(event) => {
             return event.proposed-action;
@@ -81,19 +101,24 @@ export component WeekView inherits Rectangle {
             return event.proposed-action;
         }
     }
-    
+*/
+
     VerticalLayout {
-    HorizontalLayout {
-        for i in 7: DayHeader {
-            text: "Day " + i;
-        }
-    }
-    HorizontalBorder {}
-    Flickable {
         HorizontalLayout {
-            for i in 7: DayColumn {}
+            for i in 7: DayHeader {
+                text: "Day " + i;
+            }
         }
-    }
+        HorizontalBorder {}
+        Flickable {
+            HorizontalLayout {
+                for i in 7: DayColumn {
+                    offset-x: root.active-drag-offset-x;
+                    offset-y: root.active-drag-offset-y;
+
+                }
+            }
+        }
     }
 }
 
