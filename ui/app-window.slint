@@ -30,6 +30,9 @@ export component MainWindow inherits Window {
     in-out property <[TaskForm]> left-column-tasks;
     in-out property <[TaskForm]> right-column-tasks;
 
+    in-out property <length> active-drag-offset-x: 0px;
+    in-out property <length> active-drag-offset-y: 0px;
+
     out property <length> hour-height: Theme.hour-height;
     out property <length> task-block-min-height: Theme.task-block-min-height;
     out property <length> task-block-width: Theme.task-block-width;
@@ -59,6 +62,11 @@ export component MainWindow inherits Window {
                 TaskPanel {
                     left-column <=> root.left-column-tasks;
                     right-column <=> root.right-column-tasks;
+
+                    drag-offset-changed(ox, oy) => {
+                        root.active-drag-offset-x = ox;
+                        root.active-drag-offset-y = oy;
+                    }
                 }
 
                 TaskAttributes {
@@ -73,6 +81,10 @@ export component MainWindow inherits Window {
 
             WeekView {
                 scheduled-tasks <=> root.scheduled-tasks;
+
+                active-drag-offset-x <=> root.active-drag-offset-x;
+                active-drag-offset-y <=> root.active-drag-offset-y;
+
                 dropped(id, x, y) => { root.task-dropped(id, x, y) }
             }
         }

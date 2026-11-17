@@ -5,7 +5,9 @@ import { TaskForm } from "../types.slint";
 export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> left-column;
     in-out property <[TaskForm]> right-column;
-
+    
+    callback drag-offset-changed(length, length);
+    
     background: Theme.surface;
 
     Flickable {
@@ -22,6 +24,10 @@ export component TaskPanel inherits Rectangle {
                 
                 for task in left-column : TaskBlock {
                     form: task;
+
+                    drag-offset-changed(ox, oy) => {
+                        root.drag-offset-changed(ox, oy);
+                    }
                 }
             }
             
@@ -31,6 +37,10 @@ export component TaskPanel inherits Rectangle {
                 
                 for task in right-column : TaskBlock {
                     form: task;
+
+                    drag-offset-changed(ox, oy) => {
+                        root.drag-offset-changed(ox, oy);
+                    }
                 }
             }
         }
