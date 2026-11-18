@@ -13,13 +13,15 @@ export component TaskBlock inherits Rectangle {
     // ---- resize things ----
     callback resize-finished(int, int);
     property <bool> resizing: false;
-    property <length> resize-start-y: 0px;
+    property <bool> resize-from-top: false;
+    property <length> resize-start-pointer-y: 0px;
     property <int> resize-start-duration: 0;
-    property <int> resize-preview-duration: form.duration;
+    property <int> resize-start-minute: form.duration;
 
     width: Theme.task-block-width;
     height: max(
         Theme.task-block-min-height,
+        // thats what im working on rn, still under construction
         root.resize-preview-duration * Theme.hour-height / 60
     );
 
