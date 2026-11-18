@@ -99,23 +99,45 @@ export component TaskBlock inherits Rectangle {
             }
 
             moved => {
+                // the logic: delta time = delta y / hour height * 60
                 if root.resizing {
-                    root.resize-preview-duration = max(
-                        Theme.resize-step,
-                        round(
-                            (
-                                root.resize-start-duration
-                                + (self.mouse-y - root.resize-start-y)
-                                / Theme.hour-height * 60
+                    let delta-minutes = round(
+                        (
+                            (ta.mouse-y - root.resize-start-pointer-y)
+                            / Theme.hour-height * 60
+                        ) / Theme.resize-step
+                    ) * Theme.resize-step;
+
+                    let original-end =
+                        root.resize-start-minute
+                        + root.resize-start-duration;
+
+                    if root.resize-from-top {
+                        // only the upper end changes
+                        // the lower border stays the same
+                        let new-start = max(
+                            0,
+                            min(
+                                original-end - Theme.resize-step,
+                                root.resize-start-minute + delta-minutes
                             )
-                            / Theme.resize-step
-                        ) * Theme.resize-step
-                    );
+                        );
+
+                        root.resize-preview-start-minute = new-start;
+                        root.resize-preview-duration = original-end - new-start;
+
+                    } else {
+                        // the exact opposite obviously
+                        root.resize-preview-start-minute = root.resize-start-minute;
+                        root.resize-preview-duration = max(
+                            Theme.resize-step,
+                            min(
+                                1440 - root.resize-start-minute,
+                                root.resize-start-duration + delta-minutes
+                            )
+                        );
                 }
             }
-
-
         }
     }
-
 }
