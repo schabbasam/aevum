@@ -11,12 +11,22 @@ export component TaskBlock inherits Rectangle {
     property <length> drag-offset-y: 0px;
 
     // ---- resize things ----
-    callback resize-finished(int, int);
     property <bool> resizing: false;
     property <bool> resize-from-top: false;
+    
+    // starting state
     property <length> resize-start-pointer-y: 0px;
     property <int> resize-start-duration: 0;
     property <int> resize-start-minute: form.duration;
+    
+    property <int> resize-preview-start-minute: form.start-minute;
+    property <int> resize-preview-duration: form.duration;
+
+    out property <int> displayed-start-minute:
+        resizing ? resize-preview-start-minute : form.start-minute;
+
+    // tast-id, new-start-minute and new-duration are the parameters
+    callback resize-finished(int, int, int);
 
     width: Theme.task-block-width;
     height: max(
@@ -58,8 +68,17 @@ export component TaskBlock inherits Rectangle {
                 } else if event.kind == PointerEventKind.down {
                     if event.button == PointerEventButton.right {
                         root.resizing = true;
-                        root.resize-start-y = self.mouse-y;
+
+                        // where did it get clicked?
+                        root.resize-from-top = ta.pressed-y < root.height / 2;
+                        
+                        // save the original state
+                        root.resize-start-pointer-y = ta.mouse-y;
+                        root.resize-start-minute = root.form.start-minute;
                         root.resize-start-duration = root.form.duration;
+
+                        // initialize preview
+                        root.resize-preview-start-minute = root.form.start-minute;
                         root.resize-preview-duration = root.form.duration;
                     }
                     root.drag-offset-x = self.pressed-x;
