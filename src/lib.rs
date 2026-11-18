@@ -111,11 +111,14 @@ pub fn run() -> Result<(), slint::PlatformError> {
     let refresh_drop = refresh.clone();
 
     app.on_task_dropped(move |id, x, y| {
-        let Some(idx) = panel.iter().position(|t| t.id == id) else {
+        let mut form = if let Some(idx) = panel.iter().position(|t| t.id == id) {
+            panel.remove(idx)
+        } else if let Some(idx) = sched.iter().position(|t| t.id == id) {
+            sched.remove(idx)
+        } else {
             return;
         };
 
-        let mut form = panel.remove(idx);
         form.drop_x = x;
         form.drop_y = y;
 

@@ -40,7 +40,7 @@ export component Idk inherits VerticalLayout {
 
 export component DayColumn inherits HorizontalLayout {
     callback dropped(int, length, length);
-    in-out property <length> offset-x;
+    // in-out property <length> offset-x;
     in-out property <length> offset-y;
 
     width: Theme.task-block-width + border.width;
@@ -55,7 +55,7 @@ export component DayColumn inherits HorizontalLayout {
         dropped(event) => {
             root.dropped(
                 Api.transfer-to-int(event.data),
-                da.absolute-position.x + event.position.x - root.offset-x,
+                da.absolute-position.x,
                 da.absolute-position.y + event.position.y - root.offset-y,
 
             );
@@ -86,25 +86,6 @@ export component WeekView inherits Rectangle {
 
     }
 
-/*
-    da := DropArea {
-        can-drop(event) => {
-            return event.proposed-action;
-        }
-
-        dropped(event) => {
-            root.dropped(
-                Api.transfer-to-int(event.data),
-                event.position.x - root.active-drag-offset-x,
-                event.position.y - root.active-drag-offset-y,
-
-            );
-            // this callback requires a return value of DragAction
-            return event.proposed-action;
-        }
-    }
-*/
-
     VerticalLayout {
         HorizontalLayout {
             for i in 7: DayHeader {
@@ -115,7 +96,8 @@ export component WeekView inherits Rectangle {
         Flickable {
             HorizontalLayout {
                 for i in 7: DayColumn {
-                    offset-x: root.active-drag-offset-x;
+                    // x offset not needed anymore
+                    // offset-x: root.active-drag-offset-x;
                     offset-y: root.active-drag-offset-y;
                     
                     dropped(id, x, y) => {
