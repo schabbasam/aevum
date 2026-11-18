@@ -10,10 +10,17 @@ export component TaskBlock inherits Rectangle {
     property <length> drag-offset-x: 0px;
     property <length> drag-offset-y: 0px;
 
+    // ---- resize things ----
+    callback resize-finished(int, int);
+    property <bool> resizing: false;
+    property <length> resize-start-y: 0px;
+    property <int> resize-start-duration: 0;
+    property <int> resize-preview-duration: form.duration;
+
     width: Theme.task-block-width;
     height: max(
         Theme.task-block-min-height,
-        form.duration * Theme.hour-height / 60
+        root.resize-preview-duration * Theme.hour-height / 60
     );
 
     background: form.color-brush;
@@ -44,15 +51,42 @@ export component TaskBlock inherits Rectangle {
         ta := TouchArea {
             
             pointer-event(event) => {
-                if event.kind == PointerEventKind.down {
+                if event.kind == PointerEventKind.cancel {
+                    root.resizing = false;
+                } else if event.kind == PointerEventKind.down {
+                    if event.button == PointerEventButton.right {
+                        root.resizing = true;
+                        root.resize-start-y = self.mouse-y;
+                        root.resize-start-duration = root.form.duration;
+                        root.resize-preview-duration = root.form.duration;
+                    }
                     root.drag-offset-x = self.pressed-x;
                     root.drag-offset-y = self.pressed-y;
                     root.drag-offset-changed(
                         root.drag-offset-x,
                         root.drag-offset-y,
                     );
+                } else if event.kind == PointerEventKind.up {
+                    if event.button == PointerEventButton.right {
+                        root.resize-finished(
+                            root.task-id,
+                            root.resize-preview-duration
+                        );
+                        root.resizing = false;
+                    }
                 }
             }
+
+            moved => {
+                if root.resizing {
+                    root.resize-preview-duration = round(
+                        root.resize-start-duration
+                        + (self.mouse-y - root.resize-start-y)
+                        / Theme.hour-height * 60
+                    );
+                }
+            }
+
 
         }
     }
