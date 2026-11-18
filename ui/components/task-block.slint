@@ -91,7 +91,8 @@ export component TaskBlock inherits Rectangle {
                     if event.button == PointerEventButton.right {
                         root.resize-finished(
                             root.task-id,
-                            root.resize-preview-duration
+                            root.resize-preview-start-time,
+                            root.resize-preview-duration,
                         );
                         root.resizing = false;
                     }
