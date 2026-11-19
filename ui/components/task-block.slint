@@ -66,6 +66,19 @@ export component TaskBlock inherits Rectangle {
         root.resizing = false;
         root.resize-pointer(false, 0px);
     }
+
+    // ---- focus ring ----
+    Rectangle {
+        visible: root.resizing;
+        x: -Theme.focus-ring-width;
+        y: -Theme.focus-ring-width;
+        width: parent.width + 2 * Theme.focus-ring-width;
+        height: parent.height + 2 * Theme.focus-ring-width;
+        border-radius: root.border-radius + Theme.focus-ring-width;
+        border-width: Theme.focus-ring-width;
+        border-color: Theme.border-focus;
+        background: transparent;
+    }
     
     // starting state
     property <length> resize-start-pointer-y: ;
