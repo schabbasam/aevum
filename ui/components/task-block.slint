@@ -28,6 +28,44 @@ export component TaskBlock inherits Rectangle {
         (root.pointer-content-y - root.press-content-y)
         / Theme.hour-height * 60 / Theme.resize-step
     ) * Theme.resize-step;
+
+    out property <int> live-start:
+        !root.resizing ? root.form.start-minute
+        : root.resize-from-top
+            ? clamp( // clamp takes value, min, max and gives min/max if value is out of range
+                root.start0 + root.delta-minutes, 
+                root.form.min-start, 
+                root.end0 - Theme.resize-step
+            )
+            : root.start0;
+
+    out property <int> live-duration:
+        !root.resizing ? root.form.duration
+        : root.resize-from-top
+            ? root.end0 - root.live-start
+            : clamp(
+                root.end0 + root.delta-minutes,
+                root.start0 + Theme.resize-step,
+                root.form.max-end
+            ) - root.start0;
+
+    property <length> exact-height: root.live-duration * Theme.hour-height / 60;
+
+    width: Theme.task-block-width;
+    height: root.calendar-mode
+        ? root.exact-height
+        : max(Theme.task-block-min-height, root.exact-height);
+
+    background: form.color-brush;
+    border-radius: Theme.radius-small;
+
+    property <color> text-color: self.background.to-oklch().lightness > 0.6
+        ? Theme.background : Theme.foreground;
+
+    function end-resize() {
+        root.resizing = false;
+        root.resize-pointer(false, 0px);
+    }
     
     // starting state
     property <length> resize-start-pointer-y: ;
@@ -50,14 +88,6 @@ export component TaskBlock inherits Rectangle {
         root.resize-preview-duration * Theme.hour-height / 60
     );
 
-    background: form.color-brush;
-    border-radius: Theme.radius-small;
-
-    property <color> text-color:
-        self.background.to-oklch().lightness > 0.6
-        ? Theme.background
-        : Theme.foreground;
-    
     Text {
         text: form.title;
         color: root.text-color;
