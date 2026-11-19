@@ -59,7 +59,10 @@ export global Theme {
     in-out property <length> task-block-width:      120px;
 
     // ---- misc ----
-    out property <int> resize-step:     50;
+    out property <int> resize-step:     15;
+    out property <length> column-width: task-block-width + 2 * border-width;
+    out property <length> scroll-edge:  50px;
+    out property <length> scroll-speed: 12px;
 }
 
 export component Border inherits Rectangle {
