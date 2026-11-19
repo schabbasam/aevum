@@ -39,15 +39,14 @@ export component Idk inherits VerticalLayout {
 }
 
 export component DayColumn inherits HorizontalLayout {
-    callback dropped(int, length, length);
-    // in-out property <length> offset-x;
-    in-out property <length> offset-y;
+    in property <int> index;
+    callback dropped(int, int, length); // id, column, viewport-y
+    
+    width: Theme.column-width;
+    height: 24 * theme.hour-height;
 
-    width: Theme.task-block-width + border.width;
     border := Border {}
     da := DropArea {
-        width: 100%;
-        height: 100%;
         can-drop(event) => {
             return event.proposed-action;
         }
@@ -55,11 +54,9 @@ export component DayColumn inherits HorizontalLayout {
         dropped(event) => {
             root.dropped(
                 Api.transfer-to-int(event.data),
-                da.absolute-position.x,
-                da.absolute-position.y + event.position.y - root.offset-y,
-
+                root.index,
+                event.position.y
             );
-            // this callback requires a return value of DragAction
             return event.proposed-action;
         }
     }
@@ -68,12 +65,40 @@ export component DayColumn inherits HorizontalLayout {
 export component WeekView inherits Rectangle {
     background: Theme.background;
 
-    callback dropped(int, length, length);
-
     in-out property <[TaskForm]> scheduled-tasks;
-
     in-out property <length> active-drag-offset-x: 0px;
     in-out property <length> active-drag-offset-y: 0px;
+
+    callback task-placed(int, int, int);    // id, column, start-minute
+    callback task-resized(int, int, int);   // id, start-minute, duration
+
+    property <bool> resize-active: false;
+    property <length> resize-pointer-y: 0px;
+    
+    // looks crazy, but it is kinda simple
+    // -1 means up, 0 means nothing, 1 means down
+    property <int> scroll-dir:
+        (top-zone.has-drag 
+            || (root.resize-active
+                && root.resize-pointer-y < Theme.scroll-edge)
+        ) ? -1
+        : (bottom-zone.has-drag
+            || (root.resize-active
+                && rot.resize-pointer-y > scroll-area.height - Theme.scroll-edge)
+        ) ? 1
+        : 0;
+
+    function place(id: int, col: int, y: length) {
+        root.task-placed(
+            id,
+            clamp(col, 0, 6),
+            round(
+                (y - root.active-drag-offset-y)
+                / Theme.hour-height * 60
+                / Theme.resize-step
+            ) * Theme.resize-step
+        );
+    }
 
     for task in scheduled-tasks : TaskBlock {
         drag-offset-changed(ox, oy) => {
