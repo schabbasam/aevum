@@ -104,9 +104,9 @@ export component WeekView inherits Rectangle {
         interval: 16ms;
         running: root.scroll-dir != 0;
         triggered => {
-            fl.viewport-y = clamp(
-                fl.viewport-y - root.scroll-dir * Theme.scroll-speed,
-                min(0px, fl.height - fl.viewport-height),
+            fl.content-y = clamp(
+                fl.content-y - root.scroll-dir * Theme.scroll-speed,
+                min(0px, fl.height - fl.content-height),
                 0px
             );
         }
@@ -125,14 +125,14 @@ export component WeekView inherits Rectangle {
             clip: true;
             
             fl := Flickable {
-                viewport-width: 7 * Theme.column-width;
-                viewport-height: 24 * Theme.hour-height;
+                content-width: 7 * Theme.column-width;
+                content-height: 24 * Theme.hour-height;
                 interactive: false; // fl shouln't eat the input for drag/resize
 
                 for task in root.scheduled-tasks : TaskBlock {
                     calendar-mode: true;
                     form: task;
-                    scroll-y: fl.viewport-y;
+                    scroll-y: fl.content-y;
                     x: task.column * Theme.column-width + 2 * Theme.border-width;
                     y: self.live-start * Theme.hour-height / 60;
 
