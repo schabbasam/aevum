@@ -7,41 +7,31 @@ export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> right-column;
     
     callback drag-offset-changed(length, length);
-    
+    callback dropped-here(int, int, length); // id, column 0 or 1, y coordinate
+
     background: Theme.surface;
 
-    Flickable {
-        width: 100%;
-        height: 100%;
-
-        DropArea {
-
-        }
+    fl := Flickable {
+        interactive: false;
 
         HorizontalLayout {
             padding: Theme.spacing-medium;
             spacing: Theme.spacing-medium;
-            
-            // left column
+
             VerticalLayout {
                 spacing: Theme.spacing-medium;
-                
-                for task in left-column : TaskBlock {
+                for task in root.left-column : TaskBlock {
                     form: task;
-
                     drag-offset-changed(ox, oy) => {
                         root.drag-offset-changed(ox, oy);
                     }
                 }
             }
-            
-            // right column
+
             VerticalLayout {
                 spacing: Theme.spacing-medium;
-                
-                for task in right-column : TaskBlock {
+                for task in root.right-column: TaskBlock {
                     form: task;
-
                     drag-offset-changed(ox, oy) => {
                         root.drag-offset-changed(ox, oy);
                     }
