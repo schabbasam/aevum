@@ -79,7 +79,18 @@ export component TaskBlock inherits Rectangle {
         border-color: Theme.border-focus;
         background: transparent;
     }
-    
+
+    // bar at the edge that is currently being resized
+    Rectangle {
+        visible: root.resizing;
+        width: parent.width;
+        height: Theme.focus-ring-width;
+        y: root.resize-from-top
+            ? 0px : parent.height - self.height;
+        background: Theme.accent-hover;
+    }
+
+
     // starting state
     property <length> resize-start-pointer-y: ;
     property <int> resize-start-duration: 0;
