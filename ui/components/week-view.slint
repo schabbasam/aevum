@@ -100,16 +100,18 @@ export component WeekView inherits Rectangle {
         );
     }
 
-    for task in scheduled-tasks : TaskBlock {
-        drag-offset-changed(ox, oy) => {
-            root.active-drag-offset-x = ox;
-            root.active-drag-offset-y = oy;
+    Timer {
+        interval: 16ms;
+        running: root.scroll-dir != 0;
+        triggered => {
+            fl.viewport-y = clamp(
+                fl.viewport-y - root.scroll-dir * Theme.scroll-speed,
+                min(0px, fl.height - fl.viewport-height),
+                0px
+            );
         }
-        x: task.drop-x;
-        y: task.drop-y;
-        form: task;
-
     }
+
 
     VerticalLayout {
         HorizontalLayout {
@@ -118,19 +120,32 @@ export component WeekView inherits Rectangle {
             }
         }
         HorizontalBorder {}
-        Flickable {
-            HorizontalLayout {
-                for i in 7: DayColumn {
-                    // x offset not needed anymore
-                    // offset-x: root.active-drag-offset-x;
-                    offset-y: root.active-drag-offset-y;
-                    
-                    dropped(id, x, y) => {
-                        root.dropped(
-                            id,
-                            x - root.absolute-position.x, 
-                            y - root.absolute-position.y,
-                        );
+
+        scroll-area := Rectangle {
+            clip: true;
+            
+            fl := Flickable {
+                viewport-width: 7 * Theme.column-width;
+                viewport-height: 24 * Theme.hour-height;
+                interactive: false; // fl shouln't eat the input for drag/resize
+
+                for task in root.scheduled-tasks : TaskBlock {
+                    calendar-mode: true;
+                    form: task;
+                    scroll-y: fl.viewport-y;
+                    x: task.column * Theme.column-width + 2 * Theme.border-width;
+                    y: self.live-start * Theme.hour-height / 60;
+
+                    drag-offset-changed(ox, oy) => {
+                        root.active-drag-offset-x = ox;
+                        root.active-drag-offset-y = oy;
+                    }
+                    resize-pointer(active, py) => {
+                        root.resize-active = active;
+                        root.resize-pointer-y = py;
+                    }
+                    resize-finished(id, start, dura) => {
+                        root.task-resized(id, start, dura);
                     }
                 }
             }
