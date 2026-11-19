@@ -43,7 +43,7 @@ export component DayColumn inherits HorizontalLayout {
     callback dropped(int, int, length); // id, column, viewport-y
     
     width: Theme.column-width;
-    height: 24 * theme.hour-height;
+    height: 24 * Theme.hour-height;
 
     border := Border {}
     da := DropArea {
@@ -84,7 +84,7 @@ export component WeekView inherits Rectangle {
         ) ? -1
         : (bottom-zone.has-drag
             || (root.resize-active
-                && rot.resize-pointer-y > scroll-area.height - Theme.scroll-edge)
+                && root.resize-pointer-y > scroll-area.height - Theme.scroll-edge)
         ) ? 1
         : 0;
 
@@ -163,6 +163,24 @@ export component WeekView inherits Rectangle {
                         Api.transfer-to-int(event.data),
                         floor(event.position.x / Theme.column-width),
                         event.position.y - fl.content-y
+                    );
+                    return event.proposed-action;
+                }
+            }
+
+            bottom-zone := DropArea {
+                y: parent.height - Theme.scroll-edge;
+                width: parent.width;
+                height: Theme.scroll-edge;
+                
+                can-drop(event) => {
+                    return event.proposed-action;
+                }
+                dropped(event) => {
+                    root.place(
+                        Api.transfer-to-int(event.data),
+                        floor(event.position.x / Theme.column-width),
+                        event.position.y + self.y - fl.content-y
                     );
                     return event.proposed-action;
                 }
