@@ -1,6 +1,6 @@
 import { Theme } from "../theme.slint";
 import { TaskBlock } from "task-block.slint";
-import { TaskForm } from "../types.slint";
+import { TaskForm, Api } from "../types.slint";
 
 export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> left-column;
@@ -37,6 +37,20 @@ export component TaskPanel inherits Rectangle {
                     }
                 }
             }
+        }
+    }
+
+    DropArea {
+        can-drop(event) => {
+            return event.proposed-action;
+        }
+        dropped(event) => {
+            root.dropped-here(
+                Api.transfer-to-int(event.data),
+                event.position.x < self.width / 2 ? 0 : 1,
+                event.position.y - fl.content-y
+            );
+            return event.proposed-action;
         }
     }
 }
