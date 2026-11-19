@@ -90,35 +90,12 @@ export component TaskBlock inherits Rectangle {
         background: Theme.accent-hover;
     }
 
-
-    // starting state
-    property <length> resize-start-pointer-y: ;
-    property <int> resize-start-duration: 0;
-    property <int> resize-start-minute: form.duration;
-    
-    property <int> resize-preview-start-minute: form.start-minute;
-    property <int> resize-preview-duration: form.duration;
-
-    out property <int> displayed-start-minute:
-        resizing ? resize-preview-start-minute : form.start-minute;
-
-    // tast-id, new-start-minute and new-duration are the parameters
-    callback resize-finished(int, int, int);
-
-    width: Theme.task-block-width;
-    height: max(
-        Theme.task-block-min-height,
-        // thats what im working on rn, still under construction
-        root.resize-preview-duration * Theme.hour-height / 60
-    );
-
     Text {
         text: form.title;
         color: root.text-color;
         horizontal-alignment: center;
         vertical-alignment: center;
     }
-   
 
     da := DragArea {
 
@@ -130,40 +107,37 @@ export component TaskBlock inherits Rectangle {
         drag-image-offset-y: root.drag-offset-y / 1phx;
         
         ta := TouchArea {
+            mouse-cursor: root.resizing ?
+                MouseCursor.ns-resize : MouseCursor.default;
             
             pointer-event(event) => {
                 if event.kind == PointerEventKind.cancel {
-                    root.resizing = false;
+                    root.end-resize();
                 } else if event.kind == PointerEventKind.down {
-                    if event.button == PointerEventButton.right {
+                    if event.button == PointerEventButton.left {
+                        root.drag-offset-x = self.pressed-x;
+                        root.drag-offset-y = self.pressed-y;
+                        root.drag-offset-changed(
+                            root.drag-offset-x,
+                            root.drag-offset-y,
+                        );
+                    } else if event.button == PointerEventButton.right && root.calendar-mode {
                         root.resizing = true;
-
-                        // where did it get clicked?
-                        root.resize-from-top = ta.pressed-y < root.height / 2;
-                        
-                        // save the original state
-                        root.resize-start-pointer-y = ta.mouse-y;
-                        root.resize-start-minute = root.form.start-minute;
-                        root.resize-start-duration = root.form.duration;
-
-                        // initialize preview
-                        root.resize-preview-start-minute = root.form.start-minute;
-                        root.resize-preview-duration = root.form.duration;
+                        root.resize-from-top = self.mouse-y < root.height / 2;
+                        root.start0 = root.form.start-minute + root.form.duration;
+                        root.press-content-y = root.y + self.mouse-y;
+                        root.pointer-frame-y = root.y + self.mouse-y + root.scroll-y;
+                        root.resize-pointer(true, root.pointer-frame-y);
                     }
-                    root.drag-offset-x = self.pressed-x;
-                    root.drag-offset-y = self.pressed-y;
-                    root.drag-offset-changed(
-                        root.drag-offset-x,
-                        root.drag-offset-y,
-                    );
-                } else if event.kind == PointerEventKind.up {
-                    if event.button == PointerEventButton.right {
+                } else if event.kind == PointerEventKind.up 
+                    && event.button == PointerEventButton.right
+                    && root.resizing {
                         root.resize-finished(
                             root.task-id,
-                            root.resize-preview-start-minute,
-                            root.resize-preview-duration,
+                            root.live-start,
+                            root.live-duration
                         );
-                        root.resizing = false;
+                        root.end-resize();
                     }
                 }
             }
