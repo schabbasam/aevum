@@ -5,7 +5,12 @@ export component TaskBlock inherits Rectangle {
     in-out property <TaskForm> form;
     out property <int> task-id: form.id;
 
+    in property <bool> calendar-mode: false;
+    in property <length> scroll-y: 0px;
+
     callback drag-offset-changed(length, length);
+    callback resize-pointer(bool, length);
+    callback resize-finished(int, int, int); // id, start-minute, duration
 
     property <length> drag-offset-x: 0px;
     property <length> drag-offset-y: 0px;
@@ -13,9 +18,19 @@ export component TaskBlock inherits Rectangle {
     // ---- resize things ----
     property <bool> resizing: false;
     property <bool> resize-from-top: false;
+    property <int> start0: 0;
+    property <int> end0: 0;
+    property <length> press-content-y: 0px;
+    property <length> pointer-frame-y: 0px;
+
+    property <length> pointer-content-y: root.pointer-frame-y - root.scroll-y;
+    property <int> delta-minutes: round(
+        (root.pointer-content-y - root.press-content-y)
+        / Theme.hour-height * 60 / Theme.resize-step
+    ) * Theme.resize-step;
     
     // starting state
-    property <length> resize-start-pointer-y: 0px;
+    property <length> resize-start-pointer-y: ;
     property <int> resize-start-duration: 0;
     property <int> resize-start-minute: form.duration;
     
