@@ -130,57 +130,21 @@ export component TaskBlock inherits Rectangle {
                         root.resize-pointer(true, root.pointer-frame-y);
                     }
                 } else if event.kind == PointerEventKind.up 
-                    && event.button == PointerEventButton.right
-                    && root.resizing {
-                        root.resize-finished(
-                            root.task-id,
-                            root.live-start,
-                            root.live-duration
-                        );
-                        root.end-resize();
-                    }
+                        && event.button == PointerEventButton.right
+                        && root.resizing {
+                    root.resize-finished(
+                        root.task-id,
+                        root.live-start,
+                        root.live-duration
+                    );
+                    root.end-resize();
                 }
             }
 
             moved => {
-                // the logic: delta time = delta y / hour height * 60
                 if root.resizing {
-                    let delta-minutes = round(
-                        (
-                            (ta.mouse-y - root.resize-start-pointer-y)
-                            / Theme.hour-height * 60
-                        ) / Theme.resize-step
-                    ) * Theme.resize-step;
-
-                    let original-end =
-                        root.resize-start-minute
-                        + root.resize-start-duration;
-
-                    if root.resize-from-top {
-                        // only the upper end changes
-                        // the lower border stays the same
-                        let new-start = max(
-                            0,
-                            min(
-                                original-end - Theme.resize-step,
-                                root.resize-start-minute + delta-minutes
-                            )
-                        );
-
-                        root.resize-preview-start-minute = new-start;
-                        root.resize-preview-duration = original-end - new-start;
-
-                    } else {
-                        // the exact opposite obviously
-                        root.resize-preview-start-minute = root.resize-start-minute;
-                        root.resize-preview-duration = max(
-                            Theme.resize-step,
-                            min(
-                                1440 - root.resize-start-minute,
-                                root.resize-start-duration + delta-minutes
-                            )
-                        );
-                    }
+                    root.pointer-frame-y = root.y + self.mouse-y + root.scroll-y;
+                    root.resize-pointer(true, root.pointer-frame-y);
                 }
             }
         }
