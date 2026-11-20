@@ -243,6 +243,22 @@ pub fn run() -> Result<(), slint::PlatformError> {
         app.set_status_message("".into());
     });
 
+    let st = store.clone();
+    app.on_task_resized(move |id, start, dur| {
+        let Some(idx) = st.scheduled.iter().position(|t| t.id == id) else { return };
+        let mut form = st.scheduled.row_data(idx).unwrap();
+
+        let start = start.max(form.min_start);
+        let end = (start + dur).min(form.max_end);
+        if end - start < STEP { return };
+
+        form.start_minute = start;
+        form.duration = end - start;
+        st.scheduled.set_row_data(idx, form);
+        update_all_limits(&st.scheduled);
+    });
+
+
     app.run()?;
     Ok(())
 }
