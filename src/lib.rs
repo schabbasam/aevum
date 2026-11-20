@@ -13,6 +13,17 @@ pub mod time;
 pub mod task;
 pub mod color;
 
+const DAY_MINUTES: i32 = 1440;
+const STEP: i32 = 15;
+const DEFAULT_DURATION: i32 = 60;
+
+#[derive(Clone)]
+struct Store {
+    left: Rc<VecModel<TaskForm>>,
+    right: Rc<VecModel<TaskForm>>,
+    scheduled: Rc<VecModel<TaskForm>>,
+}
+
 pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
     let app_handle = app.as_weak();
