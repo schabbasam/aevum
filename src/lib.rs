@@ -257,7 +257,29 @@ pub fn run() -> Result<(), slint::PlatformError> {
         st.scheduled.set_row_data(idx, form);
         update_all_limits(&st.scheduled);
     });
+    
+    let (weak, st) = (app.as_weak(), store.clone());
+    app.on_task_to_panel(move |id, col, y| {
+        let Some(app) = weak.upgrade() else { return };
+        let Some((src, idx)) = st.find(id) else { return };
+        let form = src.row_data(idx).unwrap();
+        let target = st.panel_column(col);
 
+        let mut at = insertion_index(
+            target,
+            y,
+            app.get_hour_height(),
+            app.get_task_block_min_height(),
+            app.get_panel_gap(),
+        );
+
+        if Rc::ptr_eq(src, target) && idx < at {
+            at -= 1;
+        }
+        src.remove(idx);
+        target.insert(at, form);
+        update_all_limits(&st.scheduled);
+    });
 
     app.run()?;
     Ok(())
