@@ -45,7 +45,26 @@ impl Store {
             .find_map(|m| m.iter().position(|t| t.id == id)
                 .map(|i| (m, i)))
     }
+
+    fn shorter_panel_column(&self, hour_h: f32, min_h: f32) -> &Rc<VecModel<TaskForm>> {
+        if column_height(&self.left, hour_h, min_h) <= column_height(&self.right, hour_h, min_h) {
+            &self.left
+        } else {
+            &self.right
+        }
+    }
 }
+
+fn column_height(m: &VecModel<TaskForm>, hour_h: f32, min_h: f32) -> f32 {
+    m.iter().map(|t| task_height_px(t.duration, hour_h, min_h)).sum()
+}
+
+fn normalize_duration(d: i32) -> i32 {
+    let d = if d <= 0 { DEFAULT_DURATION } else { d };
+    ((d + STEP - 1) / STEP * STEP).clamp(STEP, DAY_MINUTES)
+}
+
+
 pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
     let app_handle = app.as_weak();
