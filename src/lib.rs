@@ -97,6 +97,32 @@ fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish
         .min_by_key(|&c| (c-wish).abs())
 }
 
+fn update_all_limits(sched: &VecModel<TaskForm>) {
+    for col in 0..7 {
+        let items: Vec<(usize, TaskForm)> = sched
+            .iter().enumerate().filter(|(_, t)| t.column == col).collect();
+
+        for (row, t) in &items {
+            let (start, end) = (t.start_minute, t.start_minute + t.duration);
+            let min_start = items.iter()
+                .filter(|(_, o)| o.id != t.id && o.start_minute + o.duration <= start)
+                .map(|(_, o)| o.start_minute + o.duration)
+                .max().unwrap_or(0);
+            let max_end = items.iter()
+                .filter(|(_, o)| o.id != t.id && o.start_minute >= end)
+                .map(|(_, o)| o.start_minute)
+                .min().unwrap_or(DAY_MINUTES);
+            
+            if t.min_start != min_start || t.max_end != max_end {
+                let mut t2 = t.clone();
+                t2.min_start = min_start;
+                t2.max_end = max_end;
+                sched.set_row_data(*row, t2);
+            }
+        }
+    }
+}
+
 pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
     let app_handle = app.as_weak();
