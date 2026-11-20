@@ -84,7 +84,7 @@ fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish
         .collect();
     busy.sort();
 
-    let mut cands = vec![widh, 0, DAY_MINUTES - dur];
+    let mut cands = vec![wish, 0, DAY_MINUTES - dur];
     for &(s, e) in &busy {
         cands.push(e);
         cands.push(s - dur);
