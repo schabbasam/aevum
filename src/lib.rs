@@ -64,6 +64,17 @@ fn normalize_duration(d: i32) -> i32 {
     ((d + STEP - 1) / STEP * STEP).clamp(STEP, DAY_MINUTES)
 }
 
+fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, gap: f32) -> usize {
+    let mut top = gap;
+    for (i, t) in col.iter().enumerate() {
+        let h = task_height_px(t.duration, hour_h, min_h);
+        if y < top + h / 2.0 {
+            return i;
+        }
+        top += h + gap;
+    }
+    col.row_count()
+}
 
 pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
