@@ -132,13 +132,6 @@ pub fn run() -> Result<(), slint::PlatformError> {
     app.set_max_description(MAX_DESCRIPTION as i32);
     app.set_max_duration(MAX_DURATION as i32);
 
-    // tasks list
-    let tasks: Rc<VecModel<TaskForm>> = Rc::new(VecModel::default());
-    let tasks_handle = tasks.clone();
-
-    let scheduled: Rc<VecModel<TaskForm>> = Rc::new(VecModel::default());
-    app.set_scheduled_tasks(ModelRc::from(scheduled.clone()));
-
     let api = app.global::<Api>();
     api.on_int_to_transfer(|id| SharedString::from(id.to_string()).into());
     api.on_transfer_to_int(|data| {
@@ -149,29 +142,14 @@ pub fn run() -> Result<(), slint::PlatformError> {
             .unwrap_or(0)
     });
 
-    let refresh = {
-        let app_handle = app_handle.clone();
-        let task_handle = tasks_handle.clone();
-
-        Rc::new(move || {
-            let Some(a) = app_handle.upgrade() else {
-                return;
-            };
-
-            let hour_height = a.get_hour_height();
-            let min_height = a.get_task_block_min_height();
-
-            let snapshot: Vec<TaskForm> = task_handle.iter().collect();
-            let (l, r) = balance_columns(&snapshot, hour_height, min_height);
-
-            a.set_left_column_tasks(ModelRc::from(Rc::new(VecModel::from(l))));
-            a.set_right_column_tasks(ModelRc::from(Rc::new(VecModel::from(r))));
-        })
-    };
+    let store = Store::new();
+    app.set_left_column_tasks(ModelRc::from(store.left.clone()));
+    app.set_right_column_tasks(ModelRc::from(store.right.clone()));
+    app.set_scheduled_tasks(ModelRc::from(store.scheduled.clone()));
 
     let tasks_save = tasks_handle.clone();
-    let refresh_save = refresh.clone();
-
+    
+    let st = store.clone();
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
 
@@ -202,8 +180,7 @@ pub fn run() -> Result<(), slint::PlatformError> {
 
                 form.color_brush = brush;
 
-                tasks_save.push(form);
-                refresh_save();
+                st.shorter_panel_column(hour_height, min_height).push(form);
 
                 println!("task created \n{:?}", task);
                 app.set_is_error(false);
@@ -234,6 +211,36 @@ pub fn run() -> Result<(), slint::PlatformError> {
 
         sched.push(form);
         refresh_drop();
+    });
+
+    let (weak, st) = (app.as_weak(), store.clone());
+    app.on_task_placed(move |id, col, start| {
+        let Some(app) = weak.upgrade() else { return };
+        let Some((src, idx)) = st.find(id) else { return };
+        let mut form = src.row_data(idx).unwrap();
+
+        let dur = normalize_duration(form.duration);
+        let wish = start.clamp(0, DAY_MINUTES - dur);
+
+        let Some(free) = find_free_start(&st.scheduled, id, col, dur, wish) else {
+            app.set_is_error(true);
+            app.set_status_message("no free space on that day".into());
+            return; // block stays where it was, nothing moved
+        };
+
+        form.column = col;
+        form.start_minute = free;
+        form.duration = dur;
+
+        if Rc::ptr_eq(src, &st.scheduled) {
+            st.scheduled.set_row_data(idx, form);
+        } else {
+            src.remove(idx);
+            st.scheduled.push(form);
+        }
+        update_all_limits(&st.scheduled);
+        app.set_is_error(false);
+        app.set_status_message("".into());
     });
 
     app.run()?;
