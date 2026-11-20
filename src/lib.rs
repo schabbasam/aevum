@@ -76,6 +76,27 @@ fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, ga
     col.row_count()
 }
 
+fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish: i32) -> Option<i32> {
+    let mut busy: Vec<(i32, i32)> = sched
+        .iter()
+        .filter(|t| t.id != id && t.column == col)
+        .map(|t| (t.start_minute, t.start_minute + t.duration))
+        .collect();
+    busy.sort();
+
+    let mut cands = vec![widh, 0, DAY_MINUTES - dur];
+    for &(s, e) in &busy {
+        cands.push(e);
+        cands.push(s - dur);
+    }
+
+    cands
+        .into_iter()
+        .filter(|&c| c >= 0 && c + dur <= DAY_MINUTES)
+        .filter(|&c| busy.iter().all(|&(s, e)| c + dur <= s || c >= e))
+        .min_by_key(|&c| (c-wish).abs())
+}
+
 pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
     let app_handle = app.as_weak();
