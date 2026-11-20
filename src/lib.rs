@@ -23,7 +23,29 @@ struct Store {
     right: Rc<VecModel<TaskForm>>,
     scheduled: Rc<VecModel<TaskForm>>,
 }
-
+impl Store {
+    fn new() -> Self {
+        Self {
+            left: Default::default(),
+            right: Default::default(),
+            scheduled: Default::default(),
+        }
+    }
+    fn panel_column(&self, col: i32) -> &Rc<VecModel<TaskForm>> {
+        if col == 0 {
+            &self.left
+        } else {
+            &self.right
+        }
+    }
+    // search where the task is
+    fn find(&self, id: i32) -> Option<(&Rc<VecModel<TaskForm>>, usize)> {
+        [&self.left, &self.right, &self.scheduled]
+            .into_iter()
+            .find_map(|m| m.iter().position(|t| t.id == id)
+                .map(|i| (m, i)))
+    }
+}
 pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
     let app_handle = app.as_weak();
