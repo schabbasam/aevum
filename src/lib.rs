@@ -17,13 +17,18 @@ const DAY_MINUTES: i32 = 1440;
 const STEP: i32 = 15;
 const DEFAULT_DURATION: i32 = 60;
 
+// this struct stores all tasks in their layouts
 #[derive(Clone)]
 struct Store {
+    // a VecModel is slints observable vector
+    // Rc so it can be shared between closure captures
     left: Rc<VecModel<TaskForm>>,
     right: Rc<VecModel<TaskForm>>,
     scheduled: Rc<VecModel<TaskForm>>,
 }
 impl Store {
+
+    // just creates three empty models
     fn new() -> Self {
         Self {
             left: Default::default(),
@@ -31,6 +36,8 @@ impl Store {
             scheduled: Default::default(),
         }
     }
+
+    // returns all tasks of a column
     fn panel_column(&self, col: i32) -> &Rc<VecModel<TaskForm>> {
         if col == 0 {
             &self.left
@@ -38,14 +45,21 @@ impl Store {
             &self.right
         }
     }
-    // search where the task is
+
+    // search all three places to find where the task is
     fn find(&self, id: i32) -> Option<(&Rc<VecModel<TaskForm>>, usize)> {
         [&self.left, &self.right, &self.scheduled]
             .into_iter()
-            .find_map(|m| m.iter().position(|t| t.id == id)
-                .map(|i| (m, i)))
+            // if im not wrong, find_map is the same as filter_map + find
+            .find_map(|m| { // for each element m
+                m.iter()    // look inside m
+                    .position(|t| t.id == id)   // find the index of matching t
+                    .map(|i| (m, i))            // if found, create a pair of m and index i
+            })
     }
-
+    
+    // the panel with shorter column_height
+    // used to balance the mansory layout
     fn shorter_panel_column(&self, hour_h: f32, min_h: f32) -> &Rc<VecModel<TaskForm>> {
         if column_height(&self.left, hour_h, min_h) <= column_height(&self.right, hour_h, min_h) {
             &self.left
@@ -55,46 +69,63 @@ impl Store {
     }
 }
 
+// sum of all task's task_height_px
 fn column_height(m: &VecModel<TaskForm>, hour_h: f32, min_h: f32) -> f32 {
+    // for each task t, do task_height_px() and sum it up
     m.iter().map(|t| task_height_px(t.duration, hour_h, min_h)).sum()
 }
 
 fn normalize_duration(d: i32) -> i32 {
+    // if duration d is smaller or equal 0, it is the default duration
     let d = if d <= 0 { DEFAULT_DURATION } else { d };
-    ((d + STEP - 1) / STEP * STEP).clamp(STEP, DAY_MINUTES)
+    // first it rounds up to a multiple of STEP
+    // then clamp to STEP and DAY_MINUTES (cant get hight or lower than these)
+    ((d + STEP - 1) / STEP * STEP).clamp(STEP, DAY_MINUTES) // clamp(min, max)
 }
 
+// insert a y-coordinate where you want to put the task
+// returns the index where the new item should be
 fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, gap: f32) -> usize {
-    let mut top = gap;
-    for (i, t) in col.iter().enumerate() {
+    let mut top = gap; // the gap above the first task
+    for (i, t) in col.iter().enumerate() { // for each task (i is index, t is task)
+        // calculating the height of t
         let h = task_height_px(t.duration, hour_h, min_h);
+        // if y is above the midpoint of the task
         if y < top + h / 2.0 {
+            // insert above this task
             return i;
         }
+        // otherwise, advance to the next task
         top += h + gap;
     }
+    // row count is the VecModel's item count
+    // cant use .len() because its not a plain Vec
     col.row_count()
 }
 
+// return the free spot closest to wish
 fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish: i32) -> Option<i32> {
     let mut busy: Vec<(i32, i32)> = sched
-        .iter()
-        .filter(|t| t.id != id && t.column == col)
+        .iter() // collect all tasks
+        .filter(|t| t.id != id && t.column == col) // except this one (the moving task)
+        // turn every task into a (start, end)
         .map(|t| (t.start_minute, t.start_minute + t.duration))
-        .collect();
+        .collect(); // materialize the list
+    // sort by start time to create a canonical order
     busy.sort();
-
+    
+    // vector of candidates, starts with 3 obvious picks already (exact wish, start of day, latest possible)
     let mut cands = vec![wish, 0, DAY_MINUTES - dur];
-    for &(s, e) in &busy {
+    for &(s, e) in &busy { // (s, e) = (start, end)
         cands.push(e);
         cands.push(s - dur);
     }
 
     cands
-        .into_iter()
-        .filter(|&c| c >= 0 && c + dur <= DAY_MINUTES)
-        .filter(|&c| busy.iter().all(|&(s, e)| c + dur <= s || c >= e))
-        .min_by_key(|&c| (c-wish).abs())
+        .into_iter() // consume and turn into iter
+        .filter(|&c| c >= 0 && c + dur <= DAY_MINUTES) // filter if it exceeds the day limit
+        .filter(|&c| busy.iter().all(|&(s, e)| c + dur <= s || c >= e)) // filter overlaps
+        .min_by_key(|&c| (c - wish).abs()) // pick the one closest to wish
 }
 
 fn update_all_limits(sched: &VecModel<TaskForm>) {
