@@ -46,8 +46,12 @@ export component TaskPanel inherits Rectangle {
 
     drop := DropArea {
         can-drop(event) => {
-            root.insert-col = event.position.x < self.width / 2 ? 0 : 1;
-            root.insert-y = event.position.y;
+            root.slot-col = event.position.x < self.width / 2 ? 0 : 1;
+            root.slot-y = Api.panel-slot-y(
+                DragState.id,
+                root.slot-col,
+                event.position.y - fl.content-y
+            );
             return event.proposed-action;
         }
         dropped(event) => {
