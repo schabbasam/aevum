@@ -189,18 +189,6 @@ pub fn run() -> Result<(), slint::PlatformError> {
     // TODO add edit mode
     app.set_edit_mode(false);
     
-    // Api callbacks
-    // necessary because we need a way to convert from and to the drag&drop transfer data type
-    let api = app.global::<Api>();
-    api.on_int_to_transfer(|id| SharedString::from(id.to_string()).into());
-    api.on_transfer_to_int(|data| {
-        data.plain_text()
-            .unwrap_or_default()
-            .to_string()
-            .parse::<i32>()
-            .unwrap_or(0)
-    });
-    
     // create Store and set slint properties
     let store = Store::new();
     app.set_left_column_tasks(ModelRc::from(store.left.clone()));
@@ -259,6 +247,25 @@ pub fn run() -> Result<(), slint::PlatformError> {
                 app.set_status_message(e.into());
             }
         }
+    });
+    
+    // Api callbacks
+    // necessary because we need a way to convert from and to the drag&drop transfer data type
+    let api = app.global::<Api>();
+    api.on_int_to_transfer(|id| SharedString::from(id.to_string()).into());
+    api.on_transfer_to_int(|data| {
+        data.plain_text()
+            .unwrap_or_default()
+            .to_string()
+            .parse::<i32>()
+            .unwrap_or(0)
+    });
+    let st = store.clone();
+    api.on_review_start(move |id, col, wish| {
+        let Some((src, idx)) = st.find(id) else { return -1 };
+        let dur = normalize_duration(src.row_data(idx).unwrap().duration);
+        let wish = wish.clamp(0, DAY_MINUTES - dur);
+        find_free_start(&st.scheduled, id, col, dur, wish).unwrap_or(-1)
     });
 
     let (weak, st) = (app.as_weak(), store.clone());
