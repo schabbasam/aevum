@@ -88,26 +88,28 @@ export component TaskBlock inherits Rectangle {
         root.resize-pointer(false, 0px);
     }
 
-    // ---- focus ring ----
-    Rectangle {
-        visible: root.resizing;
-        x: -Theme.focus-ring-width;
-        y: -Theme.focus-ring-width;
-        width: parent.width + 2 * Theme.focus-ring-width;
-        height: parent.height + 2 * Theme.focus-ring-width;
-        border-radius: root.border-radius + Theme.focus-ring-width;
-        border-width: Theme.focus-ring-width;
-        border-color: Theme.border-focus;
-        background: transparent;
+    function finish-resize() {
+        if root.resizing {
+            root.resize-finished(root.task-id, root.live-start, root.live-duration);
+        }
+        root.end-resize();
     }
 
-    // bar at the edge that is currently being resized
+    // bars that show the resizable edge on hover / while resizing
     Rectangle {
-        visible: root.resizing;
-        width: parent.width;
+        visible: root.calendar-mode
+            && (resize-ta-top.has-hover || (root.resizing && root.resize-from-top));
+        y: 0px;
+        width: 100%;
         height: Theme.focus-ring-width;
-        y: root.resize-from-top
-            ? 0px : parent.height - self.height;
+        background: Theme.accent-hover;
+    }
+    Rectangle {
+        visible: root.calendar-mode
+            && (resize-ta-bot.has-hover || (root.resizing && !root.resize-from-top));
+        y: parent.height - self.height;
+        width: 100%;
+        height: Theme.focus-ring-width;
         background: Theme.accent-hover;
     }
 
@@ -169,5 +171,14 @@ export component TaskBlock inherits Rectangle {
                 }
             }
         }
+    }
+
+    // resize handles
+    resize-ta-top := TouchArea {
+
+    }
+
+    resize-ta-bot := TouchArea {
+
     }
 }
