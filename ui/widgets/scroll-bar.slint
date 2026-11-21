@@ -1,0 +1,15 @@
+import { Theme } from "../theme.slint";
+
+export component ScrollBar inherits Rectangle {
+    in property <length> content-height;
+    in property <length> view-height;
+    in-out property <length> offset; // content-y, never below zero
+
+    property <length> max-scroll: max(0px, root.content-height - root.view-height);
+    property <length> thumb-height: max(24px,
+        root.height * root.view-height / max(1px, root.content-height));
+
+    width: 8px; // ill make it changable by making it a Theme variable later
+    background: Theme.surface;
+    visible: root.max-scroll > 0px;
+}
