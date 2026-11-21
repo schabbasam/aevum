@@ -66,7 +66,22 @@ export component TaskBlock inherits Rectangle {
     property <color> text-color: self.background.to-oklch().lightness > 0.6
         ? Theme.background : Theme.foreground;
 
+    function begin-resize(from-top: bool, pointer-y: length) {
+        root.resizing = true;
+        root.resize-from-top = from-top;
+        root.start0 = root.form.start-minute;
+        root.end0 = root.form.start-minute + root.form.duration;
+        root.press-content-y = pointer-y;
+        root.pointer-frame-y = pointer-y + root.scroll-y;
+        root.resize-pointer(true, root.pointer-frame-y);
+    }
 
+    function track-resize(pointer-y: length) {
+        if root.resizing {
+            root.pointer-frame-y = pointer-y + root.scroll-y;
+            root.resize-pointer(true, root.pointer-frame-y);
+        }
+    }
 
     function end-resize() {
         root.resizing = false;
