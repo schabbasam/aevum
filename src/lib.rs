@@ -261,7 +261,7 @@ pub fn run() -> Result<(), slint::PlatformError> {
             .unwrap_or(0)
     });
     let st = store.clone();
-    api.on_review_start(move |id, col, wish| {
+    api.on_preview_start(move |id, col, wish| {
         let Some((src, idx)) = st.find(id) else { return -1 };
         let dur = normalize_duration(src.row_data(idx).unwrap().duration);
         let wish = wish.clamp(0, DAY_MINUTES - dur);
