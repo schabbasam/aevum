@@ -1,7 +1,7 @@
 import { Theme, Border, HorizontalBorder } from "../theme.slint";
 import { TaskBlock } from "task-block.slint";
 import { TaskForm, Api } from "../types.slint";
-
+import { ScrollBar } from "../widgets/scroll-bar.slint";
 
 export component DayHeader inherits HorizontalLayout {
     in property <string> text: "Someday";
@@ -20,17 +20,21 @@ export component DayHeader inherits HorizontalLayout {
     }
 }
 
-export component DayColumn inherits HorizontalLayout {
+export component DayColumn inherits Rectangle {
     in property <int> index;
-    callback dropped(int, int, length); // id, column, viewport-y
+    callback dropped(int, int, length); // id, column, column-y
     
     width: Theme.column-width;
     height: 24 * Theme.hour-height;
 
-    border := Border {}
+    Border {}
+    
     da := DropArea {
+        x: 0px;
+        y: 0px;
         width: 100%;
         height: 100%;
+
         can-drop(event) => {
             return event.proposed-action;
         }
@@ -112,6 +116,16 @@ export component WeekView inherits Rectangle {
                 content-width: 7 * Theme.column-width;
                 content-height: 24 * Theme.hour-height;
                 interactive: false; // fl shouln't eat the input for drag/resize
+                
+                for i in 7: DayColumn {
+                    index: i;
+                    x: i * Theme.column-width;
+                    y: 0px;
+
+                    dropped(id, col, y) => {
+                        root.place(id, col, y);
+                    }
+                }
 
                 for task in root.scheduled-tasks : TaskBlock {
                     calendar-mode: true;
@@ -134,6 +148,7 @@ export component WeekView inherits Rectangle {
                 }
             }
             
+            // edge zones: autoscroll while dragging
             top-zone := DropArea {
                 y: 0px;
                 width: parent.width;
@@ -169,6 +184,16 @@ export component WeekView inherits Rectangle {
                     return event.proposed-action;
                 }
             }
+
+            ScrollBar {
+                x: parent.width - self.width;
+                y: 0px;
+                height: 100%;
+                content-height: fl.content-height;
+                view-height: fl.height;
+                offset <=> fl.content-y;
+            }
+
         }
     }
 }
