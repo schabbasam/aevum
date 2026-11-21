@@ -3,6 +3,7 @@ import { TaskPanel } from "components/task-panel.slint";
 import { TaskAttributes } from "components/task-attributes.slint";
 import { TaskForm, Api } from "types.slint";
 import { WeekView } from "components/week-view.slint";
+import { TaskBlock } from "components/task-block.slint";
 
 export { TaskForm }
 export { Api }
@@ -101,5 +102,13 @@ export component MainWindow inherits Window {
                 }
             }
         }
+    }
+
+    // ---- ghost task block ----
+    
+    in-out property <TaskForm> ghost-form;
+
+    ghost := TaskBlock {
+        form: root.ghost-form;
     }
 }
