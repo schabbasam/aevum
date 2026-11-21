@@ -55,6 +55,17 @@ export component MainWindow inherits Window {
             }
         }
 
+        tracker := TouchArea {
+            x: 0;
+            y: 0;
+            width: 100%;
+            height: 100%;
+            moved => {
+                root.ghost-x = self.mouse-x;
+                root.ghost-y = self.mouse-y;
+            }
+        }
+
         HorizontalLayout {
             spacing: 0px;
             
@@ -112,6 +123,17 @@ export component MainWindow inherits Window {
 
     GhostBlock {
         form: root.ghost-form;
+        x: root.ghost-x - root.active-drag-offset-x;
+        y: root.ghost-y - root.active-drag-offset-y;
+    }
+    
+    // rectangle to test if it works
+    // it does follow the cursor around, but only if a button is pressed
+    // which is fine because for dragging a button is pressed
+    Rectangle {
+        width: 10px;
+        height: 10px;
+        background: red;
         x: root.ghost-x - root.active-drag-offset-x;
         y: root.ghost-y - root.active-drag-offset-y;
     }
