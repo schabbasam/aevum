@@ -44,8 +44,10 @@ export component TaskPanel inherits Rectangle {
         }
     }
 
-    DropArea {
+    drop := DropArea {
         can-drop(event) => {
+            root.insert-col = event.position.x < self.width / 2 ? 0 : 1;
+            root.insert-y = event.position.y;
             return event.proposed-action;
         }
         dropped(event) => {
@@ -56,6 +58,20 @@ export component TaskPanel inherits Rectangle {
             );
             return event.proposed-action;
         }
+    }
+
+    property <length> insert-y: 0px;
+    property <int> insert-col: 0;
+
+    Rectangle {
+        visible: drop.has-drag;
+        x: Theme.spacing-medium + root.insert-col 
+            * (Theme.task-block-width + Theme.spacing-medium);
+        y: root.insert-y - self.height / 2;
+        width: Theme.task-block-width;
+        height: 3px;
+        border-radius: 1px;
+        background: Theme.accent-hover;
     }
 
     ScrollBar {
