@@ -23,6 +23,10 @@ export component TaskBlock inherits Rectangle {
     property <length> press-content-y: 0px;
     property <length> pointer-frame-y: 0px;
 
+    property <length> handle-h: root.calendar-mode
+        ? min(8px, root.height / 3) // never more than a third
+        : 0px;
+
     property <length> pointer-content-y: root.pointer-frame-y - root.scroll-y;
     property <int> delta-minutes: round(
         (root.pointer-content-y - root.press-content-y)
@@ -61,6 +65,8 @@ export component TaskBlock inherits Rectangle {
 
     property <color> text-color: self.background.to-oklch().lightness > 0.6
         ? Theme.background : Theme.foreground;
+
+
 
     function end-resize() {
         root.resizing = false;

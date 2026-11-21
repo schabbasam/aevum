@@ -1,6 +1,7 @@
 import { Theme } from "../theme.slint";
 import { TaskBlock } from "task-block.slint";
 import { TaskForm, Api } from "../types.slint";
+import { ScrollBar } from "../widgets/scroll-bar.slint";
 
 export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> left-column;
@@ -52,5 +53,14 @@ export component TaskPanel inherits Rectangle {
             );
             return event.proposed-action;
         }
+    }
+
+    ScrollBar {
+        x: parent.width - self.width;
+        y: 0px;
+        height: 100%;
+        content-height: fl.content-height;
+        view-height: fl.height;
+        offset <=> fl.content-y;
     }
 }
