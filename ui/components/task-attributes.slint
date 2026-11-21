@@ -28,13 +28,14 @@ export component TaskAttributes inherits Rectangle {
 
     // ---- callbacks ----
     callback save-task(TaskForm);
+    callback input-changed();
 
     // ---- modes and states ----
     in property <bool> edit-mode: false;
     in property <bool> has-changes: false;
 
     // the button enables when title isn't empty
-    in property <bool> button-enabled: title-input > 0;
+    in property <bool> button-enabled: !title-input.is-empty;
 
     in property <string> status-message: "";
     in property <bool> is-error: false; 
@@ -43,6 +44,17 @@ export component TaskAttributes inherits Rectangle {
 
     // ---- general appearance ----
     background: Theme.surface;
+
+    changed title-input         => { root.input-changed(); }
+    changed day-input           => { root.input-changed(); }
+    changed month-input         => { root.input-changed(); }
+    changed year-input          => { root.input-changed(); }
+    changed description-input   => { root.input-changed(); }
+    changed duration-input      => { root.input-changed(); }
+    changed recurrence-input    => { root.input-changed(); }
+    changed category-input      => { root.input-changed(); }
+    changed color-input         => { root.input-changed(); }
+    changed completed-input     => { root.input-changed(); }
 
     VerticalLayout {
         padding: 2 * Theme.spacing-medium;
