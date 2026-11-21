@@ -12,4 +12,40 @@ export component ScrollBar inherits Rectangle {
     width: 8px; // ill make it changable by making it a Theme variable later
     background: Theme.surface;
     visible: root.max-scroll > 0px;
+
+    Rectangle {
+        x: 1px;
+        width: parent.width - 2px;
+        height: root.thumb-height;
+        y: root.max-scroll > 0px
+            ? (root.height - self.height) * (- root.offset / root.max-scroll)
+            : 0px;
+        border-radius: Theme.radius-small;
+        background: (ta.pressed || ta.has-hover)
+            ? Theme.accent-hover
+            : Theme.accent-disabled;
+    }
+
+    ta := TouchArea {
+        property <length> start-offset: 0px;
+
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                self.start-offset = root.offset;
+            }
+        }
+
+        moved => {
+            if self.pressed {
+                root.offset = clamp(
+                    self.start-offset
+                        - (self.mouse-y - self.pressed-y)
+                        * root.max-scroll
+                        / max(1px, root.height - root.thumb-height),
+                    - root.max-scroll,
+                    0px
+                );
+            }
+        }
+    }
 }
