@@ -12,7 +12,10 @@ export component TaskPanel inherits Rectangle {
 
     background: Theme.surface;
 
+    vertical-stretch: 1;
+
     fl := Flickable {
+        height: 100%;
         interactive: false;
 
         HorizontalLayout {
