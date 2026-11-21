@@ -5,8 +5,6 @@ import { TaskForm, Api } from "types.slint";
 import { WeekView } from "components/week-view.slint";
 
 export { TaskForm }
-
-import { TaskBlock } from "components/task-block.slint";
 export { Api }
 
 
@@ -25,6 +23,7 @@ export component MainWindow inherits Window {
 
     in-out property <string> status-message: "";
     in-out property <bool> is-error: false;
+    in-out property <bool> edit-mode: false; // TODO set with rust and logic
     in-out property <int> max-title;
     in-out property <int> max-description;
     in-out property <int> max-duration;
@@ -77,8 +76,12 @@ export component MainWindow inherits Window {
 
                 TaskAttributes {
                     save-task(form) => { root.save-task(form); }
+                    input-changed => { root.status-message = ""; }
+                    
+                    edit-mode <=> root.edit-mode;
                     status-message <=> root.status-message;
                     is-error <=> root.is-error;
+
                     max-title <=> root.max-title;
                     max-description <=> root.max-description;
                     max-duration <=> root.max-duration;
