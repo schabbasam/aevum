@@ -206,7 +206,9 @@ pub fn run() -> Result<(), slint::PlatformError> {
 
     let st = store.clone();
     app.on_save_task(move |form| {
-        let app = app_handle.upgrade().unwrap();
+        // very unlikely, but just in case the window is dropped mid flight or something
+        // this defensive way doesnt panic
+        let Some(app) = app_handle.upgrade() else { return };
         
         // create the task
         match build_task(&form) {
@@ -254,22 +256,6 @@ pub fn run() -> Result<(), slint::PlatformError> {
                 app.set_status_message(e.into());
             }
         }
-    });
-
-    app.on_task_dropped(move |id, x, y| {
-        let mut form = if let Some(idx) = panel.iter().position(|t| t.id == id) {
-            panel.remove(idx)
-        } else if let Some(idx) = sched.iter().position(|t| t.id == id) {
-            sched.remove(idx)
-        } else {
-            return;
-        };
-
-        form.drop_x = x;
-        form.drop_y = y;
-
-        sched.push(form);
-        refresh_drop();
     });
 
     let (weak, st) = (app.as_weak(), store.clone());
