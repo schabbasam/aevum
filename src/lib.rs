@@ -181,11 +181,13 @@ pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
     let app_handle = app.as_weak();
 
-    // set max length
+    // set max length constants
     app.set_max_title(MAX_TITLE as i32);
     app.set_max_description(MAX_DESCRIPTION as i32);
     app.set_max_duration(MAX_DURATION as i32);
-
+    
+    // Api callbacks
+    // necessary because we need a way to convert from and to the drag&drop transfer data type
     let api = app.global::<Api>();
     api.on_int_to_transfer(|id| SharedString::from(id.to_string()).into());
     api.on_transfer_to_int(|data| {
@@ -195,7 +197,8 @@ pub fn run() -> Result<(), slint::PlatformError> {
             .parse::<i32>()
             .unwrap_or(0)
     });
-
+    
+    // create Store and set slint properties
     let store = Store::new();
     app.set_left_column_tasks(ModelRc::from(store.left.clone()));
     app.set_right_column_tasks(ModelRc::from(store.right.clone()));
@@ -203,22 +206,28 @@ pub fn run() -> Result<(), slint::PlatformError> {
 
     let tasks_save = tasks_handle.clone();
     
+
     let st = store.clone();
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
-
+        
+        // create the task
         match build_task(&form) {
+
+            // on success
             Ok(task) => {
                 let mut form = form;
                 form.id = task.id() as i32;
-
+                
+                // get some constants
                 let w = app.get_task_block_width();
                 let hour_height = app.get_hour_height();
                 let min_height = app.get_task_block_min_height();
                 let default_color = app.get_default_task_color();
 
                 let h = task_height_px(form.duration, hour_height, min_height);
-
+                
+                // color
                 let hex = task.color().map(|c| c.to_hex());
                 form.drag_preview = make_drag_preview(w, h, hex.as_deref());
 
@@ -233,13 +242,16 @@ pub fn run() -> Result<(), slint::PlatformError> {
                 };
 
                 form.color_brush = brush;
-
+                
+                // add it to the shorter panel column
                 st.shorter_panel_column(hour_height, min_height).push(form);
 
                 println!("task created \n{:?}", task);
                 app.set_is_error(false);
                 app.set_status_message("task created".into());
             }
+
+            // on failure
             Err(e) => {
                 app.set_is_error(true);
                 app.set_status_message(e.into());
@@ -269,8 +281,13 @@ pub fn run() -> Result<(), slint::PlatformError> {
 
     let (weak, st) = (app.as_weak(), store.clone());
     app.on_task_placed(move |id, col, start| {
+
+        // if Some is returned, it gets extracted into these variables
+        // else the function is aborted
         let Some(app) = weak.upgrade() else { return };
         let Some((src, idx)) = st.find(id) else { return };
+
+        // clone the form
         let mut form = src.row_data(idx).unwrap();
 
         let dur = normalize_duration(form.duration);
@@ -285,10 +302,12 @@ pub fn run() -> Result<(), slint::PlatformError> {
         form.column = col;
         form.start_minute = free;
         form.duration = dur;
-
+        
+        // check if the pointers of the Rc are equal
         if Rc::ptr_eq(src, &st.scheduled) {
             st.scheduled.set_row_data(idx, form);
         } else {
+            // if not, replace it with the new one
             src.remove(idx);
             st.scheduled.push(form);
         }
@@ -299,15 +318,20 @@ pub fn run() -> Result<(), slint::PlatformError> {
 
     let st = store.clone();
     app.on_task_resized(move |id, start, dur| {
+        // find index in scheduled tasks
         let Some(idx) = st.scheduled.iter().position(|t| t.id == id) else { return };
         let mut form = st.scheduled.row_data(idx).unwrap();
 
         let start = start.max(form.min_start);
         let end = (start + dur).min(form.max_end);
+
+        // if duration gets smaller than the STEP
         if end - start < STEP { return };
 
         form.start_minute = start;
         form.duration = end - start;
+
+        // set the new thing into scheduled and update
         st.scheduled.set_row_data(idx, form);
         update_all_limits(&st.scheduled);
     });
@@ -320,16 +344,20 @@ pub fn run() -> Result<(), slint::PlatformError> {
         let target = st.panel_column(col);
 
         let mut at = insertion_index(
-            target,
-            y,
+            target, // column
+            y, // wished position
             app.get_hour_height(),
             app.get_task_block_min_height(),
             app.get_panel_gap(),
         );
 
         if Rc::ptr_eq(src, target) && idx < at {
+            // decrement index if source column and target are the same
+            // because the dragged task is still in the index of target
             at -= 1;
         }
+
+        // replace and update
         src.remove(idx);
         target.insert(at, form);
         update_all_limits(&st.scheduled);
