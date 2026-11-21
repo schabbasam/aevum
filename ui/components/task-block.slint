@@ -175,10 +175,47 @@ export component TaskBlock inherits Rectangle {
 
     // resize handles
     resize-ta-top := TouchArea {
+        enabled: root.calendar-mode;
+        x: 0px;
+        y: 0px;
+        width: 100%;
+        height: root.handle-h;
+        mouse-cursor: MouseCursor.ns-resize;
 
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down
+                    && event.button == PointerEventButton.left {
+                root.begin-resize(true, root.y + self.y + self.mouse-y);
+            } else if event.kind == PointerEventKind.up
+                    && event.button == PointerEventButton.left {
+                root.finish-resize();
+            } else if event.kind == PointerEventKind.cancel {
+                root.end-resize();
+            }
+        }
+        moved => {
+            root.track-resize(root.y + self.y + self.mouse-y);
+        }
     }
 
     resize-ta-bot := TouchArea {
+        enabled: root.calendar-mode;
+        x: 0px;
+        y: parent.height - self.height;
+        width: 100%;
+        height: root.handle-h;
+        mouse-cursor: MouseCursor.ns-resize;
 
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down
+                    && event.button == PointerEventButton.left {
+                root.begin-resize(false, root.y + self.y + self.mouse-y);
+            } else if event.kind == PointerEventKind.up
+                    && event.button == PointerEventButton.left {
+                root.finish-resize();
+            } else if event.kind == PointerEventKind.cancel {
+                root.end-resize();
+            }
+        }
     }
 }
