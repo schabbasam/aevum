@@ -160,15 +160,24 @@ export component TaskAttributes inherits Rectangle {
             
             clicked => {
                 root.save-task({
+                    // the values marked with a // d are set on default
+                    // because i have to pass every value defined in TaskForm
+                    // TODO this is a very unclean way, it needs to be adressed later
+                    id:             0, // d
                     title:          root.title-input,
                     day:            root.day-input,
                     month:          root.month-input,
                     year:           root.year-input,
+                    column:         0, // d
+                    start-minute:   0, // d
+                    min-start:      0, // d
+                    max-end:        1440, // d
                     description:    root.description-input,
                     duration:       root.duration-input,
-                    recurrence:     root.recurrence-input,
-                    category:       root.category-input,
+                    recurrence:     root.recurrence-input, // d
+                    category:       root.category-input, // d
                     color:          root.color-input,
+                    color-brush:    transparent, // d
                     completed:      root.completed-input,
                     drag-preview:   root.drag-preview,
                 });
