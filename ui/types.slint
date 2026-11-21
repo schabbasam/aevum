@@ -37,4 +37,6 @@ export global Api {
     
     // id, column, wished start minute -> real start minute or -1 if busy
     callback preview-start(int, int, int) -> int;
+    // same thing, but for TaskPanel: id, column, y-coordinate
+    callback panel-slot-y(int, int, length) -> length;
 }
