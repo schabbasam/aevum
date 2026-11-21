@@ -204,9 +204,6 @@ pub fn run() -> Result<(), slint::PlatformError> {
     app.set_right_column_tasks(ModelRc::from(store.right.clone()));
     app.set_scheduled_tasks(ModelRc::from(store.scheduled.clone()));
 
-    let tasks_save = tasks_handle.clone();
-    
-
     let st = store.clone();
     app.on_save_task(move |form| {
         let app = app_handle.upgrade().unwrap();
@@ -258,10 +255,6 @@ pub fn run() -> Result<(), slint::PlatformError> {
             }
         }
     });
-
-    let panel = tasks_handle.clone();
-    let sched = scheduled.clone();
-    let refresh_drop = refresh.clone();
 
     app.on_task_dropped(move |id, x, y| {
         let mut form = if let Some(idx) = panel.iter().position(|t| t.id == id) {
@@ -445,6 +438,7 @@ fn parse_date(day: i32, month: i32, year: i32) -> Option<DateThing> {
     Some(DateThing::new(day as u8, month as u8, year as u16).unwrap())
 }
 
+// returns task height in pixels
 fn task_height_px(duration: i32, hour_height: f32, min_height: f32) -> f32 {
     let height = (duration as f32 / 60.0) * hour_height;
     height.max(min_height)
