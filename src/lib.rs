@@ -185,6 +185,9 @@ pub fn run() -> Result<(), slint::PlatformError> {
     app.set_max_title(MAX_TITLE as i32);
     app.set_max_description(MAX_DESCRIPTION as i32);
     app.set_max_duration(MAX_DURATION as i32);
+
+    // TODO add edit mode
+    app.set_edit_mode(false);
     
     // Api callbacks
     // necessary because we need a way to convert from and to the drag&drop transfer data type
