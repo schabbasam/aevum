@@ -20,24 +20,6 @@ export component DayHeader inherits HorizontalLayout {
     }
 }
 
-export component Idk inherits VerticalLayout {
-    in property <string> text;
-
-    height: self.preferred-height;
-    width: Theme.task-block-width;
-
-    Rectangle {
-        background: Theme.background;
-        height: Theme.hour-height;
-        Text {
-            text: root.text;
-            font-size: Theme.font-size-small;
-            color: Theme.accent-disabled;
-        }
-    }
-    HorizontalBorder {background: Theme.surface-raised;}
-}
-
 export component DayColumn inherits HorizontalLayout {
     in property <int> index;
     callback dropped(int, int, length); // id, column, viewport-y
