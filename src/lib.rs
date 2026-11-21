@@ -116,38 +116,61 @@ fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish
     
     // vector of candidates, starts with 3 obvious picks already (exact wish, start of day, latest possible)
     let mut cands = vec![wish, 0, DAY_MINUTES - dur];
+    // since were using a ref of busy, we 'destruct' it to pull out s and e
     for &(s, e) in &busy { // (s, e) = (start, end)
+        // if there is something blocking it, just pick
+        // the spot right below or above it
         cands.push(e);
         cands.push(s - dur);
     }
 
     cands
         .into_iter() // consume and turn into iter
-        .filter(|&c| c >= 0 && c + dur <= DAY_MINUTES) // filter if it exceeds the day limit
-        .filter(|&c| busy.iter().all(|&(s, e)| c + dur <= s || c >= e)) // filter overlaps
+        // filter the ones that start before midnight or end after the end of the day
+        .filter(|&c| c >= 0 && c + dur <= DAY_MINUTES)
+        // filter if it overlaps with any busy element
+        .filter(|&c| busy.iter().all(|&(s, e)| c + dur <= s || c >= e))
         .min_by_key(|&c| (c - wish).abs()) // pick the one closest to wish
 }
 
 fn update_all_limits(sched: &VecModel<TaskForm>) {
+    // for each weekday column
     for col in 0..7 {
         let items: Vec<(usize, TaskForm)> = sched
-            .iter().enumerate().filter(|(_, t)| t.column == col).collect();
+            .iter().enumerate()
+            // filter out tasks of other columns
+            .filter(|(_, t)| t.column == col)
+            .collect();
 
         for (row, t) in &items {
+            // create an interval for each task t
             let (start, end) = (t.start_minute, t.start_minute + t.duration);
+            
+            // the wall above the task
             let min_start = items.iter()
+                // excluding the task itself, only keep the tasks before this one
                 .filter(|(_, o)| o.id != t.id && o.start_minute + o.duration <= start)
+                // for each such left neighbor, take the end time 
                 .map(|(_, o)| o.start_minute + o.duration)
+                // use the latest end, if there is nothing, use 0 (start of day)
                 .max().unwrap_or(0);
+            
+            // same stuff as min_start, but the start of the task after it
+            // meaning the wall below it
             let max_end = items.iter()
                 .filter(|(_, o)| o.id != t.id && o.start_minute >= end)
                 .map(|(_, o)| o.start_minute)
                 .min().unwrap_or(DAY_MINUTES);
             
+            // only write the stuff if it actually changed
+            // (since slint rewrites the whole thing if it changes)
             if t.min_start != min_start || t.max_end != max_end {
+                // cloning is necessary bacause t is a shared ref
+                // mutating through it is not an option
                 let mut t2 = t.clone();
                 t2.min_start = min_start;
                 t2.max_end = max_end;
+                // pass the updated task clone
                 sched.set_row_data(*row, t2);
             }
         }
