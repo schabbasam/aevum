@@ -1,6 +1,6 @@
 import { Theme } from "../theme.slint";
 import { TaskBlock } from "task-block.slint";
-import { TaskForm, Api } from "../types.slint";
+import { TaskForm, Api, DragState } from "../types.slint";
 import { ScrollBar } from "../widgets/scroll-bar.slint";
 
 export component TaskPanel inherits Rectangle {
@@ -60,18 +60,24 @@ export component TaskPanel inherits Rectangle {
         }
     }
 
-    property <length> insert-y: 0px;
-    property <int> insert-col: 0;
+    property <length> slot-y: 0px;
+    property <int> slot-col: 0;
 
     Rectangle {
         visible: drop.has-drag;
-        x: Theme.spacing-medium + root.insert-col 
+        background: DragState.color.with-alpha(0.35);
+
+        x : Theme.spacing-medium + root.slot-col
             * (Theme.task-block-width + Theme.spacing-medium);
-        y: root.insert-y - self.height / 2;
+        y: root.slot-y + fl.content-y;
+
         width: Theme.task-block-width;
-        height: 3px;
-        border-radius: 1px;
-        background: Theme.accent-hover;
+        height: max(Theme.task-block-min-height,
+                    DragState.duration * Theme.hour-height / 60);
+
+        border-width: Theme.focus-ring-width;
+        border-color: Theme.accent-hover;
+        border-radius: Theme.radius-small;
     }
 
     ScrollBar {
