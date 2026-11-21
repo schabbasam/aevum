@@ -120,7 +120,13 @@ export component MainWindow inherits Window {
     in-out property <TaskForm> ghost-form;
     in-out property <length> ghost-x;
     in-out property <length> ghost-y;
-
+    
+    // this ghost block is supposed to be a better drag preview
+    // component GhostBlock is a very skimmed version of TaskBlock
+    // it should follow the cursor around if dragging
+    // if it is possible, it should show the live position the TaskBlock would be in if dropped
+    // meaning it should show for example where it would move and in which gap it would go
+    // in TaskPanel and DayColumns
     GhostBlock {
         form: root.ghost-form;
         x: root.ghost-x - root.active-drag-offset-x;

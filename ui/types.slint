@@ -24,8 +24,17 @@ export struct TaskForm {
     drag-preview:   image,
 }
 
+export global DragState {
+    in-out property <int> id: 0;
+    in-out property <int> duration: 60;
+    in-out property <brush> color: transparent;
+    in-out property <length> grab-y: 0px;
+}
 
 export global Api {
     pure callback int-to-transfer(int) -> data-transfer;
     pure callback transfer-to-int(data-transfer) -> int;
+    
+    // id, column, wished start minute -> real start minute or -1 if busy
+    callback preview-start(int, int, int) -> int;
 }
