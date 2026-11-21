@@ -93,7 +93,9 @@ export component TaskAttributes inherits Rectangle {
         Button {
             horizontal-stretch: 1;
             height: Theme.control-height;
-            text: "Date: " + root.day-input + "." + root.month-input + "." + root.year-input;
+            text: root.day-input == 0
+                ? "Select date"
+                : "Date: " + root.day-input + "." + root.month-input + "." + root.year-input;
             clicked => {
                 datepicker.show();
             }
