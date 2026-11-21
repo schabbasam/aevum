@@ -116,7 +116,7 @@ export component MainWindow inherits Window {
     }
 
     // ---- ghost task block ----
-    
+/*    
     in-out property <TaskForm> ghost-form;
     in-out property <length> ghost-x;
     in-out property <length> ghost-y;
@@ -132,15 +132,5 @@ export component MainWindow inherits Window {
         x: root.ghost-x - root.active-drag-offset-x;
         y: root.ghost-y - root.active-drag-offset-y;
     }
-    
-    // rectangle to test if it works
-    // it does follow the cursor around, but only if a button is pressed
-    // which is fine because for dragging a button is pressed
-    Rectangle {
-        width: 10px;
-        height: 10px;
-        background: red;
-        x: root.ghost-x - root.active-drag-offset-x;
-        y: root.ghost-y - root.active-drag-offset-y;
-    }
+*/
 }
