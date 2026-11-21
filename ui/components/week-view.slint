@@ -1,6 +1,6 @@
 import { Theme, Border, HorizontalBorder } from "../theme.slint";
 import { TaskBlock } from "task-block.slint";
-import { TaskForm, Api } from "../types.slint";
+import { TaskForm, Api, DragState } from "../types.slint";
 import { ScrollBar } from "../widgets/scroll-bar.slint";
 
 export component DayHeader inherits HorizontalLayout {
@@ -27,8 +27,23 @@ export component DayColumn inherits Rectangle {
     width: Theme.column-width;
     height: 24 * Theme.hour-height;
 
+    // -1 means nothing to show
+    property <int> preview-start: -1;
+
     Border {
         x: 0px;
+    }
+
+    Rectangle {
+        visible: da.has-drag && root.preview-start >= 0;
+        x: 2 * Theme.border-width;
+        y: root.preview-start * Theme.hour-height / 60;
+        width: Theme.task-block-width;
+        height: DragState.duration * Theme.hour-height / 60;
+        background: DragState.color.with-alpha(0.35);
+        border-width: Theme.focus-ring-width;
+        border-color: Theme.accent-hover;
+        border-radius: Theme.radius-small;
     }
     
     da := DropArea {
@@ -38,6 +53,15 @@ export component DayColumn inherits Rectangle {
         height: 100%;
 
         can-drop(event) => {
+            root.preview-start = Api.preview-start(
+                DragState.id,
+                root.index,
+                round(
+                    (event.position.y - DragState.grab-y)
+                    / Theme.hour-height * 60
+                    / Theme.resize-step
+                ) * Theme.resize-step
+            );
             return event.proposed-action;
         }
 
