@@ -368,6 +368,10 @@ pub fn run() -> Result<(), slint::PlatformError> {
 }
 
 fn build_task(form: &TaskForm) -> Result<Task, String> {
+    // this function is pretty self explanatory
+    // it just tries to put in the value from TaskForm
+    // if it failes, it throws an error that gets displayed later
+
     let title = form.title.to_string();
 
     let date = match parse_date(form.day, form.month, form.year) {
@@ -431,6 +435,9 @@ fn build_task(form: &TaskForm) -> Result<Task, String> {
 }
 
 fn parse_date(day: i32, month: i32, year: i32) -> Option<DateThing> {
+    // if no date is selected, return None,
+    // else, the date as DateThing (my Date object from time.rs) gets returned as Some
+
     if day == 0 || month == 0 || year == 0 {
         return None;
     }
