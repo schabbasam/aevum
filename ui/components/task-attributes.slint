@@ -1,6 +1,6 @@
 import { Theme } from "../theme.slint";
 import { TaskForm } from "../types.slint";
-import { CheckBox, DatePickerPopup} from "std-widgets.slint";
+import { CheckBox } from "std-widgets.slint";
 import { Button } from "../widgets/button.slint";
 import { SpinBox } from "../widgets/spin-box.slint";
 import { LineEdit } from "../widgets/line-edit.slint";
@@ -9,17 +9,12 @@ export component TaskAttributes inherits Rectangle {
 
     // ---- input values ----
     in-out property <string> title-input: "";
-    in-out property <int> day-input: 0;
-    in-out property <int> month-input: 0;
-    in-out property <int> year-input: 0;
     in-out property <string> description-input: "";
     in-out property <int> duration-input: 0;
     in-out property <string> recurrence-input: "";
     in-out property <string> category-input: "";
     in-out property <string> color-input: "";
     in-out property <bool> completed-input: false;
-
-    in-out property <image> drag-preview;
 
     // ---- max length ----
     in property <int> max-title: 0;
@@ -46,9 +41,6 @@ export component TaskAttributes inherits Rectangle {
     background: Theme.surface;
 
     changed title-input         => { root.input-changed(); }
-    changed day-input           => { root.input-changed(); }
-    changed month-input         => { root.input-changed(); }
-    changed year-input          => { root.input-changed(); }
     changed description-input   => { root.input-changed(); }
     changed duration-input      => { root.input-changed(); }
     changed recurrence-input    => { root.input-changed(); }
@@ -75,30 +67,6 @@ export component TaskAttributes inherits Rectangle {
             placeholder-text: "Title";
             max-length: root.max-title;
             text <=> root.title-input;
-        }
-        
-        // 2. date with date picker popup and button
-        datepicker := DatePickerPopup {
-            close-policy: PopupClosePolicy.no-auto-close;
-            accepted(date) => {
-                root.day-input = date.day;
-                root.month-input = date.month;
-                root.year-input = date.year;
-            }
-            canceled => {
-                datepicker.close()
-            }
-        }
-
-        Button {
-            horizontal-stretch: 1;
-            height: Theme.control-height;
-            text: root.day-input == 0
-                ? "Select date"
-                : "Date: " + root.day-input + "." + root.month-input + "." + root.year-input;
-            clicked => {
-                datepicker.show();
-            }
         }
         
         // ---- optional stuff ----
@@ -179,9 +147,6 @@ export component TaskAttributes inherits Rectangle {
                     // TODO this is a very unclean way, it needs to be adressed later
                     id:             0, // d
                     title:          root.title-input,
-                    day:            root.day-input,
-                    month:          root.month-input,
-                    year:           root.year-input,
                     column:         0, // d
                     start-minute:   0, // d
                     min-start:      0, // d
@@ -193,7 +158,6 @@ export component TaskAttributes inherits Rectangle {
                     color:          root.color-input,
                     color-brush:    transparent, // d
                     completed:      root.completed-input,
-                    drag-preview:   root.drag-preview,
                 });
             }
         }
