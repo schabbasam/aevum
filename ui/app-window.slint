@@ -41,6 +41,10 @@ export component MainWindow inherits Window {
     in-out property <int> max-description;
     in-out property <int> max-duration;
 
+    in-out property <string> date-text;
+    in-out property <string> time-text;
+    in-out property <string> week-text;
+
     in-out property <[TaskForm]> left-column-tasks;
     in-out property <[TaskForm]> right-column-tasks;
 
@@ -67,6 +71,16 @@ export component MainWindow inherits Window {
         VerticalLayout {
             
             TopBar {
+                date-text: root.date-text;
+                time-text: root.time-text;
+                week-text: root.week-text;
+
+                add-category(name, color) => {
+                    root.add-category(name, color);
+                }
+                open-settings => {
+                    root.open-settings();
+                }
             }
 
             HorizontalLayout {
