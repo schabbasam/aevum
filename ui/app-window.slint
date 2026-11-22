@@ -1,6 +1,7 @@
 import { Theme } from "theme.slint";
 import { TaskPanel } from "components/task-panel.slint";
 import { TaskAttributes } from "components/task-attributes.slint";
+import { TopBar } from "components/top-bar.slint";
 import { TaskForm, Api } from "types.slint";
 import { WeekView } from "components/week-view.slint";
 
@@ -9,11 +10,20 @@ export { Api }
 
 
 export component MainWindow inherits Window {
-    title: "Aevum";
+    title: "Schraubim";
     background: Theme.background;
 
-    width: self.preferred-width;
-    height: 800px;
+    preferred-width: 1280px;
+    preferred-height: 800px;
+    min-width: 900px;
+    min-height: 500px;
+
+    init => {
+        Theme.window-width = root.width;
+    }
+    changed width => {
+        Theme.window-width = root.width;
+    }
     
     callback task-placed(int, int, int);
     callback task-resized(int, int, int);
