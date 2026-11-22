@@ -538,23 +538,20 @@ fn make_drag_preview(
 fn calculate_drag_colors(original: SlintColor) -> (SlintColor, SlintColor) {
     let hsv = original.to_hsva();
 
-    let saturation = (hsv.saturation * 1.4).clamp(0.65, 1.0);
-
-    let preview_value = (hsv.value * 1.15).clamp(0.0, 1.0);
-    let border_value = (hsv.value * 0.55).clamp(0.0, 1.0);
-    
+    // preview: desaturated, slightly darkened version of the same hue
     let preview = SlintColor::from_hsva(
         hsv.hue,
-        saturation,
-        preview_value,
-        hsv.alpha,
+        (hsv.saturation * 0.40).min(0.45), // decrease sturation by a lot
+        (hsv.value      * 0.65).clamp(0.28, 0.55), // keep it dark but not too much
+        1.0 // no transparency at all (because the background color makes it look ungood)
     );
 
+    // border: bright, glowing outline in the same hue
     let border = SlintColor::from_hsva(
         hsv.hue,
-        (saturation * 1.1).min(1.0),
-        border_value,
-        hsv.alpha,
+        hsv.saturation.max(0.70),
+        1.0, // full brightness for the glow
+        1.0
     );
 
     (preview, border)
