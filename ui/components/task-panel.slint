@@ -24,20 +24,89 @@ export component TaskPanel inherits Rectangle {
 
             VerticalLayout {
                 spacing: Theme.spacing-medium;
-                for task in root.left-column : TaskBlock {
-                    form: task;
-                    drag-offset-changed(ox, oy) => {
-                        root.drag-offset-changed(ox, oy);
+                for task[i] in root.left-column : Rectangle {
+                    property <length> shift: 
+                        (drop.has-drag && root.slot-col == 0 && root.slot-index == i)
+                        ? root.extra : 0px;
+
+                    width: Theme.task-block-width;
+                    height: tbl.height + self.shift;
+
+                    Rectangle {
+                        visible: parent.shift > 0px;
+                        background: DragState.color.with-alpha(0.35);
+                        
+                        y: 0px;
+                        height: root.box-h;
+
+                        border-width: Theme.focus-ring-width;
+                        border-color: Theme.accent-hover;
+                        border-radius: Theme.radius-small;
+                    }
+                    tbl := TaskBlock {
+                        y: parent.shift;
+                        form: task;
+                        drag-offset-changed(ox, oy) => {
+                            root.drag-offset-changed(ox, oy);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    property <bool> active: drop.has-drag && root.slot-col == 0
+                        && root.slot-index == root.left-column.length;
+                    height: self.active ? root.box-h : 0px;
+                    Rectangle {
+                        visible: parent.active;
+                        background: DragState.color.with-alpha(0.35);
+                        border-width: Theme.focus-ring-width;
+                        border-color: Theme.accent-hover;
+                        border-radius: Theme.radius-small;
                     }
                 }
             }
 
             VerticalLayout {
                 spacing: Theme.spacing-medium;
-                for task in root.right-column: TaskBlock {
-                    form: task;
-                    drag-offset-changed(ox, oy) => {
-                        root.drag-offset-changed(ox, oy);
+                for task[i] in root.right-column: Rectangle {
+                    property <length> shift: 
+                        (drop.has-drag && root.slot-col == 1 && root.slot-index == i)
+                        ? root.extra : 0px;
+
+                    width: Theme.task-block-width;
+                    height: tbr.height + self.shift;
+
+                    Rectangle {
+                        visible: parent.shift > 0px;
+                        background: DragState.color.with-alpha(0.35);
+
+                        y: 0px;
+                        height: root.box-h;
+
+                        border-width: Theme.focus-ring-width;
+                        border-color: Theme.accent-hover;
+                        border-radius: Theme.radius-small;
+                    }
+
+                    tbr := TaskBlock {
+                        y: parent.shift;
+                        form: task;
+                        drag-offset-changed(ox, oy) => {
+                            root.drag-offset-changed(ox, oy);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    property <bool> active: drop.has-drag && root.slot-col == 0
+                        && root.slot-index == root.right-column.length;
+                    height: self.active ? root.box-h : 0px;
+                    Rectangle {
+                        visible: parent.active;
+                        background: DragState.color.with-alpha(0.35);
+                        border-width: Theme.focus-ring-width;
+                        border-color: Theme.accent-hover;
+                        border-radius: Theme.radius-small;
                     }
                 }
             }
@@ -70,23 +139,6 @@ export component TaskPanel inherits Rectangle {
     property <length> box-h: max(Theme.task-block-min-height,
                                 DragState.duration * Theme.hour-height / 60);
     property <length> extra: root.box-h + Theme.spacing-medium;
-
-    Rectangle {
-        visible: drop.has-drag;
-        background: DragState.color.with-alpha(0.35);
-
-        x : Theme.spacing-medium + root.slot-col
-            * (Theme.task-block-width + Theme.spacing-medium);
-        y: root.slot-y + fl.content-y;
-
-        width: Theme.task-block-width;
-        height: max(Theme.task-block-min-height,
-                    DragState.duration * Theme.hour-height / 60);
-
-        border-width: Theme.focus-ring-width;
-        border-color: Theme.accent-hover;
-        border-radius: Theme.radius-small;
-    }
 
     ScrollBar {
         x: parent.width - self.width;
