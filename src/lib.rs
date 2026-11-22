@@ -286,16 +286,17 @@ pub fn run() -> Result<(), slint::PlatformError> {
         find_free_start(&st.scheduled, id, col, dur, wish).unwrap_or(-1)
     });
     let (weak, st) = (app.as_weak(), store.clone());
-    api.on_panel_slot_y(move |id, col, y| {
-        let Some(app) = weak.upgrade() else { return 0.0 };
-        panel_slot_y(
+    api.on_panel_slot_index(move |col, y, cur, extra| {
+        let Some(app) = weak.upgrade() else { return 0 };
+        insertion_index_shifted(
             st.panel_column(col),
-            id,
             y,
             app.get_hour_height(),
             app.get_task_block_min_height(),
             app.get_panel_gap(),
-        )
+            cur,
+            extra,
+        ) as i32
     });
 
     let (weak, st) = (app.as_weak(), store.clone());
