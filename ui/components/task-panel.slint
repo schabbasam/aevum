@@ -43,12 +43,15 @@ export component TaskPanel inherits Rectangle {
                         border-color: Theme.accent-hover;
                         border-radius: Theme.radius-small;
                     }
+
                     tbl := TaskBlock {
                         y: parent.shift;
                         form: task;
                         drag-offset-changed(ox, oy) => {
                             root.drag-offset-changed(ox, oy);
                         }
+
+                        animate y { duration: Theme.anim-medium; }
                     }
                 }
 
@@ -94,6 +97,7 @@ export component TaskPanel inherits Rectangle {
                         drag-offset-changed(ox, oy) => {
                             root.drag-offset-changed(ox, oy);
                         }
+                        animate y { duration: Theme.anim-medium; }
                     }
                 }
 
