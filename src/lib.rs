@@ -103,6 +103,24 @@ fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, ga
     col.row_count()
 }
 
+// top y of the slot where a dragged task would land in this panel column
+// it is basically the same as on_task_to_panel()
+fn panel_slot_y(col: &VecModel<TaskForm>, id: i32, y: f32,
+        hour_h: f32, min_h: f32, gap: f32) -> f32 {
+    let mut at = insertion_index(col, y, hour_h, min_h, gap);
+
+    if let Some(idx) = col.iter().position(|t| t.id == id) && idx < at {
+        at -= 1;
+    }
+
+    let mut top = gap;
+    for t in col.iter().filter(|t| t.id != id).take(at) {
+        top += task_height_px(t.duration, hour_h, min_h) + gap;
+    }
+    top
+}
+
+
 // return the free spot closest to wish
 fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish: i32) -> Option<i32> {
     let mut busy: Vec<(i32, i32)> = sched
@@ -266,6 +284,18 @@ pub fn run() -> Result<(), slint::PlatformError> {
         let dur = normalize_duration(src.row_data(idx).unwrap().duration);
         let wish = wish.clamp(0, DAY_MINUTES - dur);
         find_free_start(&st.scheduled, id, col, dur, wish).unwrap_or(-1)
+    });
+    let (weak, st) = (app.as_weak(), store.clone());
+    api.on_panel_slot_y(move |id, col, y| {
+        let Some(app) = weak.upgrade() else { return 0.0 };
+        panel_slot_y(
+            st.panel_column(col),
+            id,
+            y,
+            app.get_hour_height(),
+            app.get_task_block_min_height(),
+            app.get_panel_gap(),
+        )
     });
 
     let (weak, st) = (app.as_weak(), store.clone());
