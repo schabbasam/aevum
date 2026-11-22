@@ -147,9 +147,9 @@ export component TaskBlock inherits Rectangle {
                         DragState.id = root.task-id;
                         DragState.duration = root.form.duration <= 0
                             ? 60 : root.form.duration;
-                        DragState.color = root.form.color-brush;
-                        // grab-x later
+                        DragState.original-color = root.form.color-brush;
                         DragState.grab-y = self.pressed-y;
+
                     } else if event.button == PointerEventButton.right && root.calendar-mode {
                         root.resizing = true;
                         root.resize-from-top = self.mouse-y < root.height / 2;

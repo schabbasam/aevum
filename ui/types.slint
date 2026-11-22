@@ -24,16 +24,16 @@ export struct TaskForm {
     drag-preview:   image,
 }
 
-export global DragState {
-    in-out property <int> id: 0;
-    in-out property <int> duration: 60;
-    in-out property <DragColors> color;
-    in-out property <length> grab-y: 0px;
-}
-
 export struct DragColors {
     preview: color,
     border: color,
+}
+export global DragState {
+    in-out property <int> id: 0;
+    in-out property <int> duration: 60;
+    in-out property <color> original-color: transparent;
+    in-out property <DragColors> colors: Api.calculate-drag-colors(original-color);
+    in-out property <length> grab-y: 0px;
 }
 
 export global Api {
@@ -47,5 +47,5 @@ export global Api {
     // -> insertion index in the full list
     callback panel-slot-index(int, length, int, length) -> int;
 
-    callback calculate-drag-colors(color) -> DragColors;
+    pure callback calculate-drag-colors(color) -> DragColors;
 }

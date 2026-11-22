@@ -40,9 +40,9 @@ export component DayColumn inherits Rectangle {
         y: root.preview-start * Theme.hour-height / 60;
         width: Theme.task-block-width;
         height: DragState.duration * Theme.hour-height / 60;
-        background: DragState.color.with-alpha(0.35);
+        background: DragState.colors.preview;
         border-width: Theme.focus-ring-width;
-        border-color: Theme.accent-hover;
+        border-color: DragState.colors.border;
         border-radius: Theme.radius-small;
     }
     
