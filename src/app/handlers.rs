@@ -68,14 +68,72 @@ fn resolved_color(form: &TaskForm, default: SlintColor) -> SlintColor {
 }
 
 
-// ---- functions / callback handlers ----
+// ---- save task ----
 
 pub fn wire_save_task(app: &MainWindow, store: Store) {
-
+    let weak = app.as_weak();
+    app.on_save_task(move |form| {
+        let Some(app) = weak.upgrade() else { return };
+        match build_task(&form) {
+            Ok(task) => on_task_created(&app, &store, form, &task),
+            Err(e)   => set_status(&app, e, true),
+        }
+    });
 }
 
-pub fn wire_api(app: &MainWindow, store: Store) {
+fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &Task) {
+    let m = UiMetrics.from_app(app);
 
+    form.id             = task.id() as i32;
+    form.color_brush    = resolved_color(&form, m.default_color);
+    // removed drag-preview since it doesn't matter
+
+    store // put the task form into the shorter panel column
+        .shorter_panel_column(m.hour_height, m.min_height)
+        .push(form);
+    
+    set_status(app, "task created", false);
+}
+
+// ---- api ----
+
+pub fn wire_api(app: &MainWindow, store: Store) {
+    let api = app.global.<Api>();
+
+    // the transfer data converter (int <-> transfer-data)
+    api.on_int_to_transfer(|id| {
+        SharedString::from(id.to_string().into())
+    });
+
+    api.on_transfer_to_int(|data| {
+        data.plain_text()
+            .unwrap_or_default()
+            .to_string()
+            .parse::<i32>()
+            .unwrap_or(0)
+    });
+    
+    // splitting it into smaller functions to keep everything neat and tidy
+    wire_preview_start(&api, store.clone());
+    wire_panel_slot_index(&api, app.as_weak(), store);
+
+    api.on_calculate_drag_colors(|original| {
+        let (preview, border) = calculate_drag_colors(original);
+        DragColors { preview, border }
+    });
+}
+
+fn wire_preview_start(api: &Api, store: Store) {
+    api.on_preview_start(move |id, col, wish| {
+        let Some((src, idx)) = store.find(id) else { return -1 };
+        let dur = normalize_duration(src.row_data(idx).unwrap().duration);
+        let wish = wish.clamp(0, DAY_MINUTES - dur);
+        find_free_start(&store.scheduled, id, col, dur, wish).unwrap_or(-1)
+    });
+}
+
+fn wire_panel_slot_index(api: &Api, weak: Weak<MainWindow>, store: Store) {
+// TODO stuff
 }
 
 pub fn wire_task_placed(app: &MainWindow, store: Store) {
