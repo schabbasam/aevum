@@ -28,7 +28,7 @@ cargo test
 
 I chose Slint because I wanted a lightweight, cross-platform framework that allows the application to run on desktop systems and Android devices.
 
-The user interface is still under development.
+Although I have done a lot, appearance wise it still looks almost the same, but a lot happened on the inside. It is still far from finished.
 
 ## Planned features
 
@@ -70,6 +70,11 @@ cargo run --release
 ## Web preview
 
 A web preview is also available: https://schabbasam.github.io/aevum/
+Note: I disabled the website temporarily because I kept pushing commits for everything and the poor github workflow ran every time. But it should be up and running now.
+
+## Other stuff
+
+The official [Slint docs](https://docs.slint.dev/latest/docs/slint/) helped a lot! Almost everything is explained here, and the things that aren't can be looked up in the compiler's source code on github.
 
 ## License
 
