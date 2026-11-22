@@ -9,8 +9,8 @@ pub struct Task {
     // the essential attributes
     id:             u64,
     title:          String,
-    date:           Date,
     // optional attributes
+    date:           Option<Date>,
     description:    Option<String>,
     start_time:     Option<Time>,
     duration:       Option<Duration>,
@@ -52,7 +52,7 @@ impl Task {
         Ok(())
     }
     
-    pub fn new(title: impl Into<String>, date: Date) -> Result<Self, String> {
+    pub fn new(title: impl Into<String>) -> Result<Self, String> {
         let title = title.into();
 
         Self::validate_title(&title)?;
@@ -61,7 +61,8 @@ impl Task {
         let id = NEXT_TASK_ID.fetch_add(1, Ordering::Relaxed);
 
         Ok(Self {
-            id, title, date,
+            id, title, 
+            date: None,
             description: None,
             start_time: None,
             duration: None,
@@ -75,10 +76,10 @@ impl Task {
     // ---- all getters ----
     pub fn id(&self) -> u64 { self.id }
     pub fn title(&self) -> &str { &self.title }
-    pub fn date(&self) -> &Date { &self.date }
     
     // as_ref() converts from &Option<Type> to Option<&Type>, meaning it's perfect for this
     // as_deref() does the same from Option<&String> to Option<&str> (string slices better)
+    pub fn date(&self) -> Option<Date> { self.date }
     pub fn description(&self) -> Option<&str> { self.description.as_deref() }
     pub fn start_time(&self) -> Option<Time> { self.start_time }
     pub fn duration(&self) -> Option<Duration> { self.duration }
@@ -106,7 +107,7 @@ impl Task {
         Ok(())
     }
 
-    pub fn set_date(&mut self, date: Date) {
+    pub fn set_date(&mut self, date: Option<Date>) {
         self.date = date;
     }
 
@@ -192,7 +193,6 @@ mod tests {
     
     #[test]
     fn test_task() {
-        let random_date = Date::new(23, 11, 2020).unwrap();
         let other_date = Date::new(24, 11, 2020).unwrap();
         let random_time = Time::new(11, 55).unwrap();
         let random_duration = Duration::new(20).unwrap();
@@ -200,8 +200,8 @@ mod tests {
         let random_color = Color::new(200, 211, 23);
         let random_category = Category::new("cat", random_color).unwrap();
 
-        let mut t = Task::new("something", random_date).unwrap();
-        let other_task = Task::new("second task", random_date).unwrap();
+        let mut t = Task::new("something").unwrap();
+        let other_task = Task::new("second task").unwrap();
 
         // ---- constructor and default values ----
         assert_ne!(t.id(), 0);
@@ -209,7 +209,7 @@ mod tests {
         assert_ne!(t.id(), other_task.id());
 
         assert_eq!(t.title(), "something");
-        assert_eq!(t.date(), &random_date);
+        assert_eq!(t.date(), None);
         assert_eq!(t.description(), None);
         assert_eq!(t.start_time(), None);
         assert_eq!(t.duration(), None);
@@ -219,10 +219,10 @@ mod tests {
         assert!(!t.completed());
 
         // ---- constructor validation ----
-        assert!(Task::new("", random_date).is_err());
-        assert!(Task::new("   ", random_date).is_err());
-        assert!(Task::new("a".repeat(MAX_TITLE + 1), random_date).is_err());
-        assert!(Task::new("a".repeat(MAX_TITLE), random_date).is_ok());
+        assert!(Task::new("").is_err());
+        assert!(Task::new("   ").is_err());
+        assert!(Task::new("a".repeat(MAX_TITLE + 1)).is_err());
+        assert!(Task::new("a".repeat(MAX_TITLE)).is_ok());
 
         // ---- title validation ----
         assert!(Task::validate_title("").is_err());
@@ -238,7 +238,7 @@ mod tests {
         // ---- valid setters ----
         assert!(t.set_title("new title").is_ok());
         assert!(t.set_description(Some("description".to_string())).is_ok());
-        t.set_date(other_date);
+        t.set_date(Some(other_date));
         t.set_start_time(Some(random_time));
         t.set_duration(Some(random_duration));
         // for some reason the Recurrence can't implement Copy
@@ -251,7 +251,7 @@ mod tests {
 
         // ---- getters after setting values ----
         assert_eq!(t.title(), "new title");
-        assert_eq!(t.date(), &other_date);
+        assert_eq!(t.date(), Some(other_date));
         assert_eq!(t.description(), Some("description"));
         assert_eq!(t.start_time(), Some(random_time));
         assert_eq!(t.duration(), Some(random_duration));
