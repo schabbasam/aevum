@@ -47,10 +47,11 @@ export component TaskPanel inherits Rectangle {
     drop := DropArea {
         can-drop(event) => {
             root.slot-col = event.position.x < self.width / 2 ? 0 : 1;
-            root.slot-y = Api.panel-slot-y(
-                DragState.id,
+            root.slot-index = Api.panel-slot-index(
                 root.slot-col,
-                event.position.y - fl.content-y
+                event.position.y - fl.content-y,
+                root.slot-index,
+                root.extra
             );
             return event.proposed-action;
         }
@@ -64,8 +65,11 @@ export component TaskPanel inherits Rectangle {
         }
     }
 
-    property <length> slot-y: 0px;
     property <int> slot-col: 0;
+    property <int> slot-index: -1;
+    property <length> box-h: max(Theme.task-block-min-height,
+                                DragState.duration * Theme.hour-height / 60);
+    property <length> extra: root.box-h + Theme.spacing-medium;
 
     Rectangle {
         visible: drop.has-drag;
