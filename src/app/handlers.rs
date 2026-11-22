@@ -153,6 +153,7 @@ fn wire_drag_color_calculation(api: &Api) {
     });
 }
 
+
 // ---- drag to calendar ----
 
 pub fn wire_task_placed(app: &MainWindow, store: Store) {
@@ -194,11 +195,39 @@ fn move_to_calendar(app: &MainWindow, store: &Store, id: i32, col: i32, start: i
     set_status(app, "", false);
 }
 
-// ----    
+
+// ---- resize ----   
 
 pub fn wire_task_resized(app: &MainWindow, store: Store) {
-
+    app.on_task_resized(move |id, start, dur| {
+        resize(&store, id, start, dur)
+    });
 }
+
+fn resize(store: &Store, id: i32, start: i32, dur: i32) {
+    // search scheduled for the task with id and save its index
+    let Some(index) = store.scheduled.iter()
+        .position(|t| t.id == id) else { return };
+
+    // mutable copy of the found task
+    let mut form = store.scheduled.row_data(index).unwrap();
+    
+    // recalculate the max-end and min-start values
+    let start = start.max(form.min_start);
+    let end = (start + dur).min(form.max_end);
+    
+    // abort if the gap is less than STEP (shouldn't be possible)
+    if end - start < STEP { return }
+
+    form.start_minute = start;
+    form.duration = end - start;
+
+    store.scheduled.set_row_data(index, form);
+    update_all_limits(&store.scheduled);
+}
+
+
+// ---- drag into task panel column ----
 
 pub fn wire_task_to_panel(app: &MainWindow, store: Store) {
 
