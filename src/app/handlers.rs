@@ -3,7 +3,7 @@
 // to keep the main loop clean
 
 use std::rc::Rc;
-use slint::{ Color as SlintColor, Model, SharedString, ComponentHandle };
+use slint::{ Color as SlintColor, Model, SharedString, ComponentHandle, Weak };
 use crate::{ Api, DragColors, MainWindow, TaskForm };
 
 use crate::app::form::build_task;
@@ -11,7 +11,7 @@ use crate::app::layout::*;
 use crate::app::store::Store;
 use crate::app::visuals::calculate_drag_colors;
 
-use crate::core::task::Task;
+use crate::core::task::{ Task, Category };
 use crate::core::color::Color;
 
 // ---- entry point ----
@@ -23,6 +23,7 @@ pub fn wire_all(app: &MainWindow, store: Store) {
     wire_task_placed    (app, store.clone());
     wire_task_resized   (app, store.clone());
     wire_task_to_panel  (app, store.clone(), m);
+    wire_add_category   (app, store.clone());
 }
 
 
@@ -34,7 +35,6 @@ pub fn wire_all(app: &MainWindow, store: Store) {
 struct UiMetrics {
     hour_height:    f32,
     min_height:     f32,
-    block_width:    f32,
     panel_gap:      f32,
     default_color:  SlintColor,
 }
@@ -44,7 +44,6 @@ impl UiMetrics {
         Self {
             hour_height:    app.get_hour_height(),
             min_height:     app.get_task_block_min_height(),
-            block_width:    app.get_task_block_width(),
             panel_gap:      app.get_panel_gap(),
             default_color:  app.get_default_task_color(),
         }
@@ -256,4 +255,8 @@ fn move_to_panel(store: &Store, id: i32, col: i32, y: f32, m: UiMetrics) {
     target.insert(at, form);
     update_all_limits(&store.scheduled);
 }
+
+
+// ---- add category ----
+
 

@@ -1,8 +1,10 @@
 
+use std::cell::RefCell;
 use std::rc::Rc;
 use slint::{ Model, VecModel };
 use crate::TaskForm;
 use crate::app::layout::task_height_px;
+use crate::core::task::Category;
 
 
 // this struct stores all tasks in their layouts
@@ -13,6 +15,8 @@ pub struct Store {
     pub left: Rc<VecModel<TaskForm>>,
     pub right: Rc<VecModel<TaskForm>>,
     pub scheduled: Rc<VecModel<TaskForm>>,
+    
+    pub categories: Rc<RefCell<Vec<Category>>>
 }
 impl Store {
 
@@ -22,6 +26,7 @@ impl Store {
             left: Default::default(),
             right: Default::default(),
             scheduled: Default::default(),
+            categories: Default::default()
         }
     }
 
