@@ -1,5 +1,8 @@
 
-fn make_drag_preview(
+use slint::Color as SlintColor;
+use crate::core::color::Color;
+
+pub fn make_drag_preview(
     width: f32,
     height: f32,
     hex: Option<&str>,
@@ -27,7 +30,7 @@ fn make_drag_preview(
     slint::Image::from_rgba8_premultiplied(buf)
 }
 
-fn calculate_drag_colors(original: SlintColor) -> (SlintColor, SlintColor) {
+pub fn calculate_drag_colors(original: SlintColor) -> (SlintColor, SlintColor) {
     let oklch = original.to_oklch();
     let l = oklch.lightness;
     let c = oklch.chroma;
