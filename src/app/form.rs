@@ -1,7 +1,6 @@
 
 use crate::core::task::Task;
 use crate::core::time::Duration;
-use crate::core::time::Date as DateThing;
 use crate::core::color::Color;
 use crate::TaskForm;
 
@@ -10,29 +9,13 @@ pub fn build_task(form: &TaskForm) -> Result<Task, String> {
     // it just tries to put in the value from TaskForm
     // if it failes, it throws an error that gets displayed later
 
-    let title = form.title.to_string();
-
-    let date = match parse_date(form.day, form.month, form.year) {
-        Some(v) => v,
-        None => return Err("no date selected".to_string()),
-    };
-
-    let mut task = match Task::new(title, date) {
+    let mut task = match Task::new(form.title.to_string()) {
         Ok(t) => t,
         Err(e) => {
             eprintln!("error when creating a new task: {e}");
             return Err("invalid title".to_string());
         }
     };
-
-    match parse_date(form.day, form.month, form.year) {
-        None => {
-            return Err("no date selected".to_string());
-        }
-        Some(d) => {
-            task.set_date(d);
-        }
-    }
 
     let desc = if form.description.is_empty() {
         None
@@ -72,13 +55,3 @@ pub fn build_task(form: &TaskForm) -> Result<Task, String> {
     Ok(task)
 }
 
-fn parse_date(day: i32, month: i32, year: i32) -> Option<DateThing> {
-    // if no date is selected, return None,
-    // else, the date as DateThing (my Date object from time.rs) gets returned as Some
-
-    if day == 0 || month == 0 || year == 0 {
-        return None;
-    }
-
-    Some(DateThing::new(day as u8, month as u8, year as u16).unwrap())
-}
