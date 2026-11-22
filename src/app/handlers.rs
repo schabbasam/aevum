@@ -124,8 +124,8 @@ fn wire_converters(api: &Api) {
 
 fn wire_preview_start(api: &Api, store: Store) {
     api.on_preview_start(move |id, col, wish| {
-        let Some((src, index)) = store.find(id) else { return -1 };
-        let dur = normalize_duration(src.row_data(index).unwrap().duration);
+        let Some((_, _, form)) = store.find_task(id) else { return -1 };
+        let dur = normalize_duration(form.duration);
         let wish = wish.clamp(0, DAY_MINUTES - dur);
         find_free_start(&store.scheduled, id, col, dur, wish).unwrap_or(-1)
     });
@@ -164,8 +164,7 @@ fn wire_task_placed(app: &MainWindow, store: Store) {
 }
 
 fn move_to_calendar(app: &MainWindow, store: &Store, id: i32, col: i32, start: i32) {
-    let Some((src, index)) = store.find(id) else { return };
-    let mut form = src.row_data(index).unwrap();
+    let Some((src, index, mut form)) = store.find_task(id) else { return };
 
     let dur = normalize_duration(form.duration);
     let wish = start.clamp(0, DAY_MINUTES - dur);
@@ -229,15 +228,13 @@ fn resize(store: &Store, id: i32, start: i32, dur: i32) {
 // ---- drag into task panel column ----
 
 fn wire_task_to_panel(app: &MainWindow, store: Store, m: UiMetrics) {
-    let weak = app.as_weak();
     app.on_task_to_panel(move |id, col, y| {
         move_to_panel(&store, id, col, y, m);
     });
 }
 
 fn move_to_panel(store: &Store, id: i32, col: i32, y: f32, m: UiMetrics) {
-    let Some((src, index)) = store.find(id) else { return };
-    let form = src.row_data(index).unwrap();
+    let Some((src, index, form)) = store.find_task(id) else { return };
     let target = store.panel_column(col);
     
     // TODO here are the getters too instead of UiMetrics
@@ -259,14 +256,4 @@ fn move_to_panel(store: &Store, id: i32, col: i32, y: f32, m: UiMetrics) {
     target.insert(at, form);
     update_all_limits(&store.scheduled);
 }
-
-/* notes:
- * maybe there should be a callback that triggers
- * if the values in UiMetrics change
- * then i can replace every getter with our struct
- *
- * also: the Some((src, index)) thing is in multiple callbacks
- * maybe it deserves an own function
- * it bothers me when there is the exact code multiple times
- */
 

@@ -55,6 +55,14 @@ impl Store {
             &self.right
         }
     }
+    
+    // locate a task by id across all columns
+    // returns (owning model, index, clone of form)
+    pub fn find_task(&self, id: i32)
+    -> Option<(&Rc<VecModel<TaskForm>>, usize, TaskForm)> {
+        let (m, i) = self.find(id)?;
+        Some((m, i, m.row_data(i)?))
+    }
 }
 
 // sum of all task's task_height_px
