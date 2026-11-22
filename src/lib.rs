@@ -26,12 +26,7 @@ pub fn run() -> Result<(), slint::PlatformError> {
     app.set_scheduled_tasks(ModelRc::from(store.scheduled.clone()));
 
     // ---- wiring ----
-    // everything lives in app::handlers
-    handlers::wire_save_task(&app, store.clone());
-    handlers::wire_api(&app, store.clone());
-    handlers::wire_task_placed(&app, store.clone());
-    handlers::wire_task_resized(&app, store.clone());
-    handlers::wire_task_to_panel(&app, store.clone());
+    handlers::wire_all(&app, store.clone());
 
     app.run()?;
     Ok(())

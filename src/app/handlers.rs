@@ -3,7 +3,7 @@
 // to keep the main loop clean
 
 use std::rc::Rc;
-use slint::{ Color as SlintColor, Weak, Model, SharedString };
+use slint::{ Color as SlintColor, Weak, Model, SharedString, ComponentHandle };
 use crate::{ Api, DragColors, MainWindow, TaskForm };
 
 use crate::app::form::build_task;
@@ -82,7 +82,7 @@ pub fn wire_save_task(app: &MainWindow, store: Store) {
 }
 
 fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &Task) {
-    let m = UiMetrics.from_app(app);
+    let m = UiMetrics::from_app(app);
 
     form.id             = task.id() as i32;
     form.color_brush    = resolved_color(&form, m.default_color);
@@ -98,7 +98,7 @@ fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &T
 // ---- api ----
 
 pub fn wire_api(app: &MainWindow, store: Store) {
-    let api = app.global.<Api>();
+    let api = app.global::<Api>();
 
     wire_converters(&api);
     wire_preview_start(&api, store.clone());
@@ -109,7 +109,7 @@ pub fn wire_api(app: &MainWindow, store: Store) {
 fn wire_converters(api: &Api) {
     // the transfer data converter (int <-> transfer-data)
     api.on_int_to_transfer(|id| {
-        SharedString::from(id.to_string().into())
+        SharedString::from(id.to_string()).into()
     });
 
     api.on_transfer_to_int(|data| {
@@ -159,7 +159,7 @@ fn wire_drag_color_calculation(api: &Api) {
 pub fn wire_task_placed(app: &MainWindow, store: Store) {
     let weak = app.as_weak();
     app.on_task_placed(move |id, col, start| {
-        let Some(app) = weak.upgrade else { return };
+        let Some(app) = weak.upgrade() else { return };
         move_to_calendar(&app, &store, id, col, start);
     });
 }
@@ -181,7 +181,7 @@ fn move_to_calendar(app: &MainWindow, store: &Store, id: i32, col: i32, start: i
     form.duration       = dur;
     
     // if task already exists in scheduled
-    if Rc:ptr_eq(src, &store.scheduled) {
+    if Rc::ptr_eq(src, &store.scheduled) {
         // replace its form data
         store.scheduled.set_row_data(index, form);
     } else {

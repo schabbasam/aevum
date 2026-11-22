@@ -63,7 +63,9 @@ pub fn column_height(m: &VecModel<TaskForm>, hour_h: f32, min_h: f32) -> f32 {
     m.iter().map(|t| task_height_px(t.duration, hour_h, min_h)).sum()
 }
 
+/*
 pub fn balance_columns(t: &[TaskForm], hour_h: f32, min_h: f32)
 -> (Vec<TaskForm>, Vec<TaskForm>) {
 // TODO later
 }
+*/
