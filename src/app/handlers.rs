@@ -4,7 +4,7 @@
 
 use std::rc::Rc;
 use slint::{ Color as SlintColor, Weak, Model, SharedString };
-use crate::{ Api, DragColors, MainWindow };
+use crate::{ Api, DragColors, MainWindow, TaskForm };
 
 use crate::app::form::build_task;
 use crate::app::layout::*;
@@ -22,6 +22,7 @@ pub fn wire_all(app: &MainWindow, store: Store) {
     wire_task_resized   (app, store.clone());
     wire_task_to_panel  (app, store.clone());
 }
+
 
 // ---- shared helper ----
 
@@ -53,6 +54,21 @@ impl UiMetrics {
     }
 }
 
+// set message and error flag in one go
+fn set_status(app: &MainWindow, message: impl Into<SharedString>, is_error: bool) {
+    app.set_status_message(message.into());
+    app.set_is_error(is_error);
+}
+
+// convert form.color into SlintColor, fallback is default
+fn resolved_color(form: &TaskForm, default: SlintColor) -> SlintColor {
+    Color::from_hex(&form.color)
+        .map(|c| SlintColor::from_rgb_u8(c.red(), c.green(), c.blue()))
+        .unwrap_or(default)
+}
+
+
+// ---- functions / callback handlers ----
 
 pub fn wire_save_task(app: &MainWindow, store: Store) {
 
