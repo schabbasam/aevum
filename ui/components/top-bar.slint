@@ -9,6 +9,9 @@ export component TopBar inherits Rectangle {
     in property <string> time-text;
     in property <string> week-text;
 
+    in-out property <string> category-name;
+    in-out property <string> category-color;
+
     callback add-category(string, string); // name, color hex
     callback open-settings();
 
@@ -33,8 +36,8 @@ export component TopBar inherits Rectangle {
             width: 140px;
             text: "New category";
             clicked => {
-                cat-name.text = "";
-                cat-color.text = "";
+                root.category-name = "";
+                root.category-color = "";
                 category-popup.show();
             }
         }
@@ -81,7 +84,7 @@ export component TopBar inherits Rectangle {
         x: Theme.spacing-medium;
         y: root.height;
         width: 240px;
-        height: 136px;
+        height: self.preferred-width;
         
         close-policy: PopupClosePolicy.close-on-click-outside;
 
@@ -94,14 +97,16 @@ export component TopBar inherits Rectangle {
 
         VerticalLayout {
             padding: Theme.spacing-medium;
-            spacing: Theme.border-width;
+            spacing: Theme.spacing-medium;
             
             cat-name := LineEdit {
+                text <=> root.category-name;
                 placeholder-text: "Category Name";
                 max-length: 20;
             }
 
             cat-color := LineEdit {
+                text <=> root.category-color;
                 placeholder-text: "#RRGGBB";
                 max-length: 7;
             }

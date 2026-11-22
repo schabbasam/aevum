@@ -17,13 +17,15 @@ export component MainWindow inherits Window {
     preferred-height: 800px;
     min-width: 900px;
     min-height: 500px;
-
+    
+    /* for some reason, if this code is active, i cant resize the width of the window
     init => {
         Theme.window-width = root.width;
     }
     changed width => {
         Theme.window-width = root.width;
     }
+    */
     
     callback task-placed(int, int, int);
     callback task-resized(int, int, int);
