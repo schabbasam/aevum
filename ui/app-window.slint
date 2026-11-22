@@ -3,7 +3,6 @@ import { TaskPanel } from "components/task-panel.slint";
 import { TaskAttributes } from "components/task-attributes.slint";
 import { TaskForm, Api } from "types.slint";
 import { WeekView } from "components/week-view.slint";
-import { GhostBlock } from "components/ghost-block.slint";
 
 export { TaskForm }
 export { Api }
@@ -114,23 +113,4 @@ export component MainWindow inherits Window {
             }
         }
     }
-
-    // ---- ghost task block ----
-/*    
-    in-out property <TaskForm> ghost-form;
-    in-out property <length> ghost-x;
-    in-out property <length> ghost-y;
-    
-    // this ghost block is supposed to be a better drag preview
-    // component GhostBlock is a very skimmed version of TaskBlock
-    // it should follow the cursor around if dragging
-    // if it is possible, it should show the live position the TaskBlock would be in if dropped
-    // meaning it should show for example where it would move and in which gap it would go
-    // in TaskPanel and DayColumns
-    GhostBlock {
-        form: root.ghost-form;
-        x: root.ghost-x - root.active-drag-offset-x;
-        y: root.ghost-y - root.active-drag-offset-y;
-    }
-*/
 }
