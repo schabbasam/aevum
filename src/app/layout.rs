@@ -1,9 +1,12 @@
 
-const DAY_MINUTES: i32 = 1440;
-const STEP: i32 = 15;
-const DEFAULT_DURATION: i32 = 60;
+use slint::{ Model, VecModel };
+use crate::TaskForm;
 
-fn normalize_duration(d: i32) -> i32 {
+pub const DAY_MINUTES: i32 = 1440;
+pub const STEP: i32 = 15;
+pub const DEFAULT_DURATION: i32 = 60;
+
+pub fn normalize_duration(d: i32) -> i32 {
     // if duration d is smaller or equal 0, it is the default duration
     let d = if d <= 0 { DEFAULT_DURATION } else { d };
     // first it rounds up to a multiple of STEP
@@ -13,7 +16,7 @@ fn normalize_duration(d: i32) -> i32 {
 
 // insert a y-coordinate where you want to put the task
 // returns the index where the new item should be
-fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, gap: f32) -> usize {
+pub fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, gap: f32) -> usize {
     let mut top = gap; // the gap above the first task
     for (i, t) in col.iter().enumerate() { // for each task (i is index, t is task)
         // calculating the height of t
@@ -31,7 +34,7 @@ fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, ga
     col.row_count()
 }
 
-fn insertion_index_shifted(
+pub fn insertion_index_shifted(
     col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32,
     gap: f32, cur: i32, extra: f32
 ) -> usize {
@@ -50,7 +53,7 @@ fn insertion_index_shifted(
 }
 
 // return the free spot closest to wish
-fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish: i32) -> Option<i32> {
+pub fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish: i32) -> Option<i32> {
     let mut busy: Vec<(i32, i32)> = sched
         .iter() // collect all tasks
         .filter(|t| t.id != id && t.column == col) // except this one (the moving task)
@@ -79,7 +82,7 @@ fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish
         .min_by_key(|&c| (c - wish).abs()) // pick the one closest to wish
 }
 
-fn update_all_limits(sched: &VecModel<TaskForm>) {
+pub fn update_all_limits(sched: &VecModel<TaskForm>) {
     // for each weekday column
     for col in 0..7 {
         let items: Vec<(usize, TaskForm)> = sched
@@ -122,3 +125,10 @@ fn update_all_limits(sched: &VecModel<TaskForm>) {
         }
     }
 }
+
+pub fn task_height_px(duration: i32, hour_h: f32, min_h: f32) -> f32 {
+    let height = (duration as f32 / 60.0) * hour_h;
+    height.max(min_h)
+}
+
+

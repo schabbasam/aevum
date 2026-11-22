@@ -1,5 +1,11 @@
 
-fn build_task(form: &TaskForm) -> Result<Task, String> {
+use crate::core::task::Task;
+use crate::core::time::Duration;
+use crate::core::time::Date as DateThing;
+use crate::core::color::Color;
+use crate::TaskForm;
+
+pub fn build_task(form: &TaskForm) -> Result<Task, String> {
     // this function is pretty self explanatory
     // it just tries to put in the value from TaskForm
     // if it failes, it throws an error that gets displayed later
