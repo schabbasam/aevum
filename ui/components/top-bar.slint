@@ -1,0 +1,84 @@
+
+import { Theme, HorizontalBorder } from "../theme.slint";
+import { Button } from "../widgets/button.slint";
+import { LineEdit } from "../widgets/line-edit.slint";
+import { Slider } from "std-widgets.slint";
+
+export component TopBar inherits Rectangle {
+    in property <string> date-text;
+    in property <string> time-text;
+    in property <string> week-text;
+
+    callback add-category(string, string); // name, color hex
+    callback open-settings();
+
+    height: Theme.control-height + 2 * Theme.spacing-medium;
+    background: Theme.surface;
+
+    Text {
+        text: "Schraubim";
+        color: Theme.foreground;
+        font-size: Theme.font-size-medium;
+        font-weight: Theme.font-weight-bold;
+
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    HorizontalLayout {
+        padding: Theme.spacing-medium;
+        spacing: Theme.spacing-medium;
+
+        Button {
+            width: 140px;
+            text: "New category";
+            clicked => {
+//                cat-name.text = "";
+//                cat-color.text = "";
+                category-popup.show();
+            }
+        }
+
+        Button {
+            width: 100px;
+            text: "Settings";
+            clicked => {
+                root.open-settings();
+            }
+        }
+
+        Text {
+            text: "Zoom";
+            color: Theme.foreground-muted;
+            vertical-alignment: center;
+        }
+
+        Slider {
+            width: 140px;
+            minimum: 30;
+            maximum: 120;
+            value: Theme.hour-height / 1px;
+            changed(v) => {
+                Theme.hour-height = v * 1px;
+            }
+        }
+
+        Rectangle {
+            horizontal-stretch: 1;
+        }
+
+        Text {
+            text: root.week-text
+                + " | " + root.date-text
+                + " | " + root.time-text;
+            color: Theme.foreground;
+            font-size: Theme.font-size-medium;
+            vertical-alignment: center;
+        }
+    }
+
+    category-popup := PopupWindow {
+    
+    }
+}
+
