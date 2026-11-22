@@ -62,7 +62,8 @@ export component TaskBlock inherits Rectangle {
 
     background: form.color-brush;
     border-radius: Theme.radius-small;
-
+    opacity: da.dragging ? 0.4 : 1.0;
+    
     property <color> text-color: self.background.to-oklch().lightness > 0.6
         ? Theme.background : Theme.foreground;
 
@@ -127,6 +128,7 @@ export component TaskBlock inherits Rectangle {
 
         drag-image-offset-x: root.drag-offset-x / 1phx; 
         drag-image-offset-y: root.drag-offset-y / 1phx;
+
         
         ta := TouchArea {
             mouse-cursor: root.resizing ?
