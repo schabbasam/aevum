@@ -3,24 +3,26 @@
 // to keep the main loop clean
 
 use std::rc::Rc;
-use slint::{ Color as SlintColor, Weak, Model, SharedString, ComponentHandle };
+use slint::{ Color as SlintColor, Model, SharedString, ComponentHandle };
 use crate::{ Api, DragColors, MainWindow, TaskForm };
 
 use crate::app::form::build_task;
 use crate::app::layout::*;
 use crate::app::store::Store;
-use crate::app::visuals::{ calculate_drag_colors, make_drag_preview };
+use crate::app::visuals::calculate_drag_colors;
 
 use crate::core::task::Task;
 use crate::core::color::Color;
 
 // ---- entry point ----
 pub fn wire_all(app: &MainWindow, store: Store) {
-    wire_save_task      (app, store.clone());
-    wire_api            (app, store.clone());
+    let m = UiMetrics::from_app(app);
+
+    wire_save_task      (app, store.clone(), m);
+    wire_api            (app, store.clone(), m);
     wire_task_placed    (app, store.clone());
     wire_task_resized   (app, store.clone());
-    wire_task_to_panel  (app, store.clone());
+    wire_task_to_panel  (app, store.clone(), m);
 }
 
 
@@ -70,19 +72,18 @@ fn resolved_color(form: &TaskForm, default: SlintColor) -> SlintColor {
 
 // ---- save task ----
 
-pub fn wire_save_task(app: &MainWindow, store: Store) {
+fn wire_save_task(app: &MainWindow, store: Store, m: UiMetrics) {
     let weak = app.as_weak();
     app.on_save_task(move |form| {
         let Some(app) = weak.upgrade() else { return };
         match build_task(&form) {
-            Ok(task) => on_task_created(&app, &store, form, &task),
+            Ok(task) => on_task_created(&app, &store, form, &task, m),
             Err(e)   => set_status(&app, e, true),
         }
     });
 }
 
-fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &Task) {
-    let m = UiMetrics::from_app(app);
+fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &Task, m: UiMetrics) {
 
     form.id             = task.id() as i32;
     form.color_brush    = resolved_color(&form, m.default_color);
@@ -97,12 +98,12 @@ fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &T
 
 // ---- api ----
 
-pub fn wire_api(app: &MainWindow, store: Store) {
+fn wire_api(app: &MainWindow, store: Store, m: UiMetrics) {
     let api = app.global::<Api>();
 
     wire_converters(&api);
     wire_preview_start(&api, store.clone());
-    wire_panel_slot_index(&api, app.as_weak(), store);
+    wire_panel_slot_index(&api, store, m);
     wire_drag_color_calculation(&api);
 }
 
@@ -130,16 +131,14 @@ fn wire_preview_start(api: &Api, store: Store) {
     });
 }
 
-fn wire_panel_slot_index(api: &Api, weak: Weak<MainWindow>, store: Store) {
+fn wire_panel_slot_index(api: &Api, store: Store, m: UiMetrics) {
     api.on_panel_slot_index(move |col, y, current, extra| {
-        let Some(app) = weak.upgrade() else { return 0 };
-        // TODO somehow use UiMetrics instead of getters here
         insertion_index_shifted(
             store.panel_column(col),
             y,
-            app.get_hour_height(),
-            app.get_task_block_min_height(),
-            app.get_panel_gap(),
+            m.hour_height,
+            m.min_height,
+            m.panel_gap,
             current,
             extra
         ) as i32
@@ -156,7 +155,7 @@ fn wire_drag_color_calculation(api: &Api) {
 
 // ---- drag to calendar ----
 
-pub fn wire_task_placed(app: &MainWindow, store: Store) {
+fn wire_task_placed(app: &MainWindow, store: Store) {
     let weak = app.as_weak();
     app.on_task_placed(move |id, col, start| {
         let Some(app) = weak.upgrade() else { return };
@@ -198,7 +197,7 @@ fn move_to_calendar(app: &MainWindow, store: &Store, id: i32, col: i32, start: i
 
 // ---- resize ----   
 
-pub fn wire_task_resized(app: &MainWindow, store: Store) {
+fn wire_task_resized(app: &MainWindow, store: Store) {
     app.on_task_resized(move |id, start, dur| {
         resize(&store, id, start, dur)
     });
@@ -229,15 +228,14 @@ fn resize(store: &Store, id: i32, start: i32, dur: i32) {
 
 // ---- drag into task panel column ----
 
-pub fn wire_task_to_panel(app: &MainWindow, store: Store) {
+fn wire_task_to_panel(app: &MainWindow, store: Store, m: UiMetrics) {
     let weak = app.as_weak();
     app.on_task_to_panel(move |id, col, y| {
-        let Some(app) = weak.upgrade() else { return };
-        move_to_panel(&app, &store, id, col, y);
+        move_to_panel(&store, id, col, y, m);
     });
 }
 
-fn move_to_panel(app: &MainWindow, store: &Store, id: i32, col: i32, y: f32) {
+fn move_to_panel(store: &Store, id: i32, col: i32, y: f32, m: UiMetrics) {
     let Some((src, index)) = store.find(id) else { return };
     let form = src.row_data(index).unwrap();
     let target = store.panel_column(col);
@@ -246,9 +244,9 @@ fn move_to_panel(app: &MainWindow, store: &Store, id: i32, col: i32, y: f32) {
     let mut at = insertion_index(
         target,
         y,
-        app.get_hour_height(),
-        app.get_task_block_min_height(),
-        app.get_panel_gap(),
+        m.hour_height,
+        m.min_height,
+        m.panel_gap,
     );
     
     // if it is the same column and the dragged task is above target
