@@ -76,6 +76,25 @@ export component DayColumn inherits Rectangle {
     }
 }
 
+component TimeAxis inherits Rectangle {
+    in property <length> scroll-y;
+
+    width: Theme.time-axis-width;
+    background: Theme.surface;
+    clip: true;
+
+    for h in 24: Text {
+        x: 0px;
+        y: h * Theme.hour-height + root.scroll-y + 2px;
+        width: parent.width - Theme.spacing-medium;
+
+        horizontal-alignment: right;
+        color: Theme.foreground-muted;
+        font-size: Theme.font-size-small;
+        text: (h < 10 ? "0" : 0) + h + ":00";
+    }
+}
+
 export component WeekView inherits Rectangle {
     background: Theme.background;
 
