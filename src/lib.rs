@@ -10,6 +10,14 @@ use crate::app::store::Store;
 use crate::core::task::{ MAX_TITLE, MAX_DESCRIPTION };
 use crate::core::time::{ MAX_DURATION };
 
+fn update_clock(app: &MainWindow) {
+    use chrono::{ Datelike, Local };
+    let now = Local::now();
+    app.set_date_text(now.format("%d.%m.%Y").to_string().into());
+    app.set_time_text(now.format("%H:%M:%S").to_string().into());
+    app.set_week_text(format!("Week {}", now.iso_week().week()).into());
+}
+
 pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
     
@@ -27,6 +35,20 @@ pub fn run() -> Result<(), slint::PlatformError> {
 
     // ---- wiring ----
     handlers::wire_all(&app, store.clone());
+
+    // ---- clock ----
+    update_clock(&app);
+    let weak = app.as_weak();
+    let clock = slint::Timer::default();
+    clock.start(
+        slint::TimerMode::Repeated,
+        std::time::Duration::from_secs(1),
+        move || {
+            if let Some(app) = weak.upgrade() {
+                update_clock(&app);
+            }
+        }
+    );
 
     app.run()?;
     Ok(())
