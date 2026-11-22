@@ -7,7 +7,6 @@ export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> left-column;
     in-out property <[TaskForm]> right-column;
     
-    callback drag-offset-changed(length, length);
     callback dropped-here(int, int, length); // id, column 0 or 1, y coordinate
 
     background: Theme.surface;
@@ -47,10 +46,6 @@ export component TaskPanel inherits Rectangle {
                     tbl := TaskBlock {
                         y: parent.shift;
                         form: task;
-                        drag-offset-changed(ox, oy) => {
-                            root.drag-offset-changed(ox, oy);
-                        }
-
                         animate y { duration: Theme.anim-medium; }
                     }
                 }
@@ -94,9 +89,6 @@ export component TaskPanel inherits Rectangle {
                     tbr := TaskBlock {
                         y: parent.shift;
                         form: task;
-                        drag-offset-changed(ox, oy) => {
-                            root.drag-offset-changed(ox, oy);
-                        }
                         animate y { duration: Theme.anim-medium; }
                     }
                 }

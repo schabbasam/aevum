@@ -8,12 +8,8 @@ export component TaskBlock inherits Rectangle {
     in property <bool> calendar-mode: false;
     in property <length> scroll-y: 0px;
 
-    callback drag-offset-changed(length, length);
     callback resize-pointer(bool, length);
     callback resize-finished(int, int, int); // id, start-minute, duration
-
-    property <length> drag-offset-x: 0px;
-    property <length> drag-offset-y: 0px;
 
     // ---- resize things ----
     property <bool> resizing: false;
@@ -22,10 +18,6 @@ export component TaskBlock inherits Rectangle {
     property <int> end0: 0;
     property <length> press-content-y: 0px;
     property <length> pointer-frame-y: 0px;
-
-    property <length> handle-h: root.calendar-mode
-        ? min(8px, root.height / 3) // never more than a third
-        : 0px;
 
     property <length> pointer-content-y: root.pointer-frame-y - root.scroll-y;
     property <int> delta-minutes: round(
@@ -98,16 +90,14 @@ export component TaskBlock inherits Rectangle {
 
     // bars that show the resizable edge on hover / while resizing
     Rectangle {
-        visible: root.calendar-mode
-            && (resize-ta-top.has-hover || (root.resizing && root.resize-from-top));
+        visible: root.resizing && root.resize-from-top;
         y: 0px;
         width: 100%;
         height: Theme.focus-ring-width;
         background: Theme.accent-hover;
     }
     Rectangle {
-        visible: root.calendar-mode
-            && (resize-ta-bot.has-hover || (root.resizing && !root.resize-from-top));
+        visible: root.resizing && !root.resize-from-top;
         y: parent.height - self.height;
         width: 100%;
         height: Theme.focus-ring-width;
@@ -126,10 +116,6 @@ export component TaskBlock inherits Rectangle {
         data: Api.int-to-transfer(root.task-id);
         allow-move: true;
 
-        drag-image-offset-x: root.drag-offset-x / 1phx; 
-        drag-image-offset-y: root.drag-offset-y / 1phx;
-
-        
         ta := TouchArea {
             mouse-cursor: root.resizing ?
                 MouseCursor.ns-resize : MouseCursor.default;
@@ -139,13 +125,6 @@ export component TaskBlock inherits Rectangle {
                     root.end-resize();
                 } else if event.kind == PointerEventKind.down {
                     if event.button == PointerEventButton.left {
-                        root.drag-offset-x = self.pressed-x;
-                        root.drag-offset-y = self.pressed-y;
-                        root.drag-offset-changed(
-                            root.drag-offset-x,
-                            root.drag-offset-y,
-                        );
-
                         DragState.id = root.task-id;
                         DragState.duration = root.form.duration <= 0
                             ? 60 : root.form.duration;
@@ -153,76 +132,22 @@ export component TaskBlock inherits Rectangle {
                         DragState.grab-y = self.pressed-y;
 
                     } else if event.button == PointerEventButton.right && root.calendar-mode {
-                        root.resizing = true;
-                        root.resize-from-top = self.mouse-y < root.height / 2;
-                        root.start0 = root.form.start-minute + root.form.duration;
-                        root.press-content-y = root.y + self.mouse-y;
-                        root.pointer-frame-y = root.y + self.mouse-y + root.scroll-y;
-                        root.resize-pointer(true, root.pointer-frame-y);
+                        root.begin-resize(
+                            self.mouse-y < root.height / 2,
+                            root.y + self.mouse-y
+                        );
                     }
                 } else if event.kind == PointerEventKind.up 
                         && event.button == PointerEventButton.right
                         && root.resizing {
-                    root.resize-finished(
-                        root.task-id,
-                        root.live-start,
-                        root.live-duration
-                    );
-                    root.end-resize();
+                    root.finish-resize();
                 }
             }
 
             moved => {
                 if root.resizing {
-                    root.pointer-frame-y = root.y + self.mouse-y + root.scroll-y;
-                    root.resize-pointer(true, root.pointer-frame-y);
+                    root.track-resize(root.y + self.mouse-y);
                 }
-            }
-        }
-    }
-
-    // resize handles
-    resize-ta-top := TouchArea {
-        enabled: root.calendar-mode;
-        x: 0px;
-        y: 0px;
-        width: 100%;
-        height: root.handle-h;
-        mouse-cursor: MouseCursor.ns-resize;
-
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down
-                    && event.button == PointerEventButton.left {
-                root.begin-resize(true, root.y + self.y + self.mouse-y);
-            } else if event.kind == PointerEventKind.up
-                    && event.button == PointerEventButton.left {
-                root.finish-resize();
-            } else if event.kind == PointerEventKind.cancel {
-                root.end-resize();
-            }
-        }
-        moved => {
-            root.track-resize(root.y + self.y + self.mouse-y);
-        }
-    }
-
-    resize-ta-bot := TouchArea {
-        enabled: root.calendar-mode;
-        x: 0px;
-        y: parent.height - self.height;
-        width: 100%;
-        height: root.handle-h;
-        mouse-cursor: MouseCursor.ns-resize;
-
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down
-                    && event.button == PointerEventButton.left {
-                root.begin-resize(false, root.y + self.y + self.mouse-y);
-            } else if event.kind == PointerEventKind.up
-                    && event.button == PointerEventButton.left {
-                root.finish-resize();
-            } else if event.kind == PointerEventKind.cancel {
-                root.end-resize();
             }
         }
     }

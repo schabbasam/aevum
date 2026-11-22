@@ -80,8 +80,6 @@ export component WeekView inherits Rectangle {
     background: Theme.background;
 
     in-out property <[TaskForm]> scheduled-tasks;
-    in-out property <length> active-drag-offset-x: 0px;
-    in-out property <length> active-drag-offset-y: 0px;
 
     callback task-placed(int, int, int);    // id, column, start-minute
     callback task-resized(int, int, int);   // id, start-minute, duration
@@ -107,7 +105,7 @@ export component WeekView inherits Rectangle {
             id,
             clamp(col, 0, 6),
             round(
-                (y - root.active-drag-offset-y)
+                (y - DragState.grab-y)
                 / Theme.hour-height * 60
                 / Theme.resize-step
             ) * Theme.resize-step
@@ -160,10 +158,6 @@ export component WeekView inherits Rectangle {
                     x: task.column * Theme.column-width + 2 * Theme.border-width;
                     y: self.live-start * Theme.hour-height / 60;
 
-                    drag-offset-changed(ox, oy) => {
-                        root.active-drag-offset-x = ox;
-                        root.active-drag-offset-y = oy;
-                    }
                     resize-pointer(active, py) => {
                         root.resize-active = active;
                         root.resize-pointer-y = py;
