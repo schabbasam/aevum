@@ -57,7 +57,12 @@ export global Theme {
     // ---- task block ----
     in-out property <length> hour-height:           50px;
     in-out property <length> task-block-min-height: 40px;
-    in-out property <length> task-block-width:      120px;
+    
+    in-out property <length> window-width: 1280px;
+    out property <length> time-axis-width: 48px;
+    out property <length> task-block-width: max(60px,
+        (window-width - time-axis-width - 3 * spacing-medium - 14 * border-width) / 9);
+    out property <length> panel-width: task-block-width * 2 + spacing-medium * 3;
 
     // ---- misc ----
     out property <int> resize-step:     15;
