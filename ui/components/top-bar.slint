@@ -33,8 +33,8 @@ export component TopBar inherits Rectangle {
             width: 140px;
             text: "New category";
             clicked => {
-//                cat-name.text = "";
-//                cat-color.text = "";
+                cat-name.text = "";
+                cat-color.text = "";
                 category-popup.show();
             }
         }
@@ -78,7 +78,54 @@ export component TopBar inherits Rectangle {
     }
 
     category-popup := PopupWindow {
-    
+        x: Theme.spacing-medium;
+        y: root.height;
+        width: 240px;
+        height: 136px;
+        
+        close-policy: PopupClosePolicy.close-on-click-outside;
+
+        Rectangle {
+            background: Theme.surface-raised;
+            border-width: Theme.border-width;
+            border-color: Theme.border;
+            border-radius: Theme.radius-medium;
+        }
+
+        VerticalLayout {
+            padding: Theme.spacing-medium;
+            spacing: Theme.border-width;
+            
+            cat-name := LineEdit {
+                placeholder-text: "Category Name";
+                max-length: 20;
+            }
+
+            cat-color := LineEdit {
+                placeholder-text: "#RRGGBB";
+                max-length: 7;
+            }
+
+            HorizontalLayout {
+                spacing: Theme.spacing-medium;
+
+                Button {
+                    text: "Cancel";
+                    clicked => {
+                        category-popup.close();
+                    }
+                }
+
+                Button {
+                    text: "Add";
+                    primary: true;
+                    clicked => {
+                        root.add-category(cat-name.text, cat-color.text);
+                        category-popup.close();
+                    }
+                }
+            }
+        }
     }
 }
 
