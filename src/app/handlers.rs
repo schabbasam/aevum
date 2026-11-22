@@ -100,6 +100,13 @@ fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &T
 pub fn wire_api(app: &MainWindow, store: Store) {
     let api = app.global.<Api>();
 
+    wire_converters(&api);
+    wire_preview_start(&api, store.clone());
+    wire_panel_slot_index(&api, app.as_weak(), store);
+    wire_drag_color_calculation(&api);
+}
+
+fn wire_converters(api: &Api) {
     // the transfer data converter (int <-> transfer-data)
     api.on_int_to_transfer(|id| {
         SharedString::from(id.to_string().into())
@@ -111,15 +118,6 @@ pub fn wire_api(app: &MainWindow, store: Store) {
             .to_string()
             .parse::<i32>()
             .unwrap_or(0)
-    });
-    
-    // splitting it into smaller functions to keep everything neat and tidy
-    wire_preview_start(&api, store.clone());
-    wire_panel_slot_index(&api, app.as_weak(), store);
-
-    api.on_calculate_drag_colors(|original| {
-        let (preview, border) = calculate_drag_colors(original);
-        DragColors { preview, border }
     });
 }
 
@@ -133,8 +131,29 @@ fn wire_preview_start(api: &Api, store: Store) {
 }
 
 fn wire_panel_slot_index(api: &Api, weak: Weak<MainWindow>, store: Store) {
-// TODO stuff
+    api.on_panel_slot_index(move |col, y, current, extra| {
+        let Some(app) = weak.upgrade() else { return 0 };
+        // TODO somehow use UiMetrics instead of getters here
+        insertion_index_shifted(
+            store.panel_column(col),
+            y,
+            app.get_hour_height(),
+            app.get_task_block_min_height(),
+            app.get_panel_gap(),
+            current,
+            extra
+        ) as i32
+    });
 }
+
+fn wire_drag_color_calculation(api: &Api) {
+    api.on_calculate_drag_colors(|original| {
+        let (preview, border) = calculate_drag_colors(original);
+        DragColors { preview, border }
+    });
+}
+
+// ----
 
 pub fn wire_task_placed(app: &MainWindow, store: Store) {
 
