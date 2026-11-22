@@ -300,14 +300,14 @@ pub fn run() -> Result<(), slint::PlatformError> {
         ) as i32
     });
 
-    api.on_caculate_drag_colors(|original| {
+    api.on_calculate_drag_colors(|original| {
         let (preview, border) = calculate_drag_colors(original);
 
         DragColors {
             preview,
             border,
         }
-    }
+    });
 
     let (weak, st) = (app.as_weak(), store.clone());
     app.on_task_placed(move |id, col, start| {
@@ -536,7 +536,7 @@ fn make_drag_preview(
 }
 
 fn calculate_drag_colors(original: SlintColor) -> (SlintColor, SlintColor) {
-    let hsv = original.to_hsvs();
+    let hsv = original.to_hsva();
 
     let saturation = (hsv.saturation * 1.4).clamp(0.65, 1.0);
 
