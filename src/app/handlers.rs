@@ -153,11 +153,48 @@ fn wire_drag_color_calculation(api: &Api) {
     });
 }
 
-// ----
+// ---- drag to calendar ----
 
 pub fn wire_task_placed(app: &MainWindow, store: Store) {
-
+    let weak = app.as_weak();
+    app.on_task_placed(move |id, col, start| {
+        let Some(app) = weak.upgrade else { return };
+        move_to_calendar(&app, &store, id, col, start);
+    });
 }
+
+fn move_to_calendar(app: &MainWindow, store: &Store, id: i32, col: i32, start: i32) {
+    let Some((src, idx)) = store.find(id) else { return };
+    let mut form = src.row_data(idx).unwrap();
+
+    let dur = normalize_duration(form.duration);
+    let wish = start.clamp(0, DAY_MINUTES - dur);
+
+    let Some(free) = find_free_start(&store.scheduled, id, col, dur, wish) else {
+        set_status(app, "no free space on that day", true);
+        return;
+    };
+
+    form.column         = col;
+    form.start_minute   = free;
+    form.duration       = dur;
+    
+    // if task already exists in scheduled
+    if Rc:ptr_eq(src, &store.scheduled) {
+        // replace its form data
+        store.scheduled.set_row_data(idx, form);
+    } else {
+        // remove from source (TaskPanel)
+        // and move it to scheduled
+        src.remove(idx);
+        store.scheduled.push(form);
+    }
+
+    update_all_limits(&store.scheduled);
+    set_status(app, "", false);
+}
+
+// ----    
 
 pub fn wire_task_resized(app: &MainWindow, store: Store) {
 
