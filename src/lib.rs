@@ -103,23 +103,23 @@ fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, ga
     col.row_count()
 }
 
-// top y of the slot where a dragged task would land in this panel column
-// it is basically the same as on_task_to_panel()
-fn panel_slot_y(col: &VecModel<TaskForm>, id: i32, y: f32,
-        hour_h: f32, min_h: f32, gap: f32) -> f32 {
-    let mut at = insertion_index(col, y, hour_h, min_h, gap);
-
-    if let Some(idx) = col.iter().position(|t| t.id == id) && idx < at {
-        at -= 1;
-    }
-
+fn insertion_index_shifted(
+    col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32,
+    gap: f32, cur: i32, extra: f32
+) -> usize {
     let mut top = gap;
-    for t in col.iter().filter(|t| t.id != id).take(at) {
-        top += task_height_px(t.duration, hour_h, min_h) + gap;
+    for (i, t) in col.iter().enumerate() {
+        if i as i32 == cur {
+            top += extra;
+        }
+        let h = task_height_px(t.duration, hour_h, min_h);
+        if y < top + h / 2.0 {
+            return i;
+        }
+        top += h + gap;
     }
-    top
+    col.row_count()
 }
-
 
 // return the free spot closest to wish
 fn find_free_start(sched: &VecModel<TaskForm>, id: i32, col: i32, dur: i32, wish: i32) -> Option<i32> {
