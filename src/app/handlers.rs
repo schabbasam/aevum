@@ -267,7 +267,7 @@ fn wire_add_category(app: &MainWindow, store: Store) {
         let Ok(color) = Color::from_hex(&color) else {
             set_status(&app, "invalid color", true);
             return;
-        }
+        };
 
         match Category::new(name.to_string(), color) {
             Ok(cat) => {
