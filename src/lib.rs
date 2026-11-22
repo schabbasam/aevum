@@ -3,6 +3,7 @@ slint::include_modules!();
 
 use slint::{Model, ModelRc, VecModel, SharedString};
 use std::rc::Rc;
+use slint::Color as SlintColor;
 
 use crate::task::*;
 use crate::time::Date as DateThing;
@@ -534,8 +535,29 @@ fn make_drag_preview(
     slint::Image::from_rgba8_premultiplied(buf)
 }
 
-fn calculate_drag_colors(original: Color) -> (Color, Color) {
+fn calculate_drag_colors(original: SlintColor) -> (SlintColor, SlintColor) {
+    let hsv = original.to_hsvs();
 
+    let saturation = (hsv.saturation * 1.4).clamp(0.65, 1.0);
+
+    let preview_value = (hsv.value * 1.15).clamp(0.0, 1.0);
+    let border_value = (hsv.value * 0.55).clamp(0.0, 1.0);
+    
+    let preview = SlintColor::from_hsva(
+        hsv.hue,
+        saturation,
+        preview_value,
+        hsv.alpha,
+    );
+
+    let border = SlintColor::from_hsva(
+        hsv.hue,
+        (saturation * 1.1).min(1.0),
+        border_value,
+        hsv.alpha,
+    );
+
+    (preview, border)
 }
 
 #[cfg(target_arch = "wasm32")]
