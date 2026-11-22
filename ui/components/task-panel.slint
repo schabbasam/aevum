@@ -98,7 +98,7 @@ export component TaskPanel inherits Rectangle {
                 }
 
                 Rectangle {
-                    property <bool> active: drop.has-drag && root.slot-col == 0
+                    property <bool> active: drop.has-drag && root.slot-col == 1
                         && root.slot-index == root.right-column.length;
                     height: self.active ? root.box-h : 0px;
                     Rectangle {
