@@ -259,4 +259,22 @@ fn move_to_panel(store: &Store, id: i32, col: i32, y: f32, m: UiMetrics) {
 
 // ---- add category ----
 
+fn wire_add_category(app: &MainWindow, store: Store) {
+    let weak = app.as_weak();
+    app.on_add_category(move |name, color| {
+        let Some(app) = weak.upgrade() else { return };
 
+        let Ok(color) = Color::from_hex(&color) else {
+            set_status(&app, "invalid color", true);
+            return;
+        }
+
+        match Category::new(name.to_string(), color) {
+            Ok(cat) => {
+                store.categories.borrow_mut().push(cat);
+                set_status(&app, "category created", false);
+            }
+            Err(e) => set_status(&app, e, true),
+        }
+    });
+}
