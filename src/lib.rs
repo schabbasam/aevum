@@ -1,18 +1,14 @@
 
 slint::include_modules!();
 
-use slint::{Model, ModelRc, VecModel, SharedString};
-use std::rc::Rc;
-use slint::Color as SlintColor;
+pub mod core;
+pub mod app;
 
-use crate::task::*;
-use crate::time::Date as DateThing;
-use crate::time::*;
-use crate::color::*;
-
-pub mod time;
-pub mod task;
-pub mod color;
+use slint::ModelRc;
+use crate::app::handlers;
+use crate::app::store::Store;
+use crate::core::task::{ MAX_TITLE, MAX_DESCRIPTION };
+use crate::core::time::{ MAX_DURATION };
 
 pub fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
