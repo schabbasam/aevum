@@ -299,6 +299,15 @@ pub fn run() -> Result<(), slint::PlatformError> {
         ) as i32
     });
 
+    api.on_caculate_drag_colors(|original| {
+        let (preview, border) = calculate_drag_colors(original);
+
+        DragColors {
+            preview,
+            border,
+        }
+    }
+
     let (weak, st) = (app.as_weak(), store.clone());
     app.on_task_placed(move |id, col, start| {
 
@@ -523,6 +532,10 @@ fn make_drag_preview(
     }
 
     slint::Image::from_rgba8_premultiplied(buf)
+}
+
+fn calculate_drag_colors(original: Color) -> (Color, Color) {
+
 }
 
 #[cfg(target_arch = "wasm32")]
