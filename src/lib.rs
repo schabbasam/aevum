@@ -4,7 +4,7 @@ slint::include_modules!();
 pub mod core;
 pub mod app;
 
-use slint::ModelRc;
+use slint::{ ModelRc, ComponentHandle };
 use crate::app::handlers;
 use crate::app::store::Store;
 use crate::core::task::{ MAX_TITLE, MAX_DESCRIPTION };
