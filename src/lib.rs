@@ -536,23 +536,30 @@ fn make_drag_preview(
 }
 
 fn calculate_drag_colors(original: SlintColor) -> (SlintColor, SlintColor) {
-    let hsv = original.to_hsva();
+    let oklch = original.to_oklch();
+    let L = oklch.lightness;
+    let C = oklch.chroma;
+    let H = oklch.hue;
+    let alpha = oklch.alpha;
+    
+    let preview;
+    let border;
 
-    // preview: desaturated, slightly darkened version of the same hue
-    let preview = SlintColor::from_hsva(
-        hsv.hue,
-        (hsv.saturation * 0.40).min(0.45), // decrease sturation by a lot
-        (hsv.value      * 0.65).clamp(0.28, 0.55), // keep it dark but not too much
-        1.0 // no transparency at all (because the background color makes it look ungood)
-    );
+    if C < 1e-3 {
+        let new_L = (L * 0.8 + 0.1).clamp(0.0, 1.0);
+        let border_L = 1.0 - L;
 
-    // border: bright, glowing outline in the same hue
-    let border = SlintColor::from_hsva(
-        hsv.hue,
-        hsv.saturation.max(0.70),
-        1.0, // full brightness for the glow
-        1.0
-    );
+        preview = SlintColor::from_oklch(new_L, 0.0, 0.0, alpha);
+        border  = SlintColor::from_oklch(border_L, 0.0, 0.0, alpha);
+    } else {
+        let new_L = (L * 0.8 + 0.1).clamp(0.0, 1.0);
+        let new_C = (C * 0.5).clamp(0.0, 0.4);
+        preview = SlintColor::from_oklch(new_L, new_C, H, alpha);
+
+        let border_L = 1.0;
+        let border_C = C.max(0.3).min(0.4);
+        border = SlintColor::from_oklch(border_L, border_C, H, alpha);
+    }
 
     (preview, border)
 }
