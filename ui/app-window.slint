@@ -29,6 +29,9 @@ export component MainWindow inherits Window {
     callback task-resized(int, int, int);
     callback task-to-panel(int, int, length);
     callback save-task(TaskForm);
+    callback add-category(string, string);
+    callback open-settings();
+
     in-out property <[TaskForm]> scheduled-tasks;
 
     in-out property <string> status-message: "";
@@ -60,45 +63,51 @@ export component MainWindow inherits Window {
                 reject
             }
         }
-
-        HorizontalLayout {
-            spacing: 0px;
+        
+        VerticalLayout {
             
-            VerticalLayout {
-                width: Theme.task-block-width * 2 + Theme.spacing-medium * 3; // TODO make a variable
+            TopBar {
+            }
+
+            HorizontalLayout {
                 spacing: 0px;
+                
+                VerticalLayout {
+                    width: Theme.task-block-width * 2 + Theme.spacing-medium * 3; // TODO make a variable
+                    spacing: 0px;
 
-                TaskPanel {
-                    left-column <=> root.left-column-tasks;
-                    right-column <=> root.right-column-tasks;
+                    TaskPanel {
+                        left-column <=> root.left-column-tasks;
+                        right-column <=> root.right-column-tasks;
 
-                    dropped-here(id, col, y) => {
-                        root.task-to-panel(id, col, y);
+                        dropped-here(id, col, y) => {
+                            root.task-to-panel(id, col, y);
+                        }
+                    }
+
+                    TaskAttributes {
+                        save-task(form) => { root.save-task(form); }
+                        input-changed => { root.status-message = ""; }
+                        
+                        edit-mode <=> root.edit-mode;
+                        status-message <=> root.status-message;
+                        is-error <=> root.is-error;
+
+                        max-title <=> root.max-title;
+                        max-description <=> root.max-description;
+                        max-duration <=> root.max-duration;
                     }
                 }
 
-                TaskAttributes {
-                    save-task(form) => { root.save-task(form); }
-                    input-changed => { root.status-message = ""; }
-                    
-                    edit-mode <=> root.edit-mode;
-                    status-message <=> root.status-message;
-                    is-error <=> root.is-error;
+                WeekView {
+                    scheduled-tasks <=> root.scheduled-tasks;
 
-                    max-title <=> root.max-title;
-                    max-description <=> root.max-description;
-                    max-duration <=> root.max-duration;
-                }
-            }
-
-            WeekView {
-                scheduled-tasks <=> root.scheduled-tasks;
-
-                task-placed(id, c, m) => {
-                    root.task-placed(id, c, m);
-                }
-                task-resized(id, s, d) => {
-                    root.task-resized(id, s, d);
+                    task-placed(id, c, m) => {
+                        root.task-placed(id, c, m);
+                    }
+                    task-resized(id, s, d) => {
+                        root.task-resized(id, s, d);
+                    }
                 }
             }
         }
