@@ -133,16 +133,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
-name = "aevum"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "slint",
- "slint-build",
- "wasm-bindgen",
-]
-
-[[package]]
 name = "ahash"
 version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3787,6 +3777,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "schraubim"
+version = "0.2.0"
+dependencies = [
+ "chrono",
+ "slint",
+ "slint-build",
+ "wasm-bindgen",
 ]
 
 [[package]]

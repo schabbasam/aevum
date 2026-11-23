@@ -1,6 +1,8 @@
 [package]
-name = "aevum"
-version = "0.1.0"
+name = "schraubim"
+authors = ["schabbasäm"]
+repository = "https://github.com/schabbasam/schraubim"
+version = "0.2.0"
 edition = "2024"
 
 [dependencies]
@@ -18,7 +20,7 @@ lto = true
 [lib]
 #path = "src/main.rs"
 #crate-type = ["cdylib"]
-name = "aevum"
+name = "schraubim"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
