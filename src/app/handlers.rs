@@ -18,8 +18,8 @@ use crate::core::color::Color;
 pub fn wire_all(app: &MainWindow, store: Store) {
     let m = UiMetrics::from_app(app);
 
-    wire_save_task      (app, store.clone(), m);
-    wire_api            (app, store.clone(), m);
+    wire_save_task      (app, store.clone(), m.clone());
+    wire_api            (app, store.clone(), m.clone());
     wire_task_placed    (app, store.clone());
     wire_task_resized   (app, store.clone());
     wire_task_to_panel  (app, store.clone(), m);
@@ -36,6 +36,8 @@ pub fn wire_all(app: &MainWindow, store: Store) {
 // and I'm all in for performance optimizations, even if they are just tiny things
 #[derive(Clone)]
 struct UiMetrics {
+    // reminder: need to use a Weak to prevent a cycle where everything points at each
+    // other and never exits
     app: Weak<MainWindow>
 }
 
@@ -45,12 +47,16 @@ impl UiMetrics {
     }
 
     // generic get function
-    // takes any callable type 
-    fn get<T>(&self, f: impl Fn(&MainWindow) -> T, fallback: T) -> T {
-        self.app.upgrade()
-            .map(|a| f(&a))
-            .unwrap_or(fallback)
+    // returns any type T as long as f and fallback agree on it
+    // Fn would also work, but FnOnce also allows comsumables (if i use move |a|)
+    // FnMut would be overkill since nothign is getting mutated
+    fn get<T>(&self, f: impl FnOnce(&MainWindow) -> T, fallback: T) -> T {
+        match self.app.upgrade() {
+            Some(a) => f(&a), // a is an Rc<MainWindow>, it auto derefs
+            None    => fallback
+        }
     }
+
     fn hour_height(&self) -> f32 {
         self.get(|a| a.get_hour_height(), 50.0)
     }
@@ -64,6 +70,10 @@ impl UiMetrics {
         self.get(|a| a.get_default_task_color(),
             SlintColor::from_rgb_u8(0, 0, 0))
     }
+    fn task_height(&self, duration: i32) -> f32 {
+        task_height_px(duration, self.hour_height(), self.min_height())
+    }
+
 }
 
 // set message and error flag in one go
