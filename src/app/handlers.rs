@@ -30,28 +30,39 @@ pub fn wire_all(app: &MainWindow, store: Store) {
 // ---- shared helper ----
 
 // contains the layout constants that are needed by everything
-// bundled so we read it only when changed instead of reading it in every callback
-#[derive(Clone, Copy)]
+// you may think that we could skip this entirely and use the getters for everything
+// but that would clone the Weak in each callback and burden the boilerplate
+// this makes it slightly more complex but it is cleaner
+// and I'm all in for performance optimizations, even if they are just tiny things
+#[derive(Clone)]
 struct UiMetrics {
-    hour_height:    f32,
-    min_height:     f32,
-    panel_gap:      f32,
-    default_color:  SlintColor,
+    app: Weak<MainWindow>
 }
 
 impl UiMetrics {
     fn from_app(app: &MainWindow) -> Self {
-        Self {
-            hour_height:    app.get_hour_height(),
-            min_height:     app.get_task_block_min_height(),
-            panel_gap:      app.get_panel_gap(),
-            default_color:  app.get_default_task_color(),
-        }
+        Self { app: app.as_weak() }
     }
-    
-    // more comfortable to use (less parameters)
-    fn task_height(&self, duration: i32) -> f32 {
-        task_height_px(duration, self.hour_height, self.min_height)
+
+    // generic get function
+    // takes any callable type 
+    fn get<T>(&self, f: impl Fn(&MainWindow) -> T, fallback: T) -> T {
+        self.app.upgrade()
+            .map(|a| f(&a))
+            .unwrap_or(fallback)
+    }
+    fn hour_height(&self) -> f32 {
+        self.get(|a| a.get_hour_height(), 50.0)
+    }
+    fn min_height(&self) -> f32 {
+        self.get(|a| a.get_task_block_min_height(), 40.0)
+    }
+    fn panel_gap(&self) -> f32 {
+        self.get(|a| a.get_panel_gap(), 8.0)
+    }
+    fn default_color(&self) -> SlintColor {
+        self.get(|a| a.get_default_task_color(),
+            SlintColor::from_rgb_u8(0, 0, 0))
     }
 }
 
