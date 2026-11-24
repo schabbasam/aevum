@@ -29,6 +29,16 @@ pub fn wire_all(app: &MainWindow, store: Store) {
 
 // ---- shared helper ----
 
+// these fallbacks are actually unreachable in praxis
+// because if the slint getter returns None, the app is already dead
+// but because there is no way around having to use a fallback, and even
+// let else blocks with return 0 would return a valid lied value,
+// lets just write these fallbacks
+const FALLBACK_HOUR_HEIGHT: f32 = 50.0;
+const FALLBACK_MIN_HEIGHT:  f32 = 40.0;
+const FALLBACK_PANEL_GAP:   f32 = 8.0;
+const FALLBACK_TASK_COLOR: SlintColor = SlintColor::from_rgb_u8(255, 0, 0);
+
 // contains the layout constants that are needed by everything
 // you may think that we could skip this entirely and use the getters for everything
 // but that would clone the Weak in each callback and burden the boilerplate
@@ -47,7 +57,6 @@ impl UiMetrics {
     }
 
     // generic get function
-    // returns any type T as long as f and fallback agree on it
     // Fn would also work, but FnOnce also allows comsumables (if i use move |a|)
     // FnMut would be overkill since nothign is getting mutated
     fn get<T>(&self, f: impl FnOnce(&MainWindow) -> T, fallback: T) -> T {
@@ -58,17 +67,16 @@ impl UiMetrics {
     }
 
     fn hour_height(&self) -> f32 {
-        self.get(|a| a.get_hour_height(), 50.0)
+        self.get(|a| a.get_hour_height(), FALLBACK_HOUR_HEIGHT)
     }
     fn min_height(&self) -> f32 {
-        self.get(|a| a.get_task_block_min_height(), 40.0)
+        self.get(|a| a.get_task_block_min_height(), FALLBACK_MIN_HEIGHT)
     }
     fn panel_gap(&self) -> f32 {
-        self.get(|a| a.get_panel_gap(), 8.0)
+        self.get(|a| a.get_panel_gap(), FALLBACK_PANEL_GAP)
     }
     fn default_color(&self) -> SlintColor {
-        self.get(|a| a.get_default_task_color(),
-            SlintColor::from_rgb_u8(0, 0, 0))
+        self.get(|a| a.get_default_task_color(), FALLBACK_TASK_COLOR)
     }
     fn task_height(&self, duration: i32) -> f32 {
         task_height_px(duration, self.hour_height(), self.min_height())
@@ -97,7 +105,7 @@ fn wire_save_task(app: &MainWindow, store: Store, m: UiMetrics) {
     app.on_save_task(move |form| {
         let Some(app) = weak.upgrade() else { return };
         match build_task(&form) {
-            Ok(task) => on_task_created(&app, &store, form, &task, m),
+            Ok(task) => on_task_created(&app, &store, form, &task, m.clone()),
             Err(e)   => set_status(&app, e, true),
         }
     });
@@ -106,12 +114,12 @@ fn wire_save_task(app: &MainWindow, store: Store, m: UiMetrics) {
 fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &Task, m: UiMetrics) {
 
     form.id             = task.id() as i32;
-    form.color_brush    = resolved_color(&form, m.default_color);
+    form.color_brush    = resolved_color(&form, m.default_color());
     form.duration       = normalize_duration(form.duration);
     // removed drag-preview since it doesn't matter
 
     store // put the task form into the shorter panel column
-        .shorter_panel_column(m.hour_height, m.min_height)
+        .shorter_panel_column(m.hour_height(), m.min_height())
         .push(form);
     
     set_status(app, "task created", false);
@@ -157,9 +165,9 @@ fn wire_panel_slot_index(api: &Api, store: Store, m: UiMetrics) {
         insertion_index_shifted(
             store.panel_column(col),
             y,
-            m.hour_height,
-            m.min_height,
-            m.panel_gap,
+            m.hour_height(),
+            m.min_height(),
+            m.panel_gap(),
             current,
             extra
         ) as i32
@@ -250,7 +258,7 @@ fn resize(store: &Store, id: i32, start: i32, dur: i32) {
 
 fn wire_task_to_panel(app: &MainWindow, store: Store, m: UiMetrics) {
     app.on_task_to_panel(move |id, col, y| {
-        move_to_panel(&store, id, col, y, m);
+        move_to_panel(&store, id, col, y, m.clone());
     });
 }
 
@@ -262,9 +270,9 @@ fn move_to_panel(store: &Store, id: i32, col: i32, y: f32, m: UiMetrics) {
     let mut at = insertion_index(
         target,
         y,
-        m.hour_height,
-        m.min_height,
-        m.panel_gap,
+        m.hour_height(),
+        m.min_height(),
+        m.panel_gap(),
     );
     
     // if it is the same column and the dragged task is above target
