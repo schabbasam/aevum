@@ -2,6 +2,7 @@ import { Theme, Border, HorizontalBorder } from "../theme.slint";
 import { TaskBlock } from "task-block.slint";
 import { TaskForm, Api, DragState } from "../types.slint";
 import { ScrollBar } from "../widgets/scroll-bar.slint";
+import "../assets/fonts/FreeMono.otf";
 
 export component DayHeader inherits HorizontalLayout {
     in property <string> text: "Someday";
@@ -78,20 +79,40 @@ export component DayColumn inherits Rectangle {
 
 component TimeAxis inherits Rectangle {
     in property <length> scroll-y;
+    property <int> ticks: 4; // marks per hour, default every 15min
 
     width: Theme.time-axis-width;
     background: Theme.surface;
     clip: true;
 
-    for h in 24: Text {
+    // little horizontal lines for the scale
+    for n in 24 * root.ticks : Rectangle {
+        property <bool> hour: mod(n, root.ticks) == 0;
+        x: parent.width - self.width;
+        y: n * (Theme.hour-height / root.ticks) + root.scroll-y;
+
+        // make the marks for hours bigger
+        width: self.hour ? 12px : 6px; 
+        height: Theme.border-width;
+        background: self.hour ? Theme.foreground-muted : Theme.border;
+    }
+
+    // the time text
+    for h in 24 : Text {
         x: 0px;
-        y: h * Theme.hour-height + root.scroll-y + 2px;
-        width: parent.width - Theme.spacing-medium;
+        y: h == 0 ? 0px
+            : h * Theme.hour-height + root.scroll-y - 8px;
+
+        width: parent.width - 16px; // left of the longest stick
+        height: 16px;
 
         horizontal-alignment: right;
+        vertical-alignment: center;
         color: Theme.foreground-muted;
+
         font-size: Theme.font-size-small;
-        text: (h < 10 ? "0" : 0) + h + ":00";
+        font-family: "Free Mono";
+        text: (h < 10 ? "0" : "") + h + ":00";
     }
 }
 
