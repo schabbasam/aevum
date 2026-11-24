@@ -86,6 +86,7 @@ fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &T
 
     form.id             = task.id() as i32;
     form.color_brush    = resolved_color(&form, m.default_color);
+    form.duration       = normalize_duration(form.duration);
     // removed drag-preview since it doesn't matter
 
     store // put the task form into the shorter panel column
