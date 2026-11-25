@@ -1,0 +1,73 @@
+
+export component DayHeader inherits HorizontalLayout {
+    in property <string> text: "Someday";
+
+    height: Theme.control-height;
+    width: self.preferred-width;
+    Border {}
+    Rectangle {
+        background: Theme.surface;
+        width: Theme.task-block-width;
+        Text {
+            text: root.text;
+            color: Theme.foreground;
+            font-size: Theme.font-size-medium;
+        }
+    }
+}
+
+export component DayColumn inherits Rectangle {
+    in property <int> index;
+    callback dropped(int, int, length); // id, column, column-y
+    
+    width: Theme.column-width;
+    height: 24 * Theme.hour-height;
+
+    // -1 means nothing to show
+    property <int> preview-start: -1;
+
+    Border {
+        x: 0px;
+    }
+
+    Rectangle {
+        visible: da.has-drag && root.preview-start >= 0;
+        x: 2 * Theme.border-width;
+        y: root.preview-start * Theme.hour-height / 60;
+        width: Theme.task-block-width;
+        height: DragState.duration * Theme.hour-height / 60;
+        background: DragState.colors.preview;
+        border-width: Theme.focus-ring-width;
+        border-color: DragState.colors.border;
+        border-radius: Theme.radius-small;
+    }
+    
+    da := DropArea {
+        x: 0px;
+        y: 0px;
+        width: 100%;
+        height: 100%;
+
+        can-drop(event) => {
+            root.preview-start = Api.preview-start(
+                DragState.id,
+                root.index,
+                round(
+                    (event.position.y - DragState.grab-y)
+                    / Theme.hour-height * 60
+                    / Theme.resize-step
+                ) * Theme.resize-step
+            );
+            return event.proposed-action;
+        }
+
+        dropped(event) => {
+            root.dropped(
+                Api.transfer-to-int(event.data),
+                root.index,
+                event.position.y
+            );
+            return event.proposed-action;
+        }
+    }
+}
