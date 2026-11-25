@@ -249,13 +249,21 @@ export component WeekView inherits Rectangle {
                             return event.proposed-action;
                         }
                     }
+
+                    ScrollBar {
+                        x: parent.width - self.width;
+                        y: 0px;
+                        height: 100%;
+                        content-height: fl.content-height;
+                        view-height: fl.height;
+                        offset <=> fl.content-y;
+                    }
+
                 }
             }
         }
 
         ScrollBar {
-            x: parent.width - self.width;
-            y: 0px;
             height: 100%;
             content-height: fl.content-height;
             view-height: fl.height;

@@ -27,57 +27,60 @@ export component TopBar inherits Rectangle {
         horizontal-alignment: center;
         vertical-alignment: center;
     }
+    
+    VerticalLayout {
+        HorizontalLayout {
+            padding: Theme.spacing-medium;
+            spacing: Theme.spacing-medium;
 
-    HorizontalLayout {
-        padding: Theme.spacing-medium;
-        spacing: Theme.spacing-medium;
+            Button {
+                width: 140px;
+                text: "New category";
+                clicked => {
+                    root.category-name = "";
+                    root.category-color = "";
+                    category-popup.show();
+                }
+            }
 
-        Button {
-            width: 140px;
-            text: "New category";
-            clicked => {
-                root.category-name = "";
-                root.category-color = "";
-                category-popup.show();
+            Button {
+                width: 100px;
+                text: "Settings";
+                clicked => {
+                    root.open-settings();
+                }
+            }
+
+            Text {
+                text: "Zoom";
+                color: Theme.foreground-muted;
+                vertical-alignment: center;
+            }
+
+            Slider {
+                width: 140px;
+                minimum: 30;
+                maximum: 120;
+                value: Theme.hour-height / 1px;
+                changed(v) => {
+                    Theme.hour-height = v * 1px;
+                }
+            }
+
+            Rectangle {
+                horizontal-stretch: 1;
+            }
+
+            Text {
+                text: root.week-text
+                    + " | " + root.date-text
+                    + " | " + root.time-text;
+                color: Theme.foreground;
+                font-size: Theme.font-size-medium;
+                vertical-alignment: center;
             }
         }
-
-        Button {
-            width: 100px;
-            text: "Settings";
-            clicked => {
-                root.open-settings();
-            }
-        }
-
-        Text {
-            text: "Zoom";
-            color: Theme.foreground-muted;
-            vertical-alignment: center;
-        }
-
-        Slider {
-            width: 140px;
-            minimum: 30;
-            maximum: 120;
-            value: Theme.hour-height / 1px;
-            changed(v) => {
-                Theme.hour-height = v * 1px;
-            }
-        }
-
-        Rectangle {
-            horizontal-stretch: 1;
-        }
-
-        Text {
-            text: root.week-text
-                + " | " + root.date-text
-                + " | " + root.time-text;
-            color: Theme.foreground;
-            font-size: Theme.font-size-medium;
-            vertical-alignment: center;
-        }
+        HorizontalBorder {}
     }
 
     category-popup := PopupWindow {
