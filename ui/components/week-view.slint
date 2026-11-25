@@ -89,7 +89,7 @@ component TimeAxis inherits Rectangle {
     for n in 24 * root.ticks : Rectangle {
         property <bool> hour: mod(n, root.ticks) == 0;
         x: parent.width - self.width;
-        y: n * (Theme.hour-height / root.ticks) + root.scroll-y;
+        y: n * (Theme.hour-height / root.ticks) + root.scroll-y + Theme.control-height;
 
         // make the marks for hours bigger
         width: self.hour ? 12px : 6px; 
@@ -100,8 +100,7 @@ component TimeAxis inherits Rectangle {
     // the time text
     for h in 24 : Text {
         x: 0px;
-        y: h == 0 ? 0px
-            : h * Theme.hour-height + root.scroll-y - 8px;
+        y: h * Theme.hour-height + root.scroll-y - self.height / 2 + Theme.control-height;
 
         width: parent.width - 16px; // left of the longest stick
         height: 16px;
@@ -249,22 +248,12 @@ export component WeekView inherits Rectangle {
                             return event.proposed-action;
                         }
                     }
-
-                    ScrollBar {
-                        x: parent.width - self.width;
-                        y: 0px;
-                        height: 100%;
-                        content-height: fl.content-height;
-                        view-height: fl.height;
-                        offset <=> fl.content-y;
-                    }
-
                 }
             }
         }
 
         ScrollBar {
-            height: 100%;
+            width: 12px;
             content-height: fl.content-height;
             view-height: fl.height;
             offset <=> fl.content-y;
