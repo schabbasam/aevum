@@ -79,7 +79,7 @@ export component DayColumn inherits Rectangle {
 
 component TimeAxis inherits Rectangle {
     in property <length> scroll-y;
-    property <int> ticks: 4; // marks per hour, default every 15min
+    property <int> ticks: 6; // marks per hour, default every 15min
 
     width: Theme.time-axis-width;
     background: Theme.surface;
@@ -164,106 +164,102 @@ export component WeekView inherits Rectangle {
         }
     }
 
-
-    VerticalLayout {
-        HorizontalLayout {
-            Rectangle {
-                width: Theme.time-axis-width;
-                background: Theme.surface;
+    HorizontalLayout {
+        Border {}
+        TimeAxis {
+            scroll-y: fl.content-y;
+        }
+        VerticalLayout {
+            HorizontalLayout {
+                for i in 7: DayHeader {
+                    text: "Day " + i;
+                }
             }
-            for i in 7: DayHeader {
-                text: "Day " + i;
+            HorizontalBorder {}
+            
+            HorizontalLayout {
+                scroll-area := Rectangle {
+                    clip: true;
+                    
+                    fl := Flickable {
+                        content-width: 7 * Theme.column-width;
+                        content-height: 24 * Theme.hour-height;
+                        interactive: false; // fl shouln't eat the input for drag/resize
+                        
+                        for i in 7: DayColumn {
+                            index: i;
+                            x: i * Theme.column-width;
+                            y: 0px;
+
+                            dropped(id, col, y) => {
+                                root.place(id, col, y);
+                            }
+                        }
+
+                        for task in root.scheduled-tasks : TaskBlock {
+                            calendar-mode: true;
+                            form: task;
+                            scroll-y: fl.content-y;
+                            x: task.column * Theme.column-width + 2 * Theme.border-width;
+                            y: self.live-start * Theme.hour-height / 60;
+
+                            resize-pointer(active, py) => {
+                                root.resize-active = active;
+                                root.resize-pointer-y = py;
+                            }
+                            resize-finished(id, start, dura) => {
+                                root.task-resized(id, start, dura);
+                            }
+                        }
+                    }
+                    
+                    // edge zones: autoscroll while dragging
+                    top-zone := DropArea {
+                        y: 0px;
+                        width: parent.width;
+                        height: Theme.scroll-edge;
+                        
+                        can-drop(event) => {
+                            return event.proposed-action;
+                        }
+                        dropped(event) => {
+                            root.place(
+                                Api.transfer-to-int(event.data),
+                                floor(event.position.x / Theme.column-width),
+                                event.position.y - fl.content-y
+                            );
+                            return event.proposed-action;
+                        }
+                    }
+
+                    bottom-zone := DropArea {
+                        y: parent.height - Theme.scroll-edge;
+                        width: parent.width;
+                        height: Theme.scroll-edge;
+                        
+                        can-drop(event) => {
+                            return event.proposed-action;
+                        }
+                        dropped(event) => {
+                            root.place(
+                                Api.transfer-to-int(event.data),
+                                floor(event.position.x / Theme.column-width),
+                                event.position.y + self.y - fl.content-y
+                            );
+                            return event.proposed-action;
+                        }
+                    }
+                }
             }
         }
-        HorizontalBorder {}
-        
-        HorizontalLayout {
-            TimeAxis {
-                scroll-y: fl.content-y;
-            }
 
-            scroll-area := Rectangle {
-                clip: true;
-                
-                fl := Flickable {
-                    content-width: 7 * Theme.column-width;
-                    content-height: 24 * Theme.hour-height;
-                    interactive: false; // fl shouln't eat the input for drag/resize
-                    
-                    for i in 7: DayColumn {
-                        index: i;
-                        x: i * Theme.column-width;
-                        y: 0px;
-
-                        dropped(id, col, y) => {
-                            root.place(id, col, y);
-                        }
-                    }
-
-                    for task in root.scheduled-tasks : TaskBlock {
-                        calendar-mode: true;
-                        form: task;
-                        scroll-y: fl.content-y;
-                        x: task.column * Theme.column-width + 2 * Theme.border-width;
-                        y: self.live-start * Theme.hour-height / 60;
-
-                        resize-pointer(active, py) => {
-                            root.resize-active = active;
-                            root.resize-pointer-y = py;
-                        }
-                        resize-finished(id, start, dura) => {
-                            root.task-resized(id, start, dura);
-                        }
-                    }
-                }
-                
-                // edge zones: autoscroll while dragging
-                top-zone := DropArea {
-                    y: 0px;
-                    width: parent.width;
-                    height: Theme.scroll-edge;
-                    
-                    can-drop(event) => {
-                        return event.proposed-action;
-                    }
-                    dropped(event) => {
-                        root.place(
-                            Api.transfer-to-int(event.data),
-                            floor(event.position.x / Theme.column-width),
-                            event.position.y - fl.content-y
-                        );
-                        return event.proposed-action;
-                    }
-                }
-
-                bottom-zone := DropArea {
-                    y: parent.height - Theme.scroll-edge;
-                    width: parent.width;
-                    height: Theme.scroll-edge;
-                    
-                    can-drop(event) => {
-                        return event.proposed-action;
-                    }
-                    dropped(event) => {
-                        root.place(
-                            Api.transfer-to-int(event.data),
-                            floor(event.position.x / Theme.column-width),
-                            event.position.y + self.y - fl.content-y
-                        );
-                        return event.proposed-action;
-                    }
-                }
-
-                ScrollBar {
-                    x: parent.width - self.width;
-                    y: 0px;
-                    height: 100%;
-                    content-height: fl.content-height;
-                    view-height: fl.height;
-                    offset <=> fl.content-y;
-                }
-
-            }
+        ScrollBar {
+            x: parent.width - self.width;
+            y: 0px;
+            height: 100%;
+            content-height: fl.content-height;
+            view-height: fl.height;
+            offset <=> fl.content-y;
         }
     }
 }
