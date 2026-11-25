@@ -1,8 +1,9 @@
-import { Theme, Border, HorizontalBorder } from "../theme.slint";
-import { TaskBlock } from "task-block.slint";
-import { TaskForm, Api, DragState } from "../types.slint";
-import { ScrollBar } from "../widgets/scroll-bar.slint";
-import "../assets/fonts/FreeMono.otf";
+import { Theme, Border, HorizontalBorder } from "../../theme.slint";
+import { TaskBlock } from "../task-block.slint";
+import { TaskForm, Api, DragState } from "../../types.slint";
+import { ScrollBar } from "../../widgets/scroll-bar.slint";
+import { TimeAxis } from "time-axis.slint";
+import "../../assets/fonts/FreeMono.otf";
 
 export component DayHeader inherits HorizontalLayout {
     in property <string> text: "Someday";
@@ -74,44 +75,6 @@ export component DayColumn inherits Rectangle {
             );
             return event.proposed-action;
         }
-    }
-}
-
-component TimeAxis inherits Rectangle {
-    in property <length> scroll-y;
-    property <int> ticks: 6; // marks per hour, default every 15min
-
-    width: Theme.time-axis-width;
-    background: Theme.surface;
-    clip: true;
-
-    // little horizontal lines for the scale
-    for n in 24 * root.ticks : Rectangle {
-        property <bool> hour: mod(n, root.ticks) == 0;
-        x: parent.width - self.width;
-        y: n * (Theme.hour-height / root.ticks) + root.scroll-y + Theme.control-height;
-
-        // make the marks for hours bigger
-        width: self.hour ? 12px : 6px; 
-        height: Theme.border-width;
-        background: self.hour ? Theme.foreground-muted : Theme.border;
-    }
-
-    // the time text
-    for h in 24 : Text {
-        x: 0px;
-        y: h * Theme.hour-height + root.scroll-y - self.height / 2 + Theme.control-height;
-
-        width: parent.width - 16px; // left of the longest stick
-        height: 16px;
-
-        horizontal-alignment: right;
-        vertical-alignment: center;
-        color: Theme.foreground-muted;
-
-        font-size: Theme.font-size-small;
-        font-family: "Free Mono";
-        text: (h < 10 ? "0" : "") + h + ":00";
     }
 }
 
