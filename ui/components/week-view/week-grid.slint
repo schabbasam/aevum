@@ -2,11 +2,43 @@
 import { DayHeader, DayColumn } from "day-components.slint";
 import { Theme, HorizontalBorder } from "../../theme.slint";
 import { TaskBlock } from "../task-block.slint";
-import { Api } from "../../types.slint";
+import { TaskForm, Api, DragState } from "../../types.slint";
+import { ScrollBar } from "../../widgets/scroll-bar.slint";
 
 export component WeekGrid inherits VerticalLayout {
+    
+    in property <[TaskForm]> scheduled-tasks;
+    callback task-placed(int, int, int);
+    callback task-resized(int, int, int);
 
-    // »» how do i link the callbacks and properties (like scheduled-tasks) here???
+    property <bool> resize-active: false;
+    property <length> resize-pointer-y: 0px;
+
+    function place(id: int, col: int, y: length) {
+        root.task-placed(
+            id,
+            clamp(col, 0, 6),
+            round(
+                (y - DragState.grab-y)
+                / Theme.hour-height * 60
+                / Theme.resize-step
+            ) * Theme.resize-step
+        );
+    }
+    
+    // looks crazy, but it is kinda simple
+    // -1 means up, 0 means nothing, 1 means down
+    property <int> scroll-dir:
+        (top-zone.has-drag 
+            || (root.resize-active
+                && root.resize-pointer-y < Theme.scroll-edge)
+        ) ? -1
+        : (bottom-zone.has-drag
+            || (root.resize-active
+                && root.resize-pointer-y > scroll-area.height - Theme.scroll-edge)
+        ) ? 1
+        : 0;
+
     HorizontalLayout {
         for i in 7: DayHeader {
             text: "Day " + i;
@@ -17,6 +49,18 @@ export component WeekGrid inherits VerticalLayout {
     HorizontalLayout {
         scroll-area := Rectangle {
             clip: true;
+    
+            Timer {
+                interval: 16ms;
+                running: root.scroll-dir != 0;
+                triggered => {
+                    fl.content-y = clamp(
+                        fl.content-y - root.scroll-dir * Theme.scroll-speed,
+                        min(0px, fl.height - fl.content-height),
+                        0px
+                    );
+                }
+            }
             
             fl := Flickable {
                 content-width: 7 * Theme.column-width;

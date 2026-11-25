@@ -32,18 +32,6 @@ export component WeekView inherits Rectangle {
         ) ? 1
         : 0;
 
-    function place(id: int, col: int, y: length) {
-        root.task-placed(
-            id,
-            clamp(col, 0, 6),
-            round(
-                (y - DragState.grab-y)
-                / Theme.hour-height * 60
-                / Theme.resize-step
-            ) * Theme.resize-step
-        );
-    }
-
     Timer {
         interval: 16ms;
         running: root.scroll-dir != 0;
