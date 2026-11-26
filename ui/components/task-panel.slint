@@ -32,7 +32,7 @@ component PanelColumn inherits VerticalLayout {
 
         clip: true;
         height: (self.hidden ? 0px : tb.height + Theme.spacing-medium) + self.gap;
-        animate height { duration: theme.anim-medium; easing: ease-out; }
+        animate height { duration: Theme.anim-medium; easing: ease-out; }
 
         Placeholder {
             y: 0px;
@@ -51,11 +51,10 @@ component PanelColumn inherits VerticalLayout {
         height: root.slot == root.tasks.length ? root.extra : 0px;
         animate height { duration: Theme.anim-medium; easing: ease-out; }
         
-        // the same placeholder as for every task in the loop
         Placeholder {
             y: 0px;
             height: root.box-height;
-            shown: parent.gap > 0px;
+            shown: parent.height > 0px;
         }
     }
 }
@@ -64,11 +63,18 @@ export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> left-column;
     in-out property <[TaskForm]> right-column;
     
-    callback dropped-here(int, int, length); // id, column 0 or 1, y coordinate
+    callback dropped-here(int, int, int); // id, column 0 or 1, insertion index
 
     background: Theme.surface;
-
     vertical-stretch: 1;
+
+    property <int> slot-col: 0;
+    property <int> slot-index: -1;
+    property <length> box-height: max(
+        Theme.task-block-min-height,
+        DragState.duration * Theme.hour-height / 60
+    );
+    property <length> extra: root.box-height + Theme.spacing-medium;
 
     fl := Flickable {
         height: 100%;
@@ -77,91 +83,21 @@ export component TaskPanel inherits Rectangle {
         HorizontalLayout {
             padding: Theme.spacing-medium;
             spacing: Theme.spacing-medium;
-
-            VerticalLayout {
-                spacing: Theme.spacing-medium;
-                for task[i] in root.left-column : Rectangle {
-                    property <length> shift: 
-                        (drop.has-drag && root.slot-col == 0 && root.slot-index == i)
-                        ? root.extra : 0px;
-
-                    width: Theme.task-block-width;
-                    height: tbl.height + self.shift;
-
-                    Rectangle {
-                        visible: parent.shift > 0px;
-                        background: DragState.colors.preview;
-                        
-                        y: 0px;
-                        height: root.box-h;
-
-                        border-width: Theme.focus-ring-width;
-                        border-color: DragState.colors.border;
-                        border-radius: Theme.radius-small;
-                    }
-
-                    tbl := TaskBlock {
-                        y: parent.shift;
-                        form: task;
-                        animate y { duration: Theme.anim-medium; }
-                    }
-                }
-
-                Rectangle {
-                    property <bool> active: drop.has-drag && root.slot-col == 0
-                        && root.slot-index == root.left-column.length;
-                    height: self.active ? root.box-h : 0px;
-                    Rectangle {
-                        visible: parent.active;
-                        background: DragState.colors.preview;
-                        border-width: Theme.focus-ring-width;
-                        border-color: DragState.colors.border;
-                        border-radius: Theme.radius-small;
-                    }
-                }
+            
+            PanelColumn {
+                tasks: root.left-column;
+                slot: drop.has-drag && root.slot-col == 0 ? root.slot-index : -1;
+                dragging: drop.has-drag;
+                box-height: root.box-height;
+                extra: root.extra;
             }
 
-            VerticalLayout {
-                spacing: Theme.spacing-medium;
-                for task[i] in root.right-column: Rectangle {
-                    property <length> shift: 
-                        (drop.has-drag && root.slot-col == 1 && root.slot-index == i)
-                        ? root.extra : 0px;
-
-                    width: Theme.task-block-width;
-                    height: tbr.height + self.shift;
-
-                    Rectangle {
-                        visible: parent.shift > 0px;
-                        background: DragState.colors.preview;
-
-                        y: 0px;
-                        height: root.box-h;
-
-                        border-width: Theme.focus-ring-width;
-                        border-color: DragState.colors.border;
-                        border-radius: Theme.radius-small;
-                    }
-
-                    tbr := TaskBlock {
-                        y: parent.shift;
-                        form: task;
-                        animate y { duration: Theme.anim-medium; }
-                    }
-                }
-
-                Rectangle {
-                    property <bool> active: drop.has-drag && root.slot-col == 1
-                        && root.slot-index == root.right-column.length;
-                    height: self.active ? root.box-h : 0px;
-                    Rectangle {
-                        visible: parent.active;
-                        background: DragState.colors.preview;
-                        border-width: Theme.focus-ring-width;
-                        border-color: DragState.colors.border;
-                        border-radius: Theme.radius-small;
-                    }
-                }
+            PanelColumn {
+                tasks: root.right-column;
+                slot: drop.has-drag && root.slot-col == 1 ? root.slot-index : -1;
+                dragging: drop.has-drag;
+                box-height: root.box-height;
+                extra: root.extra;
             }
         }
     }
@@ -173,25 +109,20 @@ export component TaskPanel inherits Rectangle {
                 root.slot-col,
                 event.position.y - fl.content-y,
                 root.slot-index,
-                root.extra
+                root.extra,
+                DragState.id
             );
             return event.proposed-action;
         }
         dropped(event) => {
             root.dropped-here(
                 Api.transfer-to-int(event.data),
-                event.position.x < self.width / 2 ? 0 : 1,
-                event.position.y - fl.content-y
+                root.slot-col,
+                max(0, root.slot-index)
             );
             return event.proposed-action;
         }
     }
-
-    property <int> slot-col: 0;
-    property <int> slot-index: -1;
-    property <length> box-h: max(Theme.task-block-min-height,
-                                DragState.duration * Theme.hour-height / 60);
-    property <length> extra: root.box-h + Theme.spacing-medium;
 
     ScrollBar {
         x: parent.width - self.width;
