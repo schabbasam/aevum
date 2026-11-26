@@ -1,5 +1,3 @@
-// »» how do i access top-zone, bottom-zone, scroll-area and fl here???
-
 import { Theme, Border, HorizontalBorder } from "../../theme.slint";
 import { TaskBlock } from "../task-block.slint";
 import { TaskForm, Api, DragState } from "../../types.slint";
@@ -16,8 +14,6 @@ export component WeekView inherits Rectangle {
     callback task-placed(int, int, int);    // id, column, start-minute
     callback task-resized(int, int, int);   // id, start-minute, duration
     
-    WeekGrid {}
-
     HorizontalLayout {
         Border {}
         TimeAxis {
@@ -34,12 +30,21 @@ export component WeekView inherits Rectangle {
                 root.task-resized(id, start, duration)
             }
         }
+        
+        VerticalLayout {
+            width: Theme.scrollbar-width;
+            
+            Rectangle {
+                height: Theme.control-height + 2 * Theme.border-width;
+                background: Theme.surface;
+            }
 
-        ScrollBar {
-            vertical-stretch: 1;
-            content-height: wg.content-height;
-            view-height: wg.height;
-            offset <=> wg.content-y;
+            ScrollBar {
+                vertical-stretch: 1;
+                content-height: wg.content-height;
+                view-height: wg.view-height;
+                offset <=> wg.content-y;
+            }
         }
     }
 }

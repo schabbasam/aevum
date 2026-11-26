@@ -15,7 +15,7 @@ export component TopBar inherits Rectangle {
     callback add-category(string, string); // name, color hex
     callback open-settings();
 
-    height: Theme.control-height + 2 * Theme.spacing-medium;
+    height: Theme.control-height + 2 * Theme.spacing-medium + 2 * Theme.border-width;
     background: Theme.surface;
 
     Text {
