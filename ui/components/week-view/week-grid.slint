@@ -14,6 +14,10 @@ export component WeekGrid inherits VerticalLayout {
     property <bool> resize-active: false;
     property <length> resize-pointer-y: 0px;
 
+    in-out property <length> content-y;
+    out property <length> content-height: fl.content-height;
+    out property <length> view-height: fl.height;
+
     function place(id: int, col: int, y: length) {
         root.task-placed(
             id,
@@ -66,6 +70,7 @@ export component WeekGrid inherits VerticalLayout {
                 content-width: 7 * Theme.column-width;
                 content-height: 24 * Theme.hour-height;
                 interactive: false; // fl shouln't eat the input for drag/resize
+                content-y <=> root.content-y;
                 
                 for i in 7: DayColumn {
                     index: i;

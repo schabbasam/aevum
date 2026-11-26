@@ -15,48 +15,31 @@ export component WeekView inherits Rectangle {
 
     callback task-placed(int, int, int);    // id, column, start-minute
     callback task-resized(int, int, int);   // id, start-minute, duration
-
-    property <bool> resize-active: false;
-    property <length> resize-pointer-y: 0px;
     
-    // looks crazy, but it is kinda simple
-    // -1 means up, 0 means nothing, 1 means down
-    property <int> scroll-dir:
-        (top-zone.has-drag 
-            || (root.resize-active
-                && root.resize-pointer-y < Theme.scroll-edge)
-        ) ? -1
-        : (bottom-zone.has-drag
-            || (root.resize-active
-                && root.resize-pointer-y > scroll-area.height - Theme.scroll-edge)
-        ) ? 1
-        : 0;
-
-    Timer {
-        interval: 16ms;
-        running: root.scroll-dir != 0;
-        triggered => {
-            fl.content-y = clamp(
-                fl.content-y - root.scroll-dir * Theme.scroll-speed,
-                min(0px, fl.height - fl.content-height),
-                0px
-            );
-        }
-    }
-
     WeekGrid {}
 
     HorizontalLayout {
         Border {}
         TimeAxis {
-            scroll-y: fl.content-y;
+            scroll-y: wg.content-y;
+        }
+
+        wg := WeekGrid {
+            scheduled-tasks: root.scheduled-tasks;
+
+            task-placed(id, col, start) => {
+                root.task-placed(id, col, start);
+            }
+            task-resized(id, start, duration) => {
+                root.task-resized(id, start, duration)
+            }
         }
 
         ScrollBar {
-            width: 12px;
-            content-height: fl.content-height;
-            view-height: fl.height;
-            offset <=> fl.content-y;
+            height: 100%;
+            content-height: wg.content-height;
+            view-height: wg.height;
+            offset <=> wg.content-y;
         }
     }
 }
