@@ -51,6 +51,8 @@ export component WeekGrid inherits VerticalLayout {
     HorizontalBorder {}
     
     HorizontalLayout {
+        vertical-stretch: 1;
+
         scroll-area := Rectangle {
             clip: true;
     
@@ -67,6 +69,8 @@ export component WeekGrid inherits VerticalLayout {
             }
             
             fl := Flickable {
+                width: 100%;
+                height: 100%;
                 content-width: 7 * Theme.column-width;
                 content-height: 24 * Theme.hour-height;
                 interactive: false; // fl shouln't eat the input for drag/resize

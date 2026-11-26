@@ -36,7 +36,8 @@ export component WeekView inherits Rectangle {
         }
 
         ScrollBar {
-            height: 100%;
+            width: 12px;
+            vertical-stretch: 1;
             content-height: wg.content-height;
             view-height: wg.height;
             offset <=> wg.content-y;
