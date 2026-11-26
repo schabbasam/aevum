@@ -8,6 +8,9 @@
 - the duration text doesnt look good, should be centered
 - horizontal border below top bar has vanished
 - the unclean save-tasks implementation in task-attributes with shabby defaults
+- the text in TaskBlocks (title and span)
+    - it is for some reason blurry if it is scheduled in the weekview, otherwise its fine
+    - the title should be vertically centered if time span is not visible
 
 ## future features
 - add animation for the collapsable TaskAttributes part

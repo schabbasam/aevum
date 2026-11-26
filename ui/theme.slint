@@ -62,8 +62,11 @@ export global Theme {
     
     in-out property <length> window-width: 1280px;
     out property <length> time-axis-width: 48px;
-    out property <length> task-block-width: max(60px,
-        (window-width - time-axis-width - 3 * spacing-medium - 14 * border-width) / 9);
+    out property <length> scrollbar-width: 12px;
+    out property <length> task-block-width: max(60px, floor(
+        (window-width - time-axis-width - scrollbar-width
+            - 3 * spacing-medium - 16 * border-width) / 9 / 1px) * 1px);
+            // 16 borders because 14 for columns + 2 for the leading one
     out property <length> panel-width: task-block-width * 2 + spacing-medium * 3;
 
     // ---- misc ----

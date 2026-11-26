@@ -9,7 +9,7 @@ export component ScrollBar inherits Rectangle {
     property <length> thumb-height: max(24px,
         root.height * root.view-height / max(1px, root.content-height));
 
-    width: 8px; // ill make it changable by making it a Theme variable later
+    width: Theme.scrollbar-width;
     background: Theme.background;
     visible: root.max-scroll > 0px;
 
