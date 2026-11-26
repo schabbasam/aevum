@@ -67,7 +67,7 @@ export component TaskAttributes inherits Rectangle {
                 }
 
                 Text {
-                    text: root.collapsed ? "▼" : "▲";
+                    text: root.collapsed ? "▲" : "▼";
                     color: Theme.foreground-muted;
                     vertical-alignment: center;
                     font-size: Theme.font-size-large;
@@ -80,9 +80,11 @@ export component TaskAttributes inherits Rectangle {
                 }
             }
         }
-        // ---- inputs ----
-        
+
+        // TODO there should be an animation for this
         if !root.collapsed : VerticalLayout {
+            // ---- inputs ----
+            
             // 1. title
             LineEdit {
                 placeholder-text: "Title";
@@ -141,16 +143,6 @@ export component TaskAttributes inherits Rectangle {
                     vertical-alignment: center;
                 }
             }
-
-            // ---- status message ----
-
-            Text {
-                text: root.status-message;
-                visible: root.status-message != "";
-                color: root.is-error ? Theme.danger : Theme.success;
-                font-size: 11px;
-            }
-
             
             // ---- save/create button ----
             
@@ -179,6 +171,15 @@ export component TaskAttributes inherits Rectangle {
                         completed:      root.completed-input,
                     });
                 }
+            }
+
+            // ---- status message ----
+
+            Text {
+                text: root.status-message;
+                visible: root.status-message != "";
+                color: root.is-error ? Theme.danger : Theme.success;
+                font-size: 11px;
             }
 
         }
