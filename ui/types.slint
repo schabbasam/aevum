@@ -36,9 +36,9 @@ export global Api {
     // id, column, wished start minute -> real start minute or -1 if busy
     callback preview-start(int, int, int) -> int;
 
-    // col, content-y, current index, extra height currently inserted
+    // col, content-y, current index, extra height currently inserted, dragged task id
     // -> insertion index in the full list
-    callback panel-slot-index(int, length, int, length) -> int;
+    callback panel-slot-index(int, length, int, length, int) -> int;
 
     pure callback calculate-drag-colors(color) -> DragColors;
 }

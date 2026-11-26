@@ -161,7 +161,7 @@ fn wire_preview_start(api: &Api, store: Store) {
 }
 
 fn wire_panel_slot_index(api: &Api, store: Store, m: UiMetrics) {
-    api.on_panel_slot_index(move |col, y, current, extra| {
+    api.on_panel_slot_index(move |col, y, current, extra, dragged| {
         insertion_index_shifted(
             store.panel_column(col),
             y,
@@ -169,7 +169,8 @@ fn wire_panel_slot_index(api: &Api, store: Store, m: UiMetrics) {
             m.min_height(),
             m.panel_gap(),
             current,
-            extra
+            extra,
+            dragged
         ) as i32
     });
 }
@@ -257,32 +258,20 @@ fn resize(store: &Store, id: i32, start: i32, dur: i32) {
 // ---- drag into task panel column ----
 
 fn wire_task_to_panel(app: &MainWindow, store: Store, m: UiMetrics) {
-    app.on_task_to_panel(move |id, col, y| {
-        move_to_panel(&store, id, col, y, m.clone());
+    app.on_task_to_panel(move |id, col, at| {
+        move_to_panel(&store, id, col, at.max(0) as usize);
     });
 }
 
-fn move_to_panel(store: &Store, id: i32, col: i32, y: f32, m: UiMetrics) {
+fn move_to_panel(store: &Store, id: i32, col: i32, mut at: usize) {
     let Some((src, index, form)) = store.find_task(id) else { return };
     let target = store.panel_column(col);
     
-    // TODO here are the getters too instead of UiMetrics
-    let mut at = insertion_index(
-        target,
-        y,
-        m.hour_height(),
-        m.min_height(),
-        m.panel_gap(),
-    );
-    
-    // if it is the same column and the dragged task is above target
     if Rc::ptr_eq(src, target) && index < at {
-        // subtract the target because the dragged task doesnt count
         at -= 1;
     }
-
     src.remove(index);
-    target.insert(at, form);
+    target.insert(at.min(target.row_count()), form);
     update_all_limits(&store.scheduled);
 }
 

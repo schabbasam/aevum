@@ -14,6 +14,7 @@ pub fn normalize_duration(d: i32) -> i32 {
     ((d + STEP - 1) / STEP * STEP).clamp(STEP, DAY_MINUTES) // clamp(min, max)
 }
 
+// >>>> this function is probably obsolete
 // insert a y-coordinate where you want to put the task
 // returns the index where the new item should be
 pub fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32, gap: f32) -> usize {
@@ -36,17 +37,18 @@ pub fn insertion_index(col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32
 
 pub fn insertion_index_shifted(
     col: &VecModel<TaskForm>, y: f32, hour_h: f32, min_h: f32,
-    gap: f32, cur: i32, extra: f32
+    gap: f32, cur: i32, extra: f32, dragged: i32
 ) -> usize {
     let mut top = gap;
+    let mut gap_added = false;
     for (i, t) in col.iter().enumerate() {
-        if i as i32 == cur {
+        if t.id == dragged { continue; } // collapsed in ui
+        if !gap_added && cur >= 0 && i as i32 >= cur {
             top += extra;
+            gap_added = true;
         }
         let h = task_height_px(t.duration, hour_h, min_h);
-        if y < top + h / 2.0 {
-            return i;
-        }
+        if y < top + h / 2.0 { return i; }
         top += h + gap;
     }
     col.row_count()
