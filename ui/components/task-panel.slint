@@ -15,6 +15,51 @@ component Placeholder inherits Rectangle {
     border-radius: Theme.radius-small;
 }
 
+component PanelColumn inherits VerticalLayout {
+    in property <[TaskForm]> tasks;
+    in property <int> slot: -1;
+    in property <bool> dragging;
+    in property <length> box-height;
+    in property <length> extra;
+    
+    // spacing lives inside sells so collapsed cells leave no gap
+    spacing: 0px;
+    alignment: start;
+
+    for task[i] in root.tasks : Rectangle {
+        property <bool> hidden: root.dragging && task.id == DragState.id;
+        property <length> gap: root.slot == i ? root.extra : 0px;
+
+        clip: true;
+        height: (self.hidden ? 0px : tb.height + Theme.spacing-medium) + self.gap;
+        animate height { duration: theme.anim-medium; easing: ease-out; }
+
+        Placeholder {
+            y: 0px;
+            height: root.box-height;
+            shown: parent.gap > 0px;
+        }
+        tb := TaskBlock {
+            form: task;
+            y: parent.height - self.height - Theme.spacing-medium;
+        }
+    }
+    
+    // the gap at the very end of the column
+    Rectangle {
+        clip: true;
+        height: root.slot == root.tasks.length ? root.extra : 0px;
+        animate height { duration: Theme.anim-medium; easing: ease-out; }
+        
+        // the same placeholder as for every task in the loop
+        Placeholder {
+            y: 0px;
+            height: root.box-height;
+            shown: parent.gap > 0px;
+        }
+    }
+}
+
 export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> left-column;
     in-out property <[TaskForm]> right-column;
