@@ -83,6 +83,9 @@ export component TaskAttributes inherits Rectangle {
 
         // TODO there should be an animation for this
         if !root.collapsed : VerticalLayout {
+            
+            spacing: Theme.spacing-medium;
+
             // ---- inputs ----
             
             // 1. title
@@ -172,16 +175,18 @@ export component TaskAttributes inherits Rectangle {
                     });
                 }
             }
+        }  
+        // ---- status message ----
 
-            // ---- status message ----
-
-            Text {
-                text: root.status-message;
-                visible: root.status-message != "";
-                color: root.is-error ? Theme.danger : Theme.success;
-                font-size: 11px;
-            }
-
+        Text {
+            visible: root.status-message != "";
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            text: root.status-message;
+            
+            color: root.is-error ? Theme.danger : Theme.success;
+            font-size: Theme.font-size-medium;
+            font-weight: Theme.font-weight-normal;
         }
     }
 }
