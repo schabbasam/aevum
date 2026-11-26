@@ -51,7 +51,8 @@ export component TaskBlock inherits Rectangle {
     height: root.calendar-mode
         ? root.exact-height
         : max(Theme.task-block-min-height, root.exact-height);
-
+    
+    clip: true;
     background: form.color-brush;
     border-radius: Theme.radius-small;
 
@@ -120,11 +121,30 @@ export component TaskBlock inherits Rectangle {
         background: Theme.accent-hover;
     }
 
-    Text {
-        text: form.title;
-        color: root.text-color;
-        horizontal-alignment: center;
-        vertical-alignment: center;
+    // ---- text ----
+    VerticalLayout {
+        alignment: center;
+        
+        // title
+        Text {
+            text: form.title;
+            color: root.text-color;
+            horizontal-alignment: center;
+            overflow: elide;
+            font-size: Theme.font-size-medium;
+            font-weight: Theme.font-weight-normal;
+        }
+
+        // time span
+        Text {
+            visible: root.calendar-mode && root.exact-height > 36px;
+            text: root.format-time-display(root.live-start)
+                + " - " + root.format-time-display(root.live-start + root.live-duration);
+            color: root.text-color.with-alpha(0.7);
+            font-size: Theme.font-size-small;
+            font-weight: Theme.font-weight-normal;
+            horizontal-alignment: center;
+        }
     }
 
     da := DragArea {
