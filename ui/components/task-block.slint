@@ -93,6 +93,17 @@ export component TaskBlock inherits Rectangle {
         root.end-resize();
     }
 
+    pure function format-time-display(m: int) -> string {
+        // floor function just rounds down to the nearest int
+        return (
+            (floor(m / 60) < 10 ? "0" : "")
+            + floor(m / 60)
+            + ":"
+            + (mod(m, 60) < 10 ? "0" : "")
+            + mod(m, 60)
+        );
+    }
+
     // bars that show the resizable edge on hover / while resizing
     Rectangle {
         visible: root.resizing && root.resize-from-top;

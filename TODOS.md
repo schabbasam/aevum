@@ -7,6 +7,7 @@
 - the scrollbar in week view is still nowhere to be found; high priority
 - the duration text doesnt look good, should be centered
 - horizontal border below top bar has vanished
+- the unclean save-tasks implementation in task-attributes with shabby defaults
 
 ## future features
 - add animation for the collapsable TaskAttributes part
@@ -25,6 +26,10 @@
     - it should change automatically to the color of the category and stay locked, if a category is selected
     - a little locked icon with a lock should show if the color is unchangable because there is a category selected
 - custom checkbox just like the other widgets
+- edit mode
+    - should load the attributes of a task if clicked on
+    - uncollapse the attributes panel if it isnt already
+    - all the rust logic
 - duration
     - increments should be standardized and fixed in a variable, standard should be 10min
     - the default duration should be the text set in the duration input spinbox by default
