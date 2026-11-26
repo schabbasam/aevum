@@ -12,6 +12,11 @@
     - it is for some reason blurry if it is scheduled in the weekview, otherwise its fine
     - the title should be vertically centered if time span is not visible
 
+- scrollbar
+    - it should have its extra space in both taskpanel and weekview so it doesnt cover the taskblocks
+    - border for the scrollbar in the weekview on the left
+    - no gap between it and window edge
+
 ## future features
 - add animation for the collapsable TaskAttributes part
 - and additionaly make the little triangle spin 180 degrees when animating
