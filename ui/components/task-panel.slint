@@ -3,11 +3,22 @@ import { TaskBlock } from "task-block.slint";
 import { TaskForm, Api, DragState } from "../types.slint";
 import { ScrollBar } from "../widgets/scroll-bar.slint";
 
+/* 
+note:
+the animations are disabled right now because they have small problems
+1. the height animation makes them 'jiggle' a bit when the drag ends
+because the height of the drag preview dissapears slowly
+2. same thing with the dragged task block when the drag starts,
+it disappears slowly
+3. when adjusting the zoom, the blocks in TaskPanel adjust slowly
+and dont look good at all
+*/
+
 component Placeholder inherits Rectangle {
     in property <bool> shown;
     width: Theme.task-block-width;
     opacity: root.shown ? 1 : 0;
-    animate opacity { duration: Theme.anim-medium; }
+ //   animate opacity { duration: Theme.anim-medium; }
     background: DragState.colors.preview;
 
     border-width: Theme.focus-ring-width;
@@ -32,7 +43,7 @@ component PanelColumn inherits VerticalLayout {
 
         clip: true;
         height: (self.hidden ? 0px : tb.height + Theme.spacing-medium) + self.gap;
-        animate height { duration: Theme.anim-medium; easing: ease-out; }
+//        animate height { duration: Theme.anim-fast; easing: ease-in-out-quad; }
 
         Placeholder {
             y: 0px;
@@ -49,7 +60,7 @@ component PanelColumn inherits VerticalLayout {
     Rectangle {
         clip: true;
         height: root.slot == root.tasks.length ? root.extra : 0px;
-        animate height { duration: Theme.anim-medium; easing: ease-out; }
+ //       animate height { duration: Theme.anim-medium; easing: ease-out; }
         
         Placeholder {
             y: 0px;

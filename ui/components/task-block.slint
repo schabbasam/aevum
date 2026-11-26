@@ -54,7 +54,12 @@ export component TaskBlock inherits Rectangle {
 
     background: form.color-brush;
     border-radius: Theme.radius-small;
-    opacity: da.dragging ? 0.4 : 1.0;
+
+    // change opacity and border when dragged
+    opacity: da.dragging ? 0.55 : 1.0;
+    border-width: da.dragging ? Theme.focus-ring-width : 0px;
+    border-color: DragState.colors.border;
+    animate opacity { duration: Theme.anim-fast; }
     
     property <color> text-color: self.background.to-oklch().lightness > 0.6
         ? Theme.background : Theme.foreground;
