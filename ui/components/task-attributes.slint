@@ -28,6 +28,7 @@ export component TaskAttributes inherits Rectangle {
     // ---- modes and states ----
     in property <bool> edit-mode: false;
     in property <bool> has-changes: false;
+    in-out property <bool> collapsed: false;
 
     // the button enables when title isn't empty
     in property <bool> button-enabled: !title-input.is-empty;
@@ -53,113 +54,133 @@ export component TaskAttributes inherits Rectangle {
         spacing: Theme.spacing-medium;
 
         // heading changes depending on the currend mode
-        Text {
-            text: root.edit-mode ? "Edit Task" : "Create Task";
-            color: Theme.foreground;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        // ---- required inputs ----
-        
-        // 1. title
-        LineEdit {
-            placeholder-text: "Title";
-            max-length: root.max-title;
-            text <=> root.title-input;
-        }
-        
-        // ---- optional stuff ----
-        
-        // 3. description
-        LineEdit {
-            max-length: root.max-description;
-            placeholder-text: "Descripton (optional)";
-            text <=> root.description-input;
-        }
-        
-        // 4. duration 
-        HorizontalLayout {
+        Rectangle {
             height: Theme.control-height;
+            HorizontalLayout {
+                Text {
+                    horizontal-stretch: 1;
+                    text: root.edit-mode ? "Edit Task" : "Add Task";
+                    color: Theme.foreground;
+                    font-size: Theme.font-size-large;
+                    font-weight: Theme.font-weight-medium;
+                    vertical-alignment: center;
+                }
 
-            Text {
-                horizontal-stretch: 1;
-                text: "Duration:";
-                color: Theme.foreground;
+                Text {
+                    text: root.collapsed ? "▼" : "▲";
+                    color: Theme.foreground-muted;
+                    vertical-alignment: center;
+                    font-size: Theme.font-size-large;
+                }
             }
 
-            SpinBox {
-                step-size: 5;
-                maximum: root.max-duration;
-                value <=> root.duration-input;
+            TouchArea {
+                clicked => {
+                    root.collapsed = !root.collapsed;
+                }
             }
-
         }
-
-        // 5. color as hex
-        LineEdit {
-            max-length: 7;
-            placeholder-text: "#RRGGBB";
-            text <=> root.color-input;
-        }
-    
-        // 6. category
-
-        // 7. recurrence
+        // ---- inputs ----
         
-        // 8. completed
-        HorizontalLayout {
-            spacing: Theme.spacing-small;
-            alignment: center;
-
-            CheckBox {
-                checked <=> root.completed-input;
+        if !root.collapsed : VerticalLayout {
+            // 1. title
+            LineEdit {
+                placeholder-text: "Title";
+                max-length: root.max-title;
+                text <=> root.title-input;
             }
-
-            Text {
-                text: "Completed";
-                color: Theme.foreground;
-                vertical-alignment: center;
-            }
-        }
-
-        // ---- status message ----
-
-        Text {
-            text: root.status-message;
-            visible: root.status-message != "";
-            color: root.is-error ? Theme.danger : Theme.success;
-            font-size: 11px;
-        }
-
-        
-        // ---- save/create button ----
-        
-        Button {
-            horizontal-stretch: 1;
-            text: root.edit-mode ? "Save Changes" : "Add Task";
-            enabled: root.button-enabled;
             
-            clicked => {
-                root.save-task({
-                    // the values marked with a // d are set on default
-                    // because i have to pass every value defined in TaskForm
-                    // TODO this is a very unclean way, it needs to be adressed later
-                    id:             0, // d
-                    title:          root.title-input,
-                    column:         0, // d
-                    start-minute:   0, // d
-                    min-start:      0, // d
-                    max-end:        1440, // d
-                    description:    root.description-input,
-                    duration:       root.duration-input,
-                    recurrence:     root.recurrence-input, // d
-                    category:       root.category-input, // d
-                    color:          root.color-input,
-                    color-brush:    transparent, // d
-                    completed:      root.completed-input,
-                });
+            // 3. description
+            LineEdit {
+                max-length: root.max-description;
+                placeholder-text: "Descripton (optional)";
+                text <=> root.description-input;
             }
+            
+            // 4. duration 
+            HorizontalLayout {
+                height: Theme.control-height;
+
+                Text {
+                    horizontal-stretch: 1;
+                    text: "Duration:";
+                    color: Theme.foreground;
+                }
+
+                SpinBox {
+                    step-size: 5;
+                    maximum: root.max-duration;
+                    value <=> root.duration-input;
+                }
+
+            }
+
+            // 5. color as hex
+            LineEdit {
+                max-length: 7;
+                placeholder-text: "#RRGGBB";
+                text <=> root.color-input;
+            }
+        
+            // 6. category
+
+            // 7. recurrence
+            
+            // 8. completed
+            HorizontalLayout {
+                spacing: Theme.spacing-small;
+                alignment: center;
+
+                CheckBox {
+                    checked <=> root.completed-input;
+                }
+
+                Text {
+                    text: "Completed";
+                    color: Theme.foreground;
+                    vertical-alignment: center;
+                }
+            }
+
+            // ---- status message ----
+
+            Text {
+                text: root.status-message;
+                visible: root.status-message != "";
+                color: root.is-error ? Theme.danger : Theme.success;
+                font-size: 11px;
+            }
+
+            
+            // ---- save/create button ----
+            
+            Button {
+                horizontal-stretch: 1;
+                text: root.edit-mode ? "Save Changes" : "Add Task";
+                enabled: root.button-enabled;
+                
+                clicked => {
+                    root.save-task({
+                        // the values marked with a // d are set on default
+                        // because i have to pass every value defined in TaskForm
+                        // TODO this is a very unclean way, it needs to be adressed later
+                        id:             0, // d
+                        title:          root.title-input,
+                        column:         0, // d
+                        start-minute:   0, // d
+                        min-start:      0, // d
+                        max-end:        1440, // d
+                        description:    root.description-input,
+                        duration:       root.duration-input,
+                        recurrence:     root.recurrence-input, // d
+                        category:       root.category-input, // d
+                        color:          root.color-input,
+                        color-brush:    transparent, // d
+                        completed:      root.completed-input,
+                    });
+                }
+            }
+
         }
     }
 }
