@@ -3,6 +3,18 @@ import { TaskBlock } from "task-block.slint";
 import { TaskForm, Api, DragState } from "../types.slint";
 import { ScrollBar } from "../widgets/scroll-bar.slint";
 
+component Placeholder inherits Rectangle {
+    in property <bool> shown;
+    width: Theme.task-block-width;
+    opacity: root.shown ? 1 : 0;
+    animate opacity { duration: Theme.anim-medium; }
+    background: DragState.colors.preview;
+
+    border-width: Theme.focus-ring-width;
+    border-color: DragState.colors.border;
+    border-radius: Theme.radius-small;
+}
+
 export component TaskPanel inherits Rectangle {
     in-out property <[TaskForm]> left-column;
     in-out property <[TaskForm]> right-column;
