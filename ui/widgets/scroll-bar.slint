@@ -36,14 +36,14 @@ export component ScrollBar inherits Rectangle {
 
         moved => {
             if self.pressed {
-                root.offset = clamp(
+                root.offset = round(clamp(
                     self.start-offset
                         - (self.mouse-y - self.pressed-y)
                         * root.max-scroll
                         / max(1px, root.height - root.thumb-height),
                     - root.max-scroll,
                     0px
-                );
+                ) / 1px) * 1px;
             }
         }
     }

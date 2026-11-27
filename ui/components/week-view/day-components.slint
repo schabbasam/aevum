@@ -36,7 +36,7 @@ export component DayColumn inherits Rectangle {
     Rectangle {
         visible: da.has-drag && root.preview-start >= 0;
         x: 2 * Theme.border-width;
-        y: root.preview-start * Theme.hour-height / 60;
+        y: round(root.preview-start * Theme.hour-height / 60 / 1px) * 1px;
         width: Theme.task-block-width;
         height: DragState.duration * Theme.hour-height / 60;
         background: DragState.colors.preview;
