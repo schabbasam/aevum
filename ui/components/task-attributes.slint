@@ -1,5 +1,5 @@
 import { Theme } from "../theme.slint";
-import { TaskForm } from "../types.slint";
+import { TaskDraft } from "../types.slint";
 import { CheckBox } from "std-widgets.slint";
 import { Button } from "../widgets/button.slint";
 import { SpinBox } from "../widgets/spin-box.slint";
@@ -22,7 +22,7 @@ export component TaskAttributes inherits Rectangle {
     in property <int> max-duration: 0;
 
     // ---- callbacks ----
-    callback save-task(TaskForm);
+    callback save-task(TaskDraft);
     callback input-changed();
 
     // ---- modes and states ----
@@ -157,21 +157,12 @@ export component TaskAttributes inherits Rectangle {
                 
                 clicked => {
                     root.save-task({
-                        // the values marked with a // d are set on default
-                        // because i have to pass every value defined in TaskForm
-                        // TODO this is a very unclean way, it needs to be adressed later
-                        id:             0, // d
                         title:          root.title-input,
-                        column:         0, // d
-                        start-minute:   0, // d
-                        min-start:      0, // d
-                        max-end:        1440, // d
                         description:    root.description-input,
                         duration:       root.duration-input,
-                        recurrence:     root.recurrence-input, // d
-                        category:       root.category-input, // d
+                        recurrence:     root.recurrence-input,
+                        category:       root.category-input,
                         color:          root.color-input,
-                        color-brush:    transparent, // d
                         completed:      root.completed-input,
                     });
                 }

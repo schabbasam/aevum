@@ -17,6 +17,17 @@ export struct TaskForm {
     completed:      bool,
 }
 
+// this struct is only for sending the user input to Rust
+export struct TaskDraft {
+    title:          string,
+    description:    string,
+    duration:       int,
+    recurrence:     string,
+    category:       string,
+    color:          string,
+    completed:      bool,
+}
+
 export struct DragColors {
     preview: color,
     border: color,
