@@ -141,8 +141,8 @@ export component TaskBlock inherits Rectangle {
         }
 
         // time span
-        Text {
-            visible: root.calendar-mode && root.exact-height > 36px;
+        // because an invisible text still takes up space, it should be a conditional element
+        if root.calendar-mode && root.exact-height > 36px : Text {
             text: root.format-time-display(root.live-start)
                 + " - " + root.format-time-display(root.live-start + root.live-duration);
             color: root.text-color.with-alpha(0.7);
