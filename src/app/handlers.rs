@@ -4,7 +4,7 @@
 
 use std::rc::Rc;
 use slint::{ Color as SlintColor, Model, SharedString, ComponentHandle, Weak };
-use crate::{ Api, DragColors, MainWindow, TaskForm };
+use crate::{ Api, DragColors, MainWindow, TaskForm, TaskDraft };
 
 use crate::app::form::build_task;
 use crate::app::layout::*;
@@ -91,8 +91,8 @@ fn set_status(app: &MainWindow, message: impl Into<SharedString>, is_error: bool
 }
 
 // convert form.color into SlintColor, fallback is default
-fn resolved_color(form: &TaskForm, default: SlintColor) -> SlintColor {
-    Color::from_hex(&form.color)
+fn resolved_color(hex: &str, default: SlintColor) -> SlintColor {
+    Color::from_hex(hex)
         .map(|c| SlintColor::from_rgb_u8(c.red(), c.green(), c.blue()))
         .unwrap_or(default)
 }
@@ -102,26 +102,38 @@ fn resolved_color(form: &TaskForm, default: SlintColor) -> SlintColor {
 
 fn wire_save_task(app: &MainWindow, store: Store, m: UiMetrics) {
     let weak = app.as_weak();
-    app.on_save_task(move |form| {
+    app.on_save_task(move |draft| {
         let Some(app) = weak.upgrade() else { return };
-        match build_task(&form) {
-            Ok(task) => on_task_created(&app, &store, form, &task, m.clone()),
+        match build_task(&draft) {
+            Ok(task) => on_task_created(&app, &store, draft, &task, m.clone()),
             Err(e)   => set_status(&app, e, true),
         }
     });
 }
 
-fn on_task_created(app: &MainWindow, store: &Store, mut form: TaskForm, task: &Task, m: UiMetrics) {
+fn on_task_created(app: &MainWindow, store: &Store, draft: TaskDraft, task: &Task, m: UiMetrics) {
 
-    form.id             = task.id() as i32;
-    form.color_brush    = resolved_color(&form, m.default_color());
-    form.duration       = normalize_duration(form.duration);
-    // removed drag-preview since it doesn't matter
+    let brush = resolved_color(&draft.color, m.default_color());
+    let form = TaskForm {
+        id:             task.id() as i32,
+        title:          draft.title,
+        column:         0,
+        start_minute:   0,
+        min_start:      0,
+        max_end:        DAY_MINUTES,
+        description:    draft.description,
+        duration:       normalize_duration(draft.duration),
+        recurrence:     draft.recurrence,
+        category:       draft.category,
+        color:          draft.color,
+        color_brush:    brush,
+        completed:      draft.completed,
+    };
 
-    store // put the task form into the shorter panel column
+    store
         .shorter_panel_column(m.hour_height(), m.min_height())
         .push(form);
-    
+
     set_status(app, "task created", false);
 }
 
