@@ -49,20 +49,23 @@ export component TaskAttributes inherits Rectangle {
     changed category-input      => { root.input-changed(); }
     changed color-input         => { root.input-changed(); }
     changed completed-input     => { root.input-changed(); }
-
+    
+    // main layout that contains everything
     VerticalLayout {
-        spacing: Theme.spacing-medium;
 
-        // heading changes depending on the currend mode
+        // heading and little indicator
         Rectangle {
             height: Theme.control-height;
             HorizontalLayout {
+                padding-left: Theme.spacing-large * 1.1;
+                padding-right: Theme.spacing-large * 1.1;
+
                 Text {
                     horizontal-stretch: 1;
                     text: root.edit-mode ? "Edit Task" : "Add Task";
                     color: Theme.foreground;
                     font-size: Theme.font-size-large;
-                    font-weight: Theme.font-weight-medium;
+                    font-weight: Theme.font-weight-bold;
                     vertical-alignment: center;
                 }
                 
@@ -76,7 +79,6 @@ export component TaskAttributes inherits Rectangle {
                     horizontal-alignment: center;
                     vertical-alignment: center;
                 }
-
             }
 
             TouchArea {
@@ -102,8 +104,10 @@ export component TaskAttributes inherits Rectangle {
                 width: 100%;
                 height: self.preferred-height;
                 
-                spacing: 2 * Theme.spacing-medium;
-                padding: 2 * Theme.spacing-medium;
+                spacing: Theme.spacing-medium;
+                padding-left: Theme.spacing-large;
+                padding-right: Theme.spacing-large;
+                padding-top: Theme.spacing-small;
 
                 // ---- inputs ----
                 
@@ -157,7 +161,6 @@ export component TaskAttributes inherits Rectangle {
 
                     HorizontalLayout {
                         spacing: Theme.spacing-medium;
-                        padding: Theme.spacing-large;
                         alignment: center;
 
                         check := CheckBox {
@@ -175,8 +178,6 @@ export component TaskAttributes inherits Rectangle {
                     }
 
                     cta := TouchArea {
-                        mouse-cursor: pointer;
-
                         clicked => {
                             check.toggle();
                         }

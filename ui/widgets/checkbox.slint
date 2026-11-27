@@ -74,7 +74,6 @@ export component CheckBox inherits Rectangle {
 
     ta := TouchArea {
         enabled: root.enabled && root.use-touch-area;
-        mouse-cursor: pointer;
 
         clicked => {
             root.toggle();
