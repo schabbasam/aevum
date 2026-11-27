@@ -2,14 +2,14 @@
 use crate::core::task::Task;
 use crate::core::time::Duration;
 use crate::core::color::Color;
-use crate::TaskForm;
+use crate::TaskDraft;
 
-pub fn build_task(form: &TaskForm) -> Result<Task, String> {
+pub fn build_task(draft: &TaskDraft) -> Result<Task, String> {
     // this function is pretty self explanatory
     // it just tries to put in the value from TaskForm
     // if it failes, it throws an error that gets displayed later
 
-    let mut task = match Task::new(form.title.to_string()) {
+    let mut task = match Task::new(draft.title.to_string()) {
         Ok(t) => t,
         Err(e) => {
             eprintln!("error when creating a new task: {e}");
@@ -17,10 +17,10 @@ pub fn build_task(form: &TaskForm) -> Result<Task, String> {
         }
     };
 
-    let desc = if form.description.is_empty() {
+    let desc = if draft.description.is_empty() {
         None
     } else {
-        Some(form.description.to_string())
+        Some(draft.description.to_string())
     };
 
     if let Err(e) = task.set_description(desc) {
@@ -28,10 +28,10 @@ pub fn build_task(form: &TaskForm) -> Result<Task, String> {
         return Err("description too long".to_string());
     }
 
-    if form.duration == 0 {
+    if draft.duration == 0 {
         task.set_duration(None);
     } else {
-        let dura = Duration::new(form.duration as u16).map_err(|e| {
+        let dura = Duration::new(draft.duration as u16).map_err(|e| {
             eprintln!("error when creating Duration: {e}");
             "duration can't be longer than a day".to_string()
         })?;
@@ -39,10 +39,10 @@ pub fn build_task(form: &TaskForm) -> Result<Task, String> {
         task.set_duration(Some(dura));
     }
 
-    if form.color.is_empty() {
+    if draft.color.is_empty() {
         task.set_color(None);
     } else {
-        let c = Color::from_hex(&form.color);
+        let c = Color::from_hex(&draft.color);
 
         if let Err(e) = c {
             eprintln!("error when creating Color: {e}");
@@ -51,6 +51,10 @@ pub fn build_task(form: &TaskForm) -> Result<Task, String> {
             task.set_color(Some(c.unwrap()));
         }
     }
+    
+    // cagetory comes later here
+
+    task.set_completed(draft.completed);
 
     Ok(task)
 }
