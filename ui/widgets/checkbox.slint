@@ -26,7 +26,7 @@ export component CheckBox inherits Rectangle {
               : has-hover ? Theme.control-hover
               : Theme.control-bg;
 
-    animate background { duration: Theme.anim-fast; }
+    animate background { duration: Theme.anim-medium; }
     animate border-color { duration: Theme.anim-fast; }
     
     // this is basically the same as an svg
@@ -46,6 +46,13 @@ export component CheckBox inherits Rectangle {
         stroke-width: 2px;
         stroke-line-cap: round;
         stroke-line-join: round;
+
+        // animation
+        property <float> progress: root.checked ? 1.0 : 0.0;
+        animate progress { duration: Theme.anim-medium; easing: ease-out-quint; }
+        opacity: self.progress;
+        transform-scale: { self.progress };
+        transform-origin: { x: self.width / 2, y: self.height / 2 };
 
         MoveTo { x:     1; y:     6; }
         LineTo { x:   4.5; y:   9.5; }
