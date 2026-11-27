@@ -51,7 +51,6 @@ export component TaskAttributes inherits Rectangle {
     changed completed-input     => { root.input-changed(); }
 
     VerticalLayout {
-        padding: 2 * Theme.spacing-medium;
         spacing: Theme.spacing-medium;
 
         // heading changes depending on the currend mode
@@ -103,7 +102,8 @@ export component TaskAttributes inherits Rectangle {
                 width: 100%;
                 height: self.preferred-height;
                 
-                spacing: Theme.spacing-medium;
+                spacing: 2 * Theme.spacing-medium;
+                padding: 2 * Theme.spacing-medium;
 
                 // ---- inputs ----
                 
@@ -152,18 +152,34 @@ export component TaskAttributes inherits Rectangle {
                 // 7. recurrence
                 
                 // 8. completed
-                HorizontalLayout {
-                    spacing: Theme.spacing-small;
-                    alignment: center;
+                Rectangle {
+                    property <bool> hovered: false;
 
-                    CheckBox {
-                        checked <=> root.completed-input;
+                    HorizontalLayout {
+                        spacing: Theme.spacing-medium;
+                        padding: Theme.spacing-large;
+                        alignment: center;
+
+                        check := CheckBox {
+                            checked <=> root.completed-input;
+                            use-touch-area: false;
+                            has-hover: cta.has-hover;
+                        }
+
+                        Text {
+                            text: "completed";
+                            color: Theme.foreground;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
                     }
 
-                    Text {
-                        text: "Completed";
-                        color: Theme.foreground;
-                        vertical-alignment: center;
+                    cta := TouchArea {
+                        mouse-cursor: pointer;
+
+                        clicked => {
+                            check.toggle();
+                        }
                     }
                 }
                 

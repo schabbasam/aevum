@@ -9,14 +9,25 @@ export component CheckBox inherits Rectangle {
     in-out property <bool> checked: false;
     
     in property <bool> enabled: true;
-    out property <bool> has-hover: ta.has-hover;
+    in property <bool> use-touch-area: true;
+
+    in-out property <bool> has-hover: false;
+    property <bool> effective-hover: root.enabled && (root.has-hover || ta.has-hover);
+    
     callback toggled(bool);
 
+    public function toggle() {
+        if root.enabled {
+            root.checked = !root.checked;
+            root.toggled(root.checked);
+        }
+    }
+    
     width: 20px;
     height: 20px;
     
     border-radius: Theme.radius-small;
-    border-width: Theme.border-width;
+    border-width: Theme.focus-ring-width;
     border-color: !enabled ? Theme.border-disabled
                 : (checked || has-hover) ? Theme.border-focus
                 : Theme.border;
@@ -59,11 +70,14 @@ export component CheckBox inherits Rectangle {
         LineTo { x:    11; y:   2.5; }
     }
 
+    
+
     ta := TouchArea {
-        enabled: root.enabled;
+        enabled: root.enabled && root.use-touch-area;
+        mouse-cursor: pointer;
+
         clicked => {
-            root.checked = !root.checked;
-            root.toggled(root.checked);
+            root.toggle();
         }
     }
 }
