@@ -1,6 +1,9 @@
 
 import { Theme } from "../theme.slint";
 
+// a custom CheckBox to make it fit my theme
+// there is no text on purpose, just like in SpinBox
+// this way there is more flexibility and less bloat
 export component CheckBox inherits Rectangle {
     
     in-out property <bool> checked: false;
@@ -25,8 +28,29 @@ export component CheckBox inherits Rectangle {
 
     animate background { duration: Theme.anim-fast; }
     animate border-color { duration: Theme.anim-fast; }
+    
+    // this is basically the same as an svg
+    // it is like a pen that draws lines
+    Path {
+        visible: root.checked;
+        // center it
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
 
+        width: 12px;
+        height: 12px;
+        viewbox-width: 12;
+        viewbox-height: 12;
 
+        stroke: Theme.on-accent;
+        stroke-width: 2px;
+        stroke-line-cap: round;
+        stroke-line-join: round;
+
+        MoveTo { x:     1; y:     6; }
+        LineTo { x:   4.5; y:   9.5; }
+        LineTo { x:    11; y:   2.5; }
+    }
 
     ta := TouchArea {
         enabled: root.enabled;
