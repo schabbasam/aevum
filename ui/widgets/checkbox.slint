@@ -1,0 +1,23 @@
+
+import { Theme } from "../theme.slint";
+
+export component CheckBox inherits Rectangle {
+    
+    in-out property <bool> checked: false;
+    
+    in property <bool> enabled: true;
+    out property <bool> has-hover: ta.has-hover;
+    callback toggled(bool);
+
+    width: 20px;
+    height: 20px;
+
+
+    ta := TouchArea {
+        enabled: root.enabled;
+        clicked => {
+            root.checked = !root.checked;
+            root.toggled(root.checked);
+        }
+    }
+}
