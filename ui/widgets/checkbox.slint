@@ -11,6 +11,21 @@ export component CheckBox inherits Rectangle {
 
     width: 20px;
     height: 20px;
+    
+    border-radius: Theme.radius-small;
+    border-width: Theme.border-width;
+    border-color: !enabled ? Theme.border-disabled
+                : (checked || has-hover) ? Theme.border-focus
+                : Theme.border;
+
+    background: !enabled ? Theme.control-disabled
+              : checked ? Theme.accent
+              : has-hover ? Theme.control-hover
+              : Theme.control-bg;
+
+    animate background { duration: Theme.anim-fast; }
+    animate border-color { duration: Theme.anim-fast; }
+
 
 
     ta := TouchArea {
