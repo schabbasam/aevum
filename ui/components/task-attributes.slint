@@ -85,94 +85,109 @@ export component TaskAttributes inherits Rectangle {
                 }
             }
         }
-
-        // TODO there should be an animation for this
-        if true : VerticalLayout {//!root.collapsed : VerticalLayout {
-            
-            spacing: Theme.spacing-medium;
-
-            // ---- inputs ----
-            
-            // 1. title
-            LineEdit {
-                placeholder-text: "Title";
-                max-length: root.max-title;
-                text <=> root.title-input;
-            }
-            
-            // 3. description
-            LineEdit {
-                max-length: root.max-description;
-                placeholder-text: "Descripton (optional)";
-                text <=> root.description-input;
-            }
-            
-            // 4. duration 
-            HorizontalLayout {
-                height: Theme.control-height;
-
-                Text {
-                    vertical-alignment: center;
-                    horizontal-stretch: 1;
-                    text: "Duration:";
-                    color: Theme.foreground;
-                }
-
-                SpinBox {
-                    step-size: 5;
-                    maximum: root.max-duration;
-                    value <=> root.duration-input;
-                }
-
-            }
-
-            // 5. color as hex
-            LineEdit {
-                max-length: 7;
-                placeholder-text: "#RRGGBB";
-                text <=> root.color-input;
-            }
         
-            // 6. category
+        // ---- the collapsable part ----
+        // wrapped in a rect so invisible ui elements dont eat the input
+        Rectangle {
+            clip: true;
+            visible: self.body-height > 0px;
+            height: self.body-height;
 
-            // 7. recurrence
-            
-            // 8. completed
-            HorizontalLayout {
-                spacing: Theme.spacing-small;
-                alignment: center;
 
-                CheckBox {
-                    checked <=> root.completed-input;
-                }
-
-                Text {
-                    text: "Completed";
-                    color: Theme.foreground;
-                    vertical-alignment: center;
-                }
-            }
+            property <length> body-height: root.collapsed ? 0px : body.preferred-height;
+            animate body-height { duration: Theme.anim-medium; easing: ease-out-quart; }
             
-            // ---- save/create button ----
-            
-            Button {
-                horizontal-stretch: 1;
-                text: root.edit-mode ? "Save Changes" : "Add Task";
-                enabled: root.button-enabled;
+            body := VerticalLayout {
+                y: 0px;
+                width: 100%;
+                height: self.preferred-height;
                 
-                clicked => {
-                    root.save-task({
-                        title:          root.title-input,
-                        description:    root.description-input,
-                        duration:       root.duration-input,
-                        recurrence:     root.recurrence-input,
-                        category:       root.category-input,
-                        color:          root.color-input,
-                        completed:      root.completed-input,
-                    });
+                spacing: Theme.spacing-medium;
+
+                // ---- inputs ----
+                
+                // 1. title
+                LineEdit {
+                    placeholder-text: "Title";
+                    max-length: root.max-title;
+                    text <=> root.title-input;
+                }
+                
+                // 3. description
+                LineEdit {
+                    max-length: root.max-description;
+                    placeholder-text: "Descripton (optional)";
+                    text <=> root.description-input;
+                }
+                
+                // 4. duration 
+                HorizontalLayout {
+                    height: Theme.control-height;
+
+                    Text {
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                        text: "Duration:";
+                        color: Theme.foreground;
+                    }
+
+                    SpinBox {
+                        step-size: 5;
+                        maximum: root.max-duration;
+                        value <=> root.duration-input;
+                    }
+
+                }
+
+                // 5. color as hex
+                LineEdit {
+                    max-length: 7;
+                    placeholder-text: "#RRGGBB";
+                    text <=> root.color-input;
+                }
+            
+                // 6. category
+
+                // 7. recurrence
+                
+                // 8. completed
+                HorizontalLayout {
+                    spacing: Theme.spacing-small;
+                    alignment: center;
+
+                    CheckBox {
+                        checked <=> root.completed-input;
+                    }
+
+                    Text {
+                        text: "Completed";
+                        color: Theme.foreground;
+                        vertical-alignment: center;
+                    }
+                }
+                
+                // ---- save/create button ----
+                
+                Button {
+                    horizontal-stretch: 1;
+                    text: root.edit-mode ? "Save Changes" : "Add Task";
+                    enabled: root.button-enabled;
+                    
+                    clicked => {
+                        root.save-task({
+                            title:          root.title-input,
+                            description:    root.description-input,
+                            duration:       root.duration-input,
+                            recurrence:     root.recurrence-input,
+                            category:       root.category-input,
+                            color:          root.color-input,
+                            completed:      root.completed-input,
+                        });
+                    }
                 }
             }
-        }  
+        }
+
         // ---- status message ----
 
         Text {
