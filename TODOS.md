@@ -2,20 +2,11 @@
 # this is just my lil scratchpad where i dump my todos and known problems
 
 ## problems
-- there are random vertical borders in the DayColumns
 - animations are a little ungood (look at the comment in task-panel.slint); low priority
-- the scrollbar in week view is still nowhere to be found; high priority
-- the duration text doesnt look good, should be centered
-- horizontal border below top bar has vanished
-- the unclean save-tasks implementation in task-attributes with shabby defaults
-- the text in TaskBlocks (title and span)
-    - it is for some reason blurry if it is scheduled in the weekview, otherwise its fine
-    - the title should be vertically centered if time span is not visible
-
 - scrollbar
-    - it should have its extra space in both taskpanel and weekview so it doesnt cover the taskblocks
     - border for the scrollbar in the weekview on the left
-    - no gap between it and window edge
+    - no gap between it and window edge (!)
+    - it is fine as is in the TaskPanel
 
 ## future features
 - add animation for the collapsable TaskAttributes part
@@ -44,3 +35,9 @@
 - a little button in the top bar that reorganizes the TaskPanel columns to use the least height (distributes evenly)
 - custom slider widget and make the zoom slider more thought through (max is so the whole timeaxis fits perfectly into the window)
 - put the timer and stuff that are currently in lib.rs into a fitting place, that was just temporary
+
+## notes
+- somehow the text is ok now, it isnt blurry
+- the duration-step should be updated like so:
+    - just like the max length values, it should be synced with the rust backend
+    - it is the same as resize-step (or should it be different?)
