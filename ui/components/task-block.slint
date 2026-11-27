@@ -45,7 +45,12 @@ export component TaskBlock inherits Rectangle {
                 root.form.max-end
             ) - root.start0;
 
-    property <length> exact-height: root.live-duration * Theme.hour-height / 60;
+    out property <length> top-px:
+        round(root.live-start * Theme.hour-height / 60 / 1px) * 1px;
+    property <length> exact-height: root.calendar-mode
+        ? round((root.live-start + root.live-duration) * Theme.hour-height / 60 / 1px) * 1px
+            - root.top-px
+        : root.live-duration * Theme.hour-height / 60;
 
     width: Theme.task-block-width;
     height: root.calendar-mode

@@ -91,7 +91,7 @@ export component WeekGrid inherits VerticalLayout {
                     form: task;
                     scroll-y: fl.content-y;
                     x: task.column * Theme.column-width + 2 * Theme.border-width;
-                    y: self.live-start * Theme.hour-height / 60;
+                    y: self.top-px;
 
                     resize-pointer(active, py) => {
                         root.resize-active = active;
