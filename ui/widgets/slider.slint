@@ -17,12 +17,33 @@ export component Slider inherits Rectangle {
     callback edited(float);
 
     property <length> handle-size: 16px;
+    
+    // this is the horizontal distaance the handle's center can move
+    // basically, the handle center moves between handle-size/2 and width - handle-size/2
     property <length> travel: max(1px, root.width - root.handle-size);
+
+    // the percentage of the value, minimum is 0.0, maximum is 1.0
+    // the max() is a guard to prevent it from dividing by 0
+    // if for some reason the value is beyond the minimum or maximum, the clamp fixes it
     property <float> fraction: clamp(
         (root.value - root.minimum) / max(0.0001, root.maximum - root.minimum), 0, 1);
-
     
-    // dimensions and the slider itself
+    // input is the x value of the mouse cursor
+    function set-from-x(x: length) {
+        if !root.enabled { return; }
+        
+        // undo the half handle offset and normalize from px to 0..1
+        // stays in range, just like fraction
+        let t = clamp((x - root.handle-size / 2) / root.travel, 0, 1);
+        
+        // actual raw value rounded to step to create the snap
+        let v = round(
+            (root.minimum + t * (root.maximum - root.minimum)) / root.step
+        ) * root.step;
+
+        // only fire the callback if the value changed
+        if v != root.value { root.edited(v) }
+    }
 
     ta := TouchArea {
         enabled: root.enabled;
