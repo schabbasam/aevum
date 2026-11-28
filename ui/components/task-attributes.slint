@@ -108,6 +108,7 @@ export component TaskAttributes inherits Rectangle {
                 padding-left: Theme.spacing-large;
                 padding-right: Theme.spacing-large;
                 padding-top: Theme.spacing-small;
+                padding-bottom: Theme.spacing-small;
 
                 // ---- inputs ----
                 
@@ -158,8 +159,10 @@ export component TaskAttributes inherits Rectangle {
                 // 8. completed
                 Rectangle {
                     property <bool> hovered: false;
+                    height: Theme.control-height;
 
                     HorizontalLayout {
+                        height: self.preferred-height;
                         spacing: Theme.spacing-medium;
                         alignment: center;
 
