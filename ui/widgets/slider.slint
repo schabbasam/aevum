@@ -14,9 +14,10 @@ export component Slider inherits Rectangle {
 
     // other properties and callbacks
     out property <bool> pressed: ta.pressed;
+    out property <bool> has-hover: ta.has-hover && root.enabled;
     callback edited(float);
 
-    property <length> handle-size: 16px;
+    property <length> handle-size: 12px;
     
     // this is the horizontal distaance the handle's center can move
     // basically, the handle center moves between handle-size/2 and width - handle-size/2
@@ -50,9 +51,8 @@ export component Slider inherits Rectangle {
         y: (parent.height - self.height) / 2;
         height: 6px;
         
-        border-width: Theme.border-width;
-        border-color: Theme.border;
-        background: root.track-color;
+        background: root.has-hover ? Theme.control-hover : Theme.control-bg;
+        animate background { duration: Theme.anim-fast; easing: ease-in-out; }
     }
 
     // handle
@@ -64,7 +64,8 @@ export component Slider inherits Rectangle {
         width: root.handle-size;
         height: root.handle-size;
 
-        background: Theme.foreground;
+        background: root.has-hover ? Theme.accent-hover : Theme.accent;
+        animate background { duration: Theme.anim-fast; easing: ease-in-out; }
     }
 
     ta := TouchArea {
