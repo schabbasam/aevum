@@ -45,6 +45,21 @@ export component Slider inherits Rectangle {
         if v != root.value { root.edited(v) }
     }
 
+    // track
+    Rectangle {
+        y: (parent.height - self.height) / 2;
+        height: 6px;
+        
+        border-width: Theme.border-width;
+        border-color: Theme.border;
+        background: root.track-color;
+
+    }
+
+    // handle, snapped to whole pixels
+    Rectangle {
+    }
+
     ta := TouchArea {
         enabled: root.enabled;
         // logic to set the value with drag
