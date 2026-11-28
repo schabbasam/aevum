@@ -2,5 +2,31 @@
 import { Theme } from "../theme.slint";
 
 export component Slider inherits Rectangle {
+    
+    // settings
+    in property <bool> enabled: true;
+    in property <brush> track-color: Theme.control-bg;
 
+    in property <float> minimum: 0;
+    in property <float> maximum: 100;
+    in property <float> value: 50;
+    in property <float> step: 1;
+
+    // other properties and callbacks
+    out property <bool> pressed: ta.pressed;
+    callback edited(float);
+
+    property <length> handle-size: 16px;
+    property <length> travel: max(1px, root.width - root.handle-size);
+    property <float> fraction: clamp(
+        (root.value - root.minimum) / max(0.0001, root.maximum - root.minimum), 0, 1);
+
+    
+    // dimensions and the slider itself
+
+    ta := TouchArea {
+        enabled: root.enabled;
+        // logic to set the value with drag
+    }
+    
 }
