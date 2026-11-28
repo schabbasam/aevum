@@ -69,7 +69,17 @@ export component Slider inherits Rectangle {
 
     ta := TouchArea {
         enabled: root.enabled;
-        // logic to set the value with drag
+        
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                root.set-from-x(self.mouse-x);
+            }
+        }
+        moved => {
+            if self.pressed {
+                root.set-from-x(self.mouse-x);
+            }
+        }
     }
     
 }
