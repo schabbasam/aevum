@@ -2,7 +2,7 @@
 import { Theme, HorizontalBorder } from "../theme.slint";
 import { Button } from "../widgets/button.slint";
 import { LineEdit } from "../widgets/line-edit.slint";
-import { Slider } from "std-widgets.slint";
+import { Slider } from "../widgets/slider.slint";
 
 export component TopBar inherits Rectangle {
     in property <string> date-text;
@@ -62,7 +62,7 @@ export component TopBar inherits Rectangle {
                 minimum: 30;
                 maximum: 120;
                 value: Theme.hour-height / 1px;
-                changed(v) => {
+                edited(v) => {
                     Theme.hour-height = v * 1px;
                 }
             }
