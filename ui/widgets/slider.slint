@@ -11,6 +11,7 @@ export component Slider inherits Rectangle {
     in property <float> maximum: 100;
     in property <float> value: 50;
     in property <float> step: 1;
+    in property <float> scroll-step: 4;
 
     // other properties and callbacks
     out property <bool> pressed: ta.pressed;
@@ -75,6 +76,18 @@ export component Slider inherits Rectangle {
             if event.kind == PointerEventKind.down {
                 root.set-from-x(self.mouse-x);
             }
+        }
+        scroll-event(event) => {
+            if event.delta-y == 0px { return reject; }
+
+            let dir = event.delta-y < 0 ? 1 : -1;
+            let raw = clamp(root.value + dir * root.scroll-step, root.minimum, root.maximum);
+            let v   = clamp(round(raw / root.step) * root.step, root.minimum, root.maximum);
+
+            if v != root.value {
+                root.edited(v);
+            }
+            accept
         }
         moved => {
             if self.pressed {
