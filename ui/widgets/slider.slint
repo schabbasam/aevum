@@ -53,11 +53,18 @@ export component Slider inherits Rectangle {
         border-width: Theme.border-width;
         border-color: Theme.border;
         background: root.track-color;
-
     }
 
-    // handle, snapped to whole pixels
+    // handle
     Rectangle {
+        // snapped to whole pixels
+        x: round(root.fraction * root.travel / 1px) * 1px;
+        y: (parent.height - self.height) / 2;
+
+        width: root.handle-size;
+        height: root.handle-size;
+
+        background: Theme.foreground;
     }
 
     ta := TouchArea {
